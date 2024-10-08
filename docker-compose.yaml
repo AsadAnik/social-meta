@@ -1,0 +1,51 @@
+version: "3"
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: social-meta-client
+    ports:
+      - "3000:3000"
+      # - "3000:80" # If we use with nginx..
+    depends_on:
+      - app
+    networks:
+      - social-meta-network
+    restart: always
+    
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: social-meta-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/socialMeta
+    networks:
+      - social-meta-network
+    command: "node server/server.js"
+    volumes:
+      - "./server:/usr/src/app/server"
+      - /usr/src/app/node_modules
+    working_dir: /usr/src/app
+    restart: always
+    links:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: social-meta-mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - social-meta-network
+    restart: always
+    volumes:
+      - /usr/local/var/mongodb:/data/db
+
+networks:
+  social-meta-network:
