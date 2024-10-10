@@ -15,8 +15,10 @@ import {
     IconButton,
     InputAdornment
 } from '@mui/material';
-import { MobileDatePicker, LocalizationProvider } from '@mui/lab';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LockOutlined as LockOutlinedIcon, Visibility, VisibilityOff } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
@@ -266,16 +268,10 @@ const Register = (props) => {
 
                             {/*-------- Birth Date -------*/}
                             <Grid item xs={12}>
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <Stack spacing={3}>
-                                        <MobileDatePicker
-                                            label="Birth Date"
-                                            inputFormat="MM/dd/yyyy"
-                                            value={date}
-                                            onChange={(newValue) => setDate(newValue)}
-                                            renderInput={(params) => <TextField {...params} />}
-                                        />
-                                    </Stack>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['DatePicker']}>
+                                    <DatePicker label="Basic date picker" />
+                                    </DemoContainer>
                                 </LocalizationProvider>
                             </Grid>
 
