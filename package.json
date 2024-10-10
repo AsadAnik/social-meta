@@ -16,6 +16,7 @@
     "socket-install": "npm install --prefix socket",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "dev": "concurrently \"npm run socket\" \"npm run server\" \"npm run client\"",
+    "start": "concurrently \"npm run server\" \"npm run client\"",
     "dev-mobile": "concurrently \"npm run socket\" \"npm run server\" \"npm run client-mobile\""
   },
   "keywords": [],

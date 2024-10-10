@@ -92,7 +92,8 @@ const ProfileHead = (props) => {
 // mapStateToProps..
 const mapStateToProps = (state) => {
     return {
-        Settings: state.Settings
+        Settings: state.Settings,
+        User: state.User.ownProfileInfo
     };
 };
 

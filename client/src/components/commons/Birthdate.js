@@ -3,6 +3,7 @@ import { Paper } from '@mui/material';
 import StylesModule from '../../css/birthdate.module.css';
 import CakeIcon from '@mui/icons-material/Cake';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 // Component of Birthdate..
 const Birthdate = (props) => {
@@ -12,6 +13,7 @@ const Birthdate = (props) => {
         cardBorder: 'lightgray',
         textColor: 'black'
     });
+
     const [appColor, setAppColor] = React.useState('royalblue');
 
     // useEffect.. Hook..
@@ -78,7 +80,7 @@ const Birthdate = (props) => {
                 <span>Birthdate</span>
             </h3>
 
-            <p style={birthdateText}>Thu Jan 13 2000 19:55:41 GMT+0600 (+06)</p>
+            <p style={birthdateText}>{moment(new Date(props.birthdata)).format("MMMM Do YYYY")}</p>
         </Paper>
     );
 };

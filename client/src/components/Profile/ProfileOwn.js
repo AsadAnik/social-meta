@@ -29,8 +29,11 @@ const ProfileOwn = (props) => {
         bio: props.ownProfileInfo ? props.ownProfileInfo.bio : "Loading...",
         email: props.ownProfileInfo ? props.ownProfileInfo.email : "Loading...",
         profilePhoto: props.ownProfileInfo ? props.ownProfileInfo.profilePhoto : "Loading...",
-        coverPhoto: props.ownProfileInfo ? props.ownProfileInfo.coverPhoto : "Loading..."
+        coverPhoto: props.ownProfileInfo ? props.ownProfileInfo.coverPhoto : "Loading...",
+        birthdate: props.ownProfileInfo ? props.ownProfileInfo.birthdate : "Loading..."
     };
+
+
 
     // show current User Posts
     const showCurrentUserPosts = (Posts) => {
@@ -96,7 +99,7 @@ const ProfileOwn = (props) => {
                 {/*---- BirthDate Section ----*/}
                 <Grid item xs={6} md={4}>
                     <SuggestedFollows />
-                    <Birthdate  />
+                    <Birthdate birthdata={userInfo.birthdate}/>
                     <Footer />
                 </Grid>
             </Grid>
