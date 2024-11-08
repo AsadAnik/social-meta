@@ -226,6 +226,8 @@ const PostHead = (props) => {
         userProfilePhoto: props.User && props.User.login ? props.User.login.profilePhoto : "Loading.."
     };
 
+    console.log('MODAL ITEM HERE -- ', postModal);
+
     // Returning statement..
     return (
         <Paper
