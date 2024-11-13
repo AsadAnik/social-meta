@@ -1,36 +1,69 @@
-/* profile components Header section here */
-.paper {
-    margin-top: 1rem;
-}
+/* Styling for the cover */
 .cover {
+    position: relative;
     width: 100%;
     height: 200px;
 }
+
 .coverPic {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 5px;
 }
 
-.profile {
-    margin-left: 2rem;
-}
-.profilePic {
-    border-radius: 100%;
-    border: 2px solid white;
-    box-shadow: 0px 0px 5px;
+.coverEditIcon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    display: none; /* Initially hidden */
 }
 
-.profileInfoText1 h1{
+
+/* Styling for the profile picture */
+.profile {
+    position: relative;
+    margin-left: 2rem;
+}
+
+.profilePic {
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0px 0px 5px;
+    object-fit: cover;
+    height: 150px;
+    width: 150px;
+}
+
+.profileEditIcon {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    display: none; /* Initially hidden */
+}
+
+.profile:hover .profileEditIcon {
+    display: block; /* Show on hover */
+}
+
+/* Profile information text styling */
+.profileInfoText1 h1 {
     font-size: 30px;
 }
 
-.profileInfoText1 p{
-    font-size: 18px;
-}
-.profileInfoText2 p{
+.profileInfoText1 p,
+.profileInfoText2 p {
     font-size: 18px;
 }
 
-.followText span{
+.followText span {
     font-weight: bold;
 }

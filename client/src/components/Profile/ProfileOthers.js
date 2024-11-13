@@ -25,13 +25,13 @@ const ProfileOthers = (props) => {
 
     // user info there..
     const userInfo = {
-        firstname: props.userInfoById ? props.userInfoById.userById.firstname : "Loading...",
-        lastname: props.userInfoById ? props.userInfoById.userById.lastname : "Loading...",
-        title: props.userInfoById ? props.userInfoById.userById.title : "Loading...",
-        bio: props.userInfoById ? props.userInfoById.userById.bio : "Loading...",
-        email: props.userInfoById ? props.userInfoById.userById.email : "Loading...",
-        profilePhoto: props.userInfoById ? props.userInfoById.userById.profilePhoto : "Loading...",
-        coverPhoto: props.userInfoById ? props.userInfoById.userById.coverPhoto : "Loading..."
+        firstname: props?.userInfoById ? props?.userInfoById?.userById?.firstname : "Loading...",
+        lastname: props?.userInfoById ? props?.userInfoById?.userById?.lastname : "Loading...",
+        title: props?.userInfoById ? props?.userInfoById?.userById?.title : "Loading...",
+        bio: props.userInfoById ? props?.userInfoById?.userById?.bio : "Loading...",
+        email: props?.userInfoById ? props?.userInfoById?.userById?.email : "Loading...",
+        profilePhoto: props?.userInfoById ? props?.userInfoById?.userById?.profilePhoto : "Loading...",
+        coverPhoto: props?.userInfoById ? props?.userInfoById?.userById?.coverPhoto : "Loading..."
     };
 
     // show current User Posts

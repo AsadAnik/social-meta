@@ -12,9 +12,8 @@
     "client-mobile": "npm run start --prefix clientMobile",
     "client-mobile-install": "npm install --prefix clientMobile",
     "socket": "npm run start --prefix socket",
-    "start":"concurrently \"npm run server\" \"npm run client\"",
-    "socket-install": "npm install --prefix socket",
     "start": "concurrently \"npm run server\" \"npm run client\"",
+    "socket-install": "npm install --prefix socket",
     "dev": "concurrently \"npm run socket\" \"npm run server\" \"npm run client\"",
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "dev-mobile": "concurrently \"npm run socket\" \"npm run server\" \"npm run client-mobile\""
@@ -23,8 +22,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.6",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
+    "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^14.1.0",
@@ -32,7 +35,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^6.0.12",
     "morgan": "^1.10.0",
-    "multer": "^1.4.4"
+    "multer": "^1.4.4",
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "devDependencies": {
     "concurrently": "^6.3.0",

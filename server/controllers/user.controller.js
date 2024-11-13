@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const upload = require('../config/multer');
 
 /**
  * ---- Show All Users ----
@@ -177,29 +178,113 @@ const profileAuth = function (req, res) {
 };
 
 
+// /**
+//  * ---- Uploading profile pic and update mongo users data ----
+//  * @param {*} req 
+//  * @param {*} res 
+//  */
+// const uploadProfilePic = function (req, res) {
+//     const userId = req.body.id;
+//     const fileName = req.file.originalname;
+
+//     // findByIdAndUpdate with database..
+//     User.findByIdAndUpdate({ _id: userId }, { profilePhoto: fileName }, (error, user) => {
+//         if (error) return res.json({ isUpdate: false, error });
+//         if (!user) return res.json({ isUpdate: false, message: 'User not found!' });
+
+//         res.status(200).json({
+//             isUpdate: true,
+//             message: 'User updated and added profile.',
+//             user
+//         });
+//     });
+// };
+
 /**
- * ---- Uploading profile pic and update mongo users data ----
+/**
+ * ---- Upload Profile Picture and Update User Data ----
  * @param {*} req 
  * @param {*} res 
  */
-const uploadProfilePic = function (req, res) {
-    const userId = req.body.id;
-    const fileName = req.file.originalname;
+const uploadProfilePic = async function (req, res) {
+    const userId = req.body.id;  // Ensure userId is passed in the body
 
-    // findByIdAndUpdate with database..
-    User.findByIdAndUpdate({ _id: userId }, { profilePhoto: fileName }, (error, user) => {
-        if (error) return res.json({ isUpdate: false, error });
-        if (!user) return res.json({ isUpdate: false, message: 'User not found!' });
+    // Check if userId is provided
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    // Check if file is uploaded
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const profilePhotoUrl = req.file.path; // Assuming Cloudinary URL
+
+    try {
+        // Update user document with the profile photo URL
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { profilePhoto: profilePhotoUrl },
+            { new: true, select: 'firstname lastname email coverPhoto' } // Limit fields in response
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found!' });
+        }
 
         res.status(200).json({
-            isUpdate: true,
-            message: 'User updated and added profile.',
-            user
+            success: true,
+            message: 'Profile photo updated successfully!',
+            user: updatedUser
         });
-    });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 
+/**
+ * ---- Upload Cover Photo and Update User Data ----
+ * @param {*} req 
+ * @param {*} res 
+ */
+const uploadCoverPic = async function (req, res) {
+    const userId = req.body.id;  // Accessing `userId` directly from req.body
+    console.log('upload cover', userId);
 
+    // Ensure `userId` is passed
+    if (!userId) {
+        return res.status(400).json({ success: false, message: 'User ID is required' });
+    }
+
+    // Check if file is uploaded
+    if (!req.file) {
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const coverPhotoUrl = req.file.path; // Cloudinary URL or local storage URL
+
+    try {
+        // Update user document with the cover photo URL
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { coverPhoto: coverPhotoUrl },
+            { new: true, select: 'firstname lastname email coverPhoto' } // Limit fields in response
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found!' });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Cover photo updated successfully!',
+            user: updatedUser
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 module.exports = {
     showUsersController,
     updateColorMode,
@@ -208,5 +293,6 @@ module.exports = {
     postOwner,
     profile,
     profileAuth,
-    uploadProfilePic
+    uploadProfilePic,
+    uploadCoverPic,
 };

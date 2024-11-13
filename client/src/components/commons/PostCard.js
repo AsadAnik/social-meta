@@ -583,19 +583,19 @@ const PostCard = (props) => {
                 if (userByOwner === null) {
                     return "Loading...";
                 }
-                return `${userByOwner.foundUser.firstname} ${userByOwner.foundUser.lastname}`;
+                return `${userByOwner?.foundUser?.firstname} ${userByOwner?.foundUser?.lastname}`;
 
             case "PROFILE":
                 if (userByOwner === null) {
                     return "Loading...";
                 }
-                return `${userByOwner.foundUser.profilePhoto}`;
+                return `${userByOwner?.foundUser?.profilePhoto}`;
 
             case "TITLE":
                 if (userByOwner === null) {
                     return "Loading...";
                 }
-                return `${userByOwner.foundUser.title}`;
+                return `${userByOwner?.foundUser?.title}`;
 
             default:
                 return "Not Found!";
@@ -604,7 +604,7 @@ const PostCard = (props) => {
 
     // Returning statement..
     return (
-        <Card style={{ marginTop: '1rem', marginBottom: '1rem', color: themeMode.cardFontColor, background: themeMode.cardBackgroundColor, border: themeMode.cardBorder }}>
+        <Card style={{ marginTop: '1rem', marginBottom: '1rem', color: themeMode?.cardFontColor, background: themeMode.cardBackgroundColor, border: themeMode.cardBorder }}>
             <CardHeader
                 avatar={
                     <Avatar
