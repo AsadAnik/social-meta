@@ -15,7 +15,7 @@ export function likedPost(isLiked, postId, data) {
                 console.log('BEFORE -- ', likeCounter);
             }
 
-            if (!response.data.likes){
+            if (!response.data.likes) {
                 likeCounter = 0;
             }
 
@@ -91,17 +91,42 @@ export function updatePost(data) {
     };
 }
 
-// Showing All Posts (ReadAllPosts)..
-export function readAllPosts() {
-    const request = axios.get(`${POST_API_ENDPOINT}/read_all_posts`, httpConfig)
-        .then(response => response.data)
-        .catch(error => console.log('ERR! when try to make read all post -> ', error.message));
+// Action: readAllPosts
+// export const readAllPosts = (page, limit) => async (dispatch) => {
+//     try {
+//         const response = await axios.get(`${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`, httpConfig);
+//         const { posts, total } = response.data;
 
-    return {
-        type: "READ_ALL_POSTS",
-        payload: request
+//         dispatch({
+//             type: "READ_ALL_POSTS",
+//             payload: { posts, total, page },
+//         });
+//         return { posts, total }; 
+//     } catch (err) {
+//         console.error('Error fetching posts:', err);
+//         throw err;
+//     }
+// };
+// In your PostActions.js or wherever your actions are defined
+export const readAllPosts = (page, limit) => {
+    return async (dispatch) => {
+      try {
+        const response = await axios.get(`${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`,httpConfig);
+        const { posts, total, totalPages } = response.data;
+  
+        // Dispatch action to update the posts in Redux store
+        dispatch({
+          type: 'FETCH_POSTS_SUCCESS',
+          payload: { posts, total, totalPages, page },
+        });
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
     };
-}
+  };
+  
+
+
 
 // Post Create..
 export function postCreate(data) {

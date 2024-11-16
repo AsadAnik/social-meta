@@ -1,6 +1,18 @@
-// Posts Reducer..
-export function PostReducer(state={}, action){
-    switch (action.type){
+const initialState = {
+    allPosts: [],
+    postsByUserId: [],
+    likes: 0,
+    deletedPost: null,
+    readPost: null,
+    updatePost: null,
+    createdPost: null,
+    currentUserPosts: [],
+    loading: false,
+    error: null,
+};
+
+export function PostReducer(state = initialState, action) {
+    switch (action.type) {
         case "LIKES_BY_POST_ID":
             return { ...state, likes: action.payload };
 
@@ -19,8 +31,16 @@ export function PostReducer(state={}, action){
         case "POST_UPDATE":
             return { ...state, updatePost: action.payload };
 
-        case "READ_ALL_POSTS":
-            return { ...state, allPosts: action.payload };
+        case 'FETCH_POSTS_SUCCESS':
+            const { posts, total, totalPages, page } = action.payload;
+
+            // Append new posts to existing ones
+            return {
+                ...state,
+                allPosts: page === 1 ? posts : [...state.allPosts, ...posts], // Append if not the first page
+                total,
+                totalPages,
+            };
 
         case "POST_CREATE":
             return { ...state, createdPost: action.payload };

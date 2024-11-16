@@ -93,6 +93,17 @@ userSchema.methods.deleteToken = function(cb){
     });
 };
 
+// Middleware to delete posts when a user is removed
+userSchema.pre('remove', async function (next) {
+    try {
+        // Delete all posts associated with this user
+        await Post.deleteMany({ ownerId: this._id });
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
 
 // user Model..
 const User = mongoose.model('User', userSchema);
