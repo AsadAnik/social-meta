@@ -13,14 +13,14 @@ const useInfiniteScroll = (fetchData, initialPage = 1, itemsPerPage = 5) => {
     }, []);
 
     const fetchMoreData = (page) => {
-        if (isLoading) return; // Prevent duplicate requests
+        if (isLoading) return; 
         setIsLoading(true);
 
         fetchData(page, itemsPerPage)
             .then(({ items, total }) => {
                 setData((prevData) => [...prevData, ...items]);
-                setHasMore(data.length + items.length < total); // Update `hasMore` based on total
-                setCurrentPage(page); // Update the current page
+                setHasMore(data.length + items.length < total); 
+                setCurrentPage(page);
             })
             .catch((err) => {
                 console.error('Error fetching data:', err);

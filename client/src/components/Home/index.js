@@ -70,7 +70,7 @@ const Home = () => {
         return (
             <>
                 {posts.map((post) => {
-                    const owner = post.ownerId; // Extract owner details
+                    const owner = post.ownerId; 
 
                     return (
                         <PostCard

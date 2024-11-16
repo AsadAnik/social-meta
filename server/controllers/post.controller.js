@@ -82,30 +82,6 @@ exports.readPost = function (req, res) {
 };
 
 
-// /**
-//  * ---- Read all posts ----
-//  * @param {*} _req 
-//  * @param {*} res 
-//  */
-// exports.readAllPosts = async function (_req, res) {
-//      await Post.find({})
-//         .populate({
-//             path: 'comments',
-//             options: {sort: {createdAt: -1}},
-//             populate: {
-//                 path: 'user',
-//                 model: 'User',
-//                 select: 'firstname lastname profilePhoto title themeMode colorMode email'
-//             }
-//         })
-//         .sort([['createdAt', -1]])
-//         .exec((err, post) => {
-//         if (err) return res.send(err);
-//         res.status(200).send(post);
-//     });
-// };
-
-
 /**
  * ---- Read all posts with pagination ----
  * @param {*} req 
