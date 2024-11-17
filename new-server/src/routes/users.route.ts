@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import profileUpload from '../middleware/profileUpload';
+import { profileUpload } from '../middlewares';
 import {
     showUsersController,
     updateColorMode,

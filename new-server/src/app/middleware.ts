@@ -9,7 +9,7 @@ const corsConfig: cors.CorsOptions = {
     origin: true,
 };
 
-const middleware: Array<Function> = [
+const middleware: any = [
     morgan('dev'),
     cors(corsConfig),
     bodyParser.json(),

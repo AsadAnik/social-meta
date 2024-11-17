@@ -3,10 +3,12 @@ dotenv.config();
 import path from 'path';
 import express from 'express';
 import { notFoundMiddleware, errorHandlerMiddleware } from './error';
+import middleware from './middleware';
+import routes from './routes';
 const app = express();
 
-app.use(require('./middleware'));
-app.use(require('./routes'));
+app.use(middleware);
+app.use(routes);
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 

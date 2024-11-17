@@ -28,7 +28,7 @@ export const readComment = async (req: Request, res: Response) => {
 export const createComment = async (req: Request, res: Response) => {
     const comment = new Comment(req.body);
     const postId = req.body.postId;
-    const currentLoggedInUserId = req.user._id;
+    const currentLoggedInUserId = (req as any).user._id;
 
     comment.user = currentLoggedInUserId;
     comment.post = postId;

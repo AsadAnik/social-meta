@@ -28,7 +28,7 @@ const register = async (req: Request, res: Response, _next: NextFunction) => {
  * @param {Response} res 
  * @param {NextFunction} _next 
  */
-const login = async (req: Request, res: Response, _next: NextFunction) => {
+const login = async (req: Request, res: Response | any, _next: NextFunction) => {
     const loginEmail = req.body.email;
     const loginPassword = req.body.password;
 
@@ -62,7 +62,7 @@ const login = async (req: Request, res: Response, _next: NextFunction) => {
  * @param {Request} req 
  * @param {Response} res 
  */
-const forgotPassword = async (req: Request, res: Response) => {
+const forgotPassword = async (_req: Request, res: Response) => {
     res.status(200).send('Route for forgot password!');
 };
 
@@ -73,7 +73,7 @@ const forgotPassword = async (req: Request, res: Response) => {
  */
 const logout = async (req: Request, res: Response) => {
     try {
-        await req.user.deleteToken();
+        await (req as any).user.deleteToken();
         res.status(200).json({
             isAuth: false,
             msg: 'Logged-Out, session deleted!'

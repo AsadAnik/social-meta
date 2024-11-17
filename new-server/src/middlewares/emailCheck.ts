@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
 
 // email checker middleware..
-const emailChecker = (req: Request, res: Response, next: NextFunction) => {
+const emailChecker = (req: Request, res: Response | any, next: NextFunction) => {
     // User.find();
     const email = req.body.email;
 

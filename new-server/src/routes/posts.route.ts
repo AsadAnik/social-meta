@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
-import postUpload from '../middleware/postUpload';
+import { postUpload } from '../middlewares';
 import {
-    getLikes, 
-    readPost, 
-    readAllPosts, 
-    currentUserPosts, 
+    getLikes,
+    readPost,
+    readAllPosts,
+    currentUserPosts,
     specificUserPosts,
     likePost,
     createPost,

@@ -1,6 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import messageController from '../controllers/message.controller';
-import { createMessage, getMessageByConversationId } from messageController;
+import { createMessage, getMessageByConversationId } from '../controllers/message.controller';
 
 const router = express.Router();
 

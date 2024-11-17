@@ -7,7 +7,7 @@ import { User } from '../models';
  * @param {NextApiResponse} res 
  * @param {NextFunction} next 
  */
-const showUsersController = async (req: Request, res: Response, next: NextFunction) => {
+const showUsersController = async (req: Request, res: Response | any, next: NextFunction) => {
     try {
         const users = await User.find({});
         if (!users) return res.status(400).json({ success: false, message: 'No users found' });
@@ -37,8 +37,8 @@ const showUsersController = async (req: Request, res: Response, next: NextFuncti
  * @param {NextApiRequest} req 
  * @param {NextApiResponse} res 
  */
-const updateColorMode = async (req: Request, res: Response) => {
-    const userId = req.user._id;
+const updateColorMode = async (req: Request, res: Response | any) => {
+    const userId = (req as any).user._id;
     const colorMode = req.query.colorMode;
 
     try {
@@ -49,7 +49,7 @@ const updateColorMode = async (req: Request, res: Response) => {
             isUpdate: true,
             user: updatedUser
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             isUpdate: false,
             error: error.message
@@ -62,8 +62,8 @@ const updateColorMode = async (req: Request, res: Response) => {
  * @param {NextApiRequest} req 
  * @param {NextApiResponse} res 
  */
-const updateThemeMode = async (req: Request, res: Response) => {
-    const userId = req.user._id;
+const updateThemeMode = async (req: Request, res: Response | any) => {
+    const userId = (req as any).user._id;
     const themeMode = req.query.themeMode;
 
     try {
@@ -74,7 +74,7 @@ const updateThemeMode = async (req: Request, res: Response) => {
             isUpdate: true,
             user: updatedUser
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             isUpdate: false,
             error: error?.message 
@@ -87,7 +87,7 @@ const updateThemeMode = async (req: Request, res: Response) => {
  * @param {NextApiRequest} req 
  * @param {NextApiResponse} res 
  */
-const profileById = async (req: Request, res: Response) => {
+const profileById = async (req: Request, res: Response | any) => {
     const userId = req.query.userId;
 
     try {
@@ -110,7 +110,7 @@ const profileById = async (req: Request, res: Response) => {
                 followers: user.followers
             }
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             isUserFound: false,
             error: error.message
@@ -123,7 +123,7 @@ const profileById = async (req: Request, res: Response) => {
  * @param {NextApiRequest} req 
  * @param {NextApiResponse} res 
  */
-const postOwner = async (req: Request, res: Response) => {
+const postOwner = async (req: Request, res: Response | any) => {
     const ownerId = req.query.ownerId;
 
     try {
@@ -139,7 +139,7 @@ const postOwner = async (req: Request, res: Response) => {
                 title: user.title
             }
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             isUserFound: false,
             error: error.message
@@ -155,17 +155,17 @@ const postOwner = async (req: Request, res: Response) => {
 const profile = (req: Request, res: Response) => {
     res.status(200).json({
         isAuth: true,
-        id: req.user._id,
-        firstname: req.user.firstname,
-        lastname: req.user.lastname,
-        title: req.user.title,
-        email: req.user.email,
-        bio: req.user.bio,
-        profilePhoto: req.user.profilePhoto,
-        coverPhoto: req.user.coverPhoto,
-        birthdate: req.user.birthdate,
-        createdAt: req.user.createdAt,
-        updatedAt: req.user.updatedAt
+        id: (req as any).user._id,
+        firstname: (req as any).user.firstname,
+        lastname: (req as any).user.lastname,
+        title: (req as any).user.title,
+        email: (req as any).user.email,
+        bio: (req as any).user.bio,
+        profilePhoto: (req as any).user.profilePhoto,
+        coverPhoto: (req as any).user.coverPhoto,
+        birthdate: (req as any).user.birthdate,
+        createdAt: (req as any).user.createdAt,
+        updatedAt: (req as any).user.updatedAt
     });
 };
 
@@ -177,14 +177,14 @@ const profile = (req: Request, res: Response) => {
 const profileAuth = (req: Request, res: Response) => {
     res.status(200).json({
         isAuth: true,
-        id: req.user._id,
-        email: req.user.email,
-        firstname: req.user.firstname,
-        lastname: req.user.lastname,
-        title: req.user.title,
-        profilePhoto: req.user.profilePhoto,
-        themeMode: req.user.themeMode,
-        colorMode: req.user.colorMode,
+        id: (req as any).user._id,
+        email: (req as any).user.email,
+        firstname: (req as any).user.firstname,
+        lastname: (req as any).user.lastname,
+        title: (req as any).user.title,
+        profilePhoto: (req as any).user.profilePhoto,
+        themeMode: (req as any).user.themeMode,
+        colorMode: (req as any).user.colorMode,        
         // token: req.user.token
     });
 };
@@ -194,9 +194,9 @@ const profileAuth = (req: Request, res: Response) => {
  * @param {NextApiRequest} req 
  * @param {NextApiResponse} res 
  */
-const uploadProfilePic = async (req: Request, res: Response) => {
+const uploadProfilePic = async (req: Request, res: Response | any) => {
     const userId = req.body.id;
-    const fileName = req.file.originalname;
+    const fileName = (req as any).file.originalname;
 
     try {
         const user = await User.findByIdAndUpdate({ _id: userId }, { profilePhoto: fileName }, { new: true });
@@ -207,7 +207,7 @@ const uploadProfilePic = async (req: Request, res: Response) => {
             message: 'User updated and added profile.',
             user
         });
-    } catch (error) {
+    } catch (error: any) {
         res.status(500).json({
             isUpdate: false,
             error: error.message
@@ -215,7 +215,7 @@ const uploadProfilePic = async (req: Request, res: Response) => {
     }
 };
 
-module.exports = {
+export {
     showUsersController,
     updateColorMode,
     updateThemeMode,

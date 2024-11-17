@@ -33,7 +33,7 @@ export const likePost = async (req: Request, res: Response) => {
  * @param {Request} req 
  * @param {Response} res 
  */
-export const getLikes = async (req: Request, res: Response) => {
+export const getLikes = async (req: Request, res: Response | any) => {
     const postId = req.query.postId;
 
     try {
@@ -54,7 +54,7 @@ export const getLikes = async (req: Request, res: Response) => {
  * @param {Request} req 
  * @param {Response} res 
  */
-export const readPost = async (req: Request, res: Response) => {
+export const readPost = async (req: Request, res: Response | any) => {
     const postId = req.query.postId;
 
     // find Post by PostId.
@@ -115,7 +115,7 @@ export const readAllPosts = async (req: Request, res: Response) => {
  * @param {Response} res 
  */
 export const currentUserPosts = async (req: Request, res: Response) => {
-    const currentLoggedInUserId = String(req.user._id);
+    const currentLoggedInUserId = String((req as any).user._id);
 
     try {
         const docs = await Post.find({ ownerId: currentLoggedInUserId })
@@ -161,7 +161,7 @@ export const specificUserPosts = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
     const post = new Post(req.body);
 
-    const currentLoggedInUserId = String(req.user._id);
+    const currentLoggedInUserId = String((req as any).user._id);
     post.ownerId = currentLoggedInUserId;
     post.user = currentLoggedInUserId;
 
