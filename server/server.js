@@ -20,7 +20,6 @@ connectDB(DB_URI)
             console.log(`Welcome to -- ${process.env.APP_NAME} -- `);
             console.log(`Server is running on http://${HOST}:${PORT}`);
         });
-
     })
     .catch(error => {
         console.log('ERR! Can\'t Connected with Database! --> ', error.message);
