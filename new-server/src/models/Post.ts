@@ -1,5 +1,5 @@
 // Post Model..
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 // posts Schema..
 const postSchema = new Schema({
