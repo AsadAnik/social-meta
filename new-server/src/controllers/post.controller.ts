@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Post from '../models/Post';
+import { Types } from 'mongoose';
 
 class PostController {
     /**
@@ -13,13 +14,13 @@ class PostController {
         const post = new Post(req.body);
 
         // Adding like...
-        post.likes = likes;
+        post.likes = likes ? parseInt(String(likes), 10) : 0;
 
         try {
             const docs = await Post.findByIdAndUpdate({ _id: postId }, post, { new: true });
             res.status(200).json({
                 success: true,
-                likes: docs.likes
+                likes: docs ? docs.likes : 0
             });
         } catch (err) {
             res.status(400).json({
@@ -180,7 +181,7 @@ class PostController {
 
         const currentLoggedInUserId = String((req as any).user._id);
         post.ownerId = currentLoggedInUserId;
-        post.user = currentLoggedInUserId;
+        post.user = new Types.ObjectId(currentLoggedInUserId);
 
         // if there is new post image update file to make it up..
         // and if no new update image file so don't need update extra..

@@ -1,5 +1,5 @@
 import http from 'http';
-import { config, connectDB } from './config';
+import { connectDB } from './config';
 import app from './app/app';
 
 const HOST: string = String(process.env.HOST || 'localhost');
@@ -21,4 +21,10 @@ connectDB(DB_URI)
     })
     .catch((error: Error) => {
         console.log('ERR! Can\'t Connected with Database! --> ', error.message);
+
+        // Closing server for error reason..
+        server.close(() => {
+            console.log('Server is closed');
+            process.exit(1);
+        });
     });

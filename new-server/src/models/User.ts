@@ -1,5 +1,5 @@
 // User Model..
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 import JWT from 'jsonwebtoken';
 
@@ -56,25 +56,25 @@ userSchema.methods.comparePassword = function(candidatePassword: string, cb: (er
 };
 
 // Schema Method to genarate token for cookie when user loggin..
-userSchema.methods.generateToken = function(cb: (err: Error | null, user: Document | null) => void){
+userSchema.methods.generateToken = function(cb: (err: Error | null, user: any | null) => void){
     const user = this;
     const token = JWT.sign(user._id.toHexString(), String(process.env.SECRET));
     user.token = token;
 
-    user.save((err: Error | undefined, user: Document) => {
+    user.save((err: Error | undefined, user: any) => {
         if (err) return cb(err, null);
         cb(null, user);
     });
 };
 
 // Find user by his loggedin token..
-userSchema.statics.findByToken = function(token: string, cb: (err: Error | null, user: Document | null) => void){
+userSchema.statics.findByToken = function(token: string, cb: (err: Error | null, user: any | null) => void){
     const user = this;
 
     JWT.verify(token, String(process.env.SECRET), { algorithms: ['HS256'] }, (err: any, decodedToken: any) => {
         if (err) return cb(err, null);
 
-        user.findOne({_id: decodedToken, token: token}, (err: Error | undefined, user: Document) => {
+        user.findOne({_id: decodedToken, token: token}, (err: Error | undefined, user: any) => {
             if (err) return cb(err, null);
             cb(null, user);
         });

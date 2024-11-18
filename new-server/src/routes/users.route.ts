@@ -1,38 +1,30 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { profileUpload } from '../middlewares';
-import {
-    showUsersController,
-    updateColorMode,
-    updateThemeMode,
-    profileById,
-    postOwner,
-    profile,
-    profileAuth,
-    uploadProfilePic
-} from '../controllers/user.controller';
-import { logout } from '../controllers/auth.controller';
+import { UserController, AuthController } from '../controllers';
+import { User } from '../models';
 
-// temporary User Model here..
-import User from '../models/User';
-
-/**
- * ==== The Testing API router and controller ====
- */
 const router = express.Router();
 
+// Object instance for UserController Class..
+const userController = new UserController();
+const authController = new AuthController();
+
+/**
+ * ---- Get Friends by User ID ----
+ */
 router.get('/friends/:userId', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { userId } = req.params;
         const user = await User.findById(userId);
         const friends = await Promise.all(
-            user.followings.map((friendId: string) => {
+            (user?.followings || []).map((friendId: string) => {
                 return User.findById(friendId);
             })
         );
 
         let friendList: { _id: string; firstname: string; lastname: string; profilePhoto: string }[] = [];
         friends.forEach(friend => {
-            const { _id, firstname, lastname, profilePhoto } = friend;
+            const { _id, firstname, lastname, profilePhoto } = friend as any;
             friendList.push({ _id, firstname, lastname, profilePhoto });
         });
         res.status(200).json(friendList);
@@ -43,48 +35,48 @@ router.get('/friends/:userId', async (req: Request, res: Response, next: NextFun
 });
 
 /**
- * ==== Get All Users ====
+ * ---- Get All Users ----
  */
-router.get('/read_all_users', showUsersController);
+router.get('/read_all_users', userController.showUsersController);
 
 /**
  * ---- Get Profile By Id ----
  */
-router.get('/profile_by_id', profileById);
+router.get('/profile_by_id', userController.profileById);
 
 /**
- * ----- Get user of owner ----
+ * ---- Get User of Owner ----
  */
-router.get('/find_user', postOwner);
+router.get('/find_user', userController.postOwner);
 
 /**
- * ---- Get profile ----
+ * ---- Get Profile ----
  */
-router.get('/profile', profile);
+router.get('/profile', userController.profile);
 
 /**
- * ---- Get Profile (Auth) -----
+ * ---- Get Profile (Auth) ----
  */
-router.get('/auth', profileAuth);
+router.get('/auth', userController.profileAuth);
 
 /**
  * ---- Update Color Mode ----
  */
-router.post('/user_colorMode_update', updateColorMode);
+router.post('/user_colorMode_update', userController.updateColorMode);
 
 /**
- * ---- User's themeMode update ----
+ * ---- User's Theme Mode Update ----
  */
-router.post('/user_themeMode_updateName', updateThemeMode);
+router.post('/user_themeMode_updateName', userController.updateThemeMode);
 
 /**
- * ---- Uploading profile pic and update mongo users data ----
+ * ---- Upload Profile Pic and Update Mongo Users Data ----
  */
-router.post('/profile_upload', profileUpload.single("file"), uploadProfilePic);
+router.post('/profile_upload', profileUpload.single("file"), userController.uploadProfilePic);
 
 /**
  * ---- Get Logout User ----
  */
-router.get('/logout', logout);
+router.get('/logout', authController.logout);
 
 export default router;
