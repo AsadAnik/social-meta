@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const upload = require('../config/CloudeService');
-import { uploadToCloudinary } from '../config/CloudeService';
+const { uploadToCloudinary } = require('../config/CloudeService');
 
 /**
  * ---- Show All Users ----
@@ -200,34 +200,35 @@ const profileAuth = function (req, res) {
 //         });
 //     });
 // };
-
 /**
- * ---- Upload Profile Picture and Update User Data ----
+ * Upload profile picture
  */
 const uploadProfilePic = async (req, res) => {
-    const { id: userId } = req.body; // Extract user ID from body
-
-    // Check for user ID and file
-    if (!userId) return res.status(400).json({ success: false, message: 'User ID is required' });
-    if (!req.files || !req.files.profileImage) {
-        return res.status(400).json({ success: false, message: 'Profile image is required' });
-    }
-
-    const file = req.files.profileImage;
-
     try {
-        // Upload file to Cloudinary
-        const uploadResult = await uploadToCloudinary(file.tempFilePath, 'profile_uploads');
-        if (!uploadResult.success) throw new Error(uploadResult.message);
+        const userId = req.body.id;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
+        }
 
-        // Update user profile photo URL
+        // Ensure a file is attached
+        const file = req.file; // Your file should be available in `req.file`
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        // Upload file to Cloudinary
+        const uploadResult = await uploadToCloudinary(file, 'profile_uploads');
+
+        // Update user's profile picture
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { profilePhoto: uploadResult.secure_url },
             { new: true, select: 'firstname lastname email profilePhoto' }
         );
 
-        if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found!' });
+        }
 
         res.status(200).json({
             success: true,
@@ -240,32 +241,31 @@ const uploadProfilePic = async (req, res) => {
 };
 
 /**
- * ---- Upload Cover Photo and Update User Data ----
+ * Upload cover picture
  */
 const uploadCoverPic = async (req, res) => {
-    const { id: userId } = req.body; 
-
-    // Check for user ID and file
-    if (!userId) return res.status(400).json({ success: false, message: 'User ID is required' });
-    if (!req.files || !req.files.coverImage) {
-        return res.status(400).json({ success: false, message: 'Cover image is required' });
-    }
-
-    const file = req.files.coverImage;
-
     try {
-        // Upload file to Cloudinary
-        const uploadResult = await uploadToCloudinary(file.tempFilePath, 'cover_uploads');
-        if (!uploadResult.success) throw new Error(uploadResult.message);
+        const userId = req.body.id;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'User ID is required' });
+        }
 
-        // Update user cover photo URL
+        const file = req.file;
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'No file uploaded' });
+        }
+
+        const uploadResult = await uploadToCloudinary(file, 'cover_uploads');
+
         const updatedUser = await User.findByIdAndUpdate(
             userId,
             { coverPhoto: uploadResult.secure_url },
             { new: true, select: 'firstname lastname email coverPhoto' }
         );
 
-        if (!updatedUser) return res.status(404).json({ success: false, message: 'User not found' });
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: 'User not found!' });
+        }
 
         res.status(200).json({
             success: true,

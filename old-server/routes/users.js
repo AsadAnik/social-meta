@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const profileUpload = require('../middleware/profileUpload');
-const upload = require('../config/multer'); // This points to your Cloudinary-based multer config
+const { uploadToCloudinary } = require('../config/CloudeService');
 const {
     showUsersController,
     updateColorMode,
@@ -82,12 +82,8 @@ router.post('/user_themeMode_updateName', updateThemeMode);
 //  */
 // router.post('/profile_upload', profileUpload.single("file"), uploadProfilePic);
 
-// Upload profile picture
-router.post('/upload/profile-pic', upload.single('file'), uploadProfilePic);
-
-// Upload cover picture
-router.post('/upload/cover-pic', upload.single('file'), uploadCoverPic);
-
+router.post('/upload/profile-pic', uploadProfilePic);
+router.post('/upload/cover-pic', uploadCoverPic);
 /**
  * ---- Get Logout User ----
  */

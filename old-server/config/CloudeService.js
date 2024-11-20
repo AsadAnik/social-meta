@@ -1,24 +1,21 @@
-// services/cloudinaryService.js
-const cloudinary = require('./cloudinary');
+const cloudinary = require('../config/cloudinary');
 
 /**
- * Upload a file to Cloudinary.
- * @param {string} filePath 
- * @param {string} folder 
- * @returns {Promise<Object>}
+ * Upload file to Cloudinary
+ * @param {Object} file - File object from request
+ * @param {String} folder - Folder name in Cloudinary
+ * @returns {Object} - Cloudinary upload result
  */
-const uploadToCloudinary = async (filePath, folder) => {
+const uploadToCloudinary = async (file, folder) => {
     try {
-        const result = await cloudinary.uploader.upload(filePath, {
+        const result = await cloudinary.uploader.upload(file.path, {
             folder: folder,
-            allowed_formats: ['jpg', 'jpeg', 'png'],
+            resource_type: 'auto', // Automatically detect file type
         });
-        return { success: true, ...result };
+        return result;
     } catch (error) {
-        return { success: false, message: error.message };
+        throw new Error('Cloudinary upload failed: ' + error.message);
     }
 };
 
-module.exports = {
-    uploadToCloudinary,
-};
+module.exports = { uploadToCloudinary };
