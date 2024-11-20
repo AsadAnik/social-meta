@@ -8,7 +8,7 @@ class UserController {
      * @param {Response} res 
      * @param {NextFunction} next 
      */
-    public async showUsersController(req: Request, res: Response | any, next: NextFunction) {
+    public async showUsersController(_req: Request, res: Response | any, next: NextFunction) {
         try {
             const users = await User.find({});
             if (!users) return res.status(400).json({ success: false, message: 'No users found' });

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models';
+import { errorResponse } from '../lib';
 
 class AuthController {
     /**
@@ -16,7 +17,7 @@ class AuthController {
             res.status(200).json({
                 success: true,
                 message: 'User created successfully.',
-                user: docs
+                user: docs,
             });
         } catch (error) {
             res.json({ success: false, error });
@@ -29,22 +30,18 @@ class AuthController {
      * @param {Response} res 
      * @param {NextFunction} _next 
      */
-    public async login(req: Request, res: Response | any, _next: NextFunction) {
+    public async login(req: Request, res: Response | any, next: NextFunction) {
         const loginEmail = req.body.email;
         const loginPassword = req.body.password;
 
         try {
             const user = await User.findOne({ email: loginEmail });
             
-            if (!user) return res.json({ isAuth: false, message: 'User not found!' });
+            if (!user) return errorResponse({ status: 404, message: 'User not found!', isAuth: false}, res);
+
             // compare password with registered user..
             const isMatch = await (user as any).comparePassword(loginPassword);
-            if (!isMatch) {
-                return res.status(401).json({
-                    isAuth: false,
-                    message: 'Auth failed! wrong password!'
-                });
-            }
+            if (!isMatch) return errorResponse({ status: 401, message: 'Auth failed! wrong password!', isAuth: false }, res);
 
             // generate token when user login with fine..
             const token = await (user as any).generateToken();
@@ -53,8 +50,9 @@ class AuthController {
                 id: user._id,
                 email: user.email
             });
-        } catch (err) {
-            res.send(err);
+
+        } catch (err: unknown) {
+            next(err);
         }
     }
 
