@@ -1,0 +1,14 @@
+# .env file
+#
+# Add environment-specific variables on new lines in the form of NAME=VALUE
+
+NODE_ENV = development
+APP_NAME = Social-Meta
+AUTHOR = ASADANIK
+HOST = localhost
+PORT = 8080
+SECRET = SUPERSECRET
+MONGO_URI = mongodb://localhost:27017/socialMeta
+CLOUDINARY_CLOUD_NAME=djktvs2yq
+CLOUDINARY_API_KEY=842923549173773
+CLOUDINARY_API_SECRET=qYw3z_3LRbUS6QTFUzdwTxElKFc

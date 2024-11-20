@@ -72,7 +72,8 @@ router.post('/user_themeMode_updateName', userController.updateThemeMode);
 /**
  * ---- Upload Profile Pic and Update Mongo Users Data ----
  */
-router.post('/profile_upload', profileUpload.single("file"), userController.uploadProfilePic);
+router.post('/upload/profile-pic', UserController.uploadProfilePic);
+router.post('/upload/cover-pic', UserController.uploadCoverPic);
 
 /**
  * ---- Get Logout User ----
