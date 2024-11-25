@@ -36,6 +36,7 @@ class AuthController {
 
         try {
             const user = await User.findOne({ email: loginEmail });
+            console.log('user exist', user)
             
             if (!user) return errorResponse({ status: 404, message: 'User not found!', isAuth: false}, res);
 

@@ -2,10 +2,10 @@
   "name": "socialmeta",
   "version": "1.0.0",
   "description": "",
-  "main": "server/server.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start-node": "node /server/server.js",
+    "start-node": "node server.js",
     "server": "nodemon start-node",
     "client": "npm run start --prefix client",
     "client-install": "npm install --prefix client",
@@ -15,7 +15,6 @@
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "socket-install": "npm install --prefix socket",
     "dev": "concurrently \"npm run socket\" \"npm run server\" \"npm run client\"",
-    "start": "concurrently \"npm run server\" \"npm run client\"",
     "dev-mobile": "concurrently \"npm run socket\" \"npm run server\" \"npm run client-mobile\""
   },
   "keywords": [],

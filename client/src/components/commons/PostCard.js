@@ -14,6 +14,7 @@ import {
     MenuItem,
     ListItemIcon,
     Modal,
+    Tooltip
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -38,6 +39,8 @@ import ViewComments from '../Comment/ViewComments';
 import MakeComments from '../Comment/MakeComments';
 import NotFound from '../widgets/NotFound';
 import dateFormat from '../../utils/dateFormat';
+import moment from 'moment';
+
 
 // HTTP CONFIG..
 import httpConfig from '../../utils/httpConfig';
@@ -602,14 +605,27 @@ const PostCard = (props) => {
         }
     };
 
+    const formatPostTime = (date) => moment(date).fromNow(); // e.g., "5 minutes ago"
+    const formatHoverTime = (date) =>
+        moment(date).format('dddd DD MMMM YYYY [at] HH:mm');
+
     // Returning statement..
     return (
-        <Card style={{ marginTop: '1rem', marginBottom: '1rem', color: themeMode?.cardFontColor, background: themeMode.cardBackgroundColor, border: themeMode.cardBorder }}>
+        <Card
+            style={{
+                marginTop: '1rem',
+                marginBottom: '1rem',
+                color: themeMode?.cardFontColor,
+                background: themeMode.cardBackgroundColor,
+                border: themeMode.cardBorder,
+            }}
+        >
+            {/* Post Header */}
             <CardHeader
                 avatar={
                     <Avatar
                         alt={'No User'}
-                        src={`${initialProfileImgPath}/${showNameOrProfileOrTitle("PROFILE")}`}
+                        src={`${initialProfileImgPath}/${showNameOrProfileOrTitle('PROFILE')}`}
                     />
                 }
                 action={
@@ -617,47 +633,60 @@ const PostCard = (props) => {
                         <IconButton aria-label="settings" onClick={handleOptionOpen}>
                             <MoreVertIcon style={{ color: themeMode.cardFontColor }} />
                         </IconButton>
-
                         {renderMenuBaseOnComponentType(props.postType, themeMode)}
                     </>
                 }
                 title={showNameOrProfileOrTitle('NAME')}
-                subheader={showNameOrProfileOrTitle('TITLE')}
+                subheader={
+                    <>
+                        {/* User's title */}
+                        <Typography
+                            variant="body2"
+                            color={themeMode.cardSubFontColor}
+                            style={{ marginBottom: '4px' }}
+                        >
+                            {showNameOrProfileOrTitle('TITLE')} {/* User's title */}
+                        </Typography>
+
+                        {/* Post time with hover for exact time */}
+                        <Tooltip title={formatHoverTime(createdAt)} arrow>
+                            <Typography
+                                variant="body2"
+                                color={themeMode.cardSubFontColor}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                {formatPostTime(createdAt)} {/* Time relative to now */}
+                            </Typography>
+                        </Tooltip>
+                    </>
+                }
                 subheaderTypographyProps={{ color: themeMode.cardSubFontColor }}
             />
 
-            {/*---- Post Image here -----*/}
-            {renderImageOrNot(postImage !== undefined ? postImage : null)}
+            {/* Post Image */}
+            {renderImageOrNot(postImage || null)}
 
-            {/*---- Post Body here ----*/}
+            {/* Post Content */}
             <CardContent>
-                <Typography variant="body1"
+                <Typography
+                    variant="body1"
                     dangerouslySetInnerHTML={{
-                        __html: postBody
+                        __html: postBody,
                     }}
                 />
-                <Typography variant="body2" color={themeMode.cardSubFontColor}>
-                    Created at: {dateFormat(createdAt)}
-                </Typography>
-                <Typography variant="body2" color={themeMode.cardSubFontColor}>
-                    Updated at: {dateFormat(updatedAt)}
-                </Typography>
             </CardContent>
 
-            {/*---- ExpandMore button and for dropdown here ----*/}
+            {/* Post Actions */}
             <CardActions disableSpacing>
-                <IconButton
-                    aria-label="add to favorites"
-                    onClick={handleLikePost}
-                >
-                    <FavoriteIcon style={{ color: !isLiked ? themeMode.cardFontColor : 'red' }} />
+                {/* Like Button */}
+                <IconButton aria-label="add to favorites" onClick={handleLikePost}>
+                    <FavoriteIcon
+                        style={{ color: isLiked ? 'red' : themeMode.cardFontColor }}
+                    />
                 </IconButton>
-                {/* Numbers of Like */}
-                <span>
-                    {showPostLikes(isLiked, postLikes)}
-                </span>
+                <span>{showPostLikes(isLiked, postLikes)}</span>
 
-                {/*---- CommentIcon to make Comment ----*/}
+                {/* Comment Button */}
                 <IconButton
                     aria-label="comment"
                     onClick={() => setCommentModal(true)}
@@ -665,33 +694,34 @@ const PostCard = (props) => {
                     <CommentIcon style={{ color: themeMode.cardFontColor }} />
                 </IconButton>
 
-                {/* Showing the MakeComments Modal */}
-                <MakeComments
-                    showModal={commentModal}
-                    setCommentModal={setCommentModal}
-                    ownerId={ownerId}
-                    postId={postId}
-                    setExpandedCommentArea={setExpanded}
-                />
+                {/* Comment Modal */}
+                {commentModal && (
+                    <MakeComments
+                        showModal={commentModal}
+                        setCommentModal={setCommentModal}
+                        ownerId={ownerId}
+                        postId={postId}
+                        setExpandedCommentArea={setExpanded}
+                    />
+                )}
 
-                {/* ExpandMore icon to see all comments */}
-                <ExpandMore
-                    expand={expanded}
+                {/* Expand Comments */}
+                <IconButton
                     onClick={handleExpandClick}
                     aria-expanded={expanded}
                     aria-label="show more"
                 >
                     <ExpandMoreIcon style={{ color: themeMode.cardFontColor }} />
-                </ExpandMore>
+                </IconButton>
             </CardActions>
 
-            {/*---- Collapse Area Section ----*/}
-            {/*---- It will be the future Comments section ----*/}
+            {/* Comments Section */}
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 {renderComments(comments)}
             </Collapse>
         </Card>
     );
+
 }
 
 // mapStateToProps..

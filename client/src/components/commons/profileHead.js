@@ -42,8 +42,9 @@ const styles = {
     },
   },
   profilePic: {
-    width: '150px !important',
-    height: '150px !important',
+    width: 150, // Dimensions must be numbers, not strings.
+    height: 150,
+    borderRadius: '50%',
     border: '4px solid #fff',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
   },
@@ -64,6 +65,9 @@ const styles = {
     '&:hover': {
       backgroundColor: 'rgba(0, 0, 0, 0.8) !important',
     },
+  },
+  cameraIcon: {
+    fontSize: '1.8rem', // Increase size of camera icon for better visibility
   },
   infoSection: {
     padding: '1.5rem 2rem',
@@ -86,123 +90,115 @@ const styles = {
 };
 
 const ProfileHead = (props) => {
-    const profilePath = "/profileUpload";
-    const coverPath = "/coverUpload";
-    
-    const coverInputRef = useRef(null);
-    const profileInputRef = useRef(null);
+  const profilePath = "/profileUpload";
+  const coverPath = "/coverUpload";
 
-    const [themeMode, setThemeMode] = useState({
-        backgroundColor: '',
-        cardBorder: '',
-        textColor: ''
-    });
+  const coverInputRef = useRef(null);
+  const profileInputRef = useRef(null);
 
-    const [coverImage, setCoverImage] = useState(`${coverPath}/demoCover.jpeg`);
-    const [profileImage, setProfileImage] = useState(`${profilePath}/${props.profilePhoto}`);
-    const [showCoverOverlay, setShowCoverOverlay] = useState(false);
+  const [themeMode, setThemeMode] = useState({
+    backgroundColor: '',
+    cardBorder: '',
+    textColor: ''
+  });
 
-    useEffect(() => {
-        if (props.Settings?.themeMode) {
-            const { backgroundColor, cardBorder, textColor } = props.Settings.themeMode;
-            setThemeMode({ backgroundColor, cardBorder, textColor });
-        }
-    }, [props.Settings]);
+  const [coverImage, setCoverImage] = useState(`${coverPath}/demoCover.jpeg`);
+  const [profileImage, setProfileImage] = useState(`${profilePath}/${props.profilePhoto}`);
+  const [showCoverOverlay, setShowCoverOverlay] = useState(false);
+  const [showProfileOverlay, setShowProfileOverlay] = useState(false); // New state for profile overlay
 
-    const handleFileChange = (event, type) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const url = URL.createObjectURL(file);
-            if (type === 'cover') {
-                setCoverImage(url);
-            } else {
-                setProfileImage(url);
-            }
-            console.log(`Uploading ${type} image:`, file);
-        }
-    };
+  useEffect(() => {
+    if (props.Settings?.themeMode) {
+      const { backgroundColor, cardBorder, textColor } = props.Settings.themeMode;
+      setThemeMode({ backgroundColor, cardBorder, textColor });
+    }
+  }, [props.Settings]);
 
-    return (
-        <Paper sx={styles.paper} style={{ background: themeMode.backgroundColor, border: themeMode.cardBorder }}>
-            <div 
-                style={styles.coverWrapper}
-                onMouseEnter={() => setShowCoverOverlay(true)}
-                onMouseLeave={() => setShowCoverOverlay(false)}
+  const handleFileChange = (event, type) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      if (type === 'cover') {
+        setCoverImage(url);
+      } else {
+        setProfileImage(url);
+      }
+      console.log(`Uploading ${type} image:`, file);
+    }
+  };
+
+  return (
+    <Paper sx={styles.paper} style={{ background: themeMode.backgroundColor, border: themeMode.cardBorder }}>
+      {/* Cover Photo */}
+      {/* Cover Photo */}
+      <div
+        style={styles.coverWrapper}
+        onMouseEnter={() => setShowCoverOverlay(true)}
+        onMouseLeave={() => setShowCoverOverlay(false)}
+      >
+        <img
+          src={coverImage}
+          alt="Cover"
+          style={styles.coverPhoto}
+        />
+        {showCoverOverlay && (
+          <div style={styles.coverOverlay}>
+            <IconButton
+              onClick={() => coverInputRef.current?.click()}
+              sx={styles.cameraButton}
             >
-                <img
-                    src={coverImage}
-                    alt="Cover"
-                    style={styles.coverPhoto}
-                />
-                {showCoverOverlay && (
-                    <div style={{ ...styles.coverOverlay, opacity: 1 }}>
-                        <IconButton
-                            onClick={() => coverInputRef.current?.click()}
-                            sx={styles.cameraButton}
-                        >
-                            <AddAPhoto />
-                        </IconButton>
-                    </div>
-                )}
-                <input
-                    type="file"
-                    ref={coverInputRef}
-                    hidden
-                    onChange={(e) => handleFileChange(e, 'cover')}
-                    accept="image/*"
-                />
-            </div>
-            
-            <div style={styles.profileSection}>
-                <div style={styles.profileWrapper}>
-                    <Avatar
-                        src={profileImage}
-                        alt="Profile Photo"
-                        sx={styles.profilePic}
-                    />
-                    <div className="profileOverlay" style={styles.profileOverlay}>
-                        <IconButton
-                            onClick={() => profileInputRef.current?.click()}
-                            sx={styles.cameraButton}
-                        >
-                            <CameraAlt />
-                        </IconButton>
-                    </div>
-                    <input
-                        type="file"
-                        ref={profileInputRef}
-                        hidden
-                        onChange={(e) => handleFileChange(e, 'profile')}
-                        accept="image/*"
-                    />
-                </div>
+              <CameraAlt sx={styles.cameraIcon} />
+            </IconButton>
+          </div>
+        )}
+        <input
+          type="file"
+          ref={coverInputRef}
+          hidden
+          onChange={(e) => handleFileChange(e, 'cover')}
+          accept="image/*"
+        />
+      </div>
 
-                <div style={styles.infoSection}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={8}>
-                            <div style={{ ...styles.name, color: themeMode.textColor }}>
-                                {props.firstname} {props.lastname}
-                                <span style={{ fontWeight: 'normal' }}> ({props.title})</span>
-                            </div>
-                            <div style={{ ...styles.bio, color: themeMode.textColor }}>{props.bio}</div>
-                        </Grid>
-                        <Grid item xs={4} style={{ textAlign: 'right' }}>
-                            <div style={{ color: themeMode.textColor }}>{props.email}</div>
-                            <div style={{ ...styles.stats, color: themeMode.textColor }}>
-                                <span>11,37,899 followers</span>
-                                <span> - </span>
-                                <span>0 following</span>
-                            </div>
-                        </Grid>
-                    </Grid>
-                </div>
-            </div>
-        </Paper>
-    );
+
+      {/* Profile Picture */}
+      <div
+        style={styles.profileWrapper}
+        onMouseEnter={() => setShowProfileOverlay(true)}
+        onMouseLeave={() => setShowProfileOverlay(false)}
+      >
+        <Avatar
+          src={profileImage}
+          alt="Profile Photo"
+          sx={styles.profilePic}
+        />
+        {showProfileOverlay && (
+          <div style={{ ...styles.profileOverlay, opacity: 1 }}>
+            <IconButton
+              onClick={() => profileInputRef.current?.click()}
+              sx={styles.cameraButton}
+            >
+              <CameraAlt sx={styles.cameraIcon} />
+            </IconButton>
+          </div>
+        )}
+        <input
+          type="file"
+          ref={profileInputRef}
+          hidden
+          onChange={(e) => handleFileChange(e, 'profile')}
+          accept="image/*"
+        />
+      </div>
+
+    </Paper>
+  );
 };
 
+
 const mapStateToProps = (state) => ({
-    Settings: state.Settings
+  Settings: state.Settings
 });
 
 export default connect(mapStateToProps)(ProfileHead);
+
