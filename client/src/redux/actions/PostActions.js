@@ -108,22 +108,54 @@ export function updatePost(data) {
 //     }
 // };
 // In your PostActions.js or wherever your actions are defined
+// export const readAllPosts = (page, limit) => {
+//     return async (dispatch) => {
+//       try {
+//         const response = await axios.get(
+//           `${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`,
+//           httpConfig
+//         );
+//         const { posts, total, totalPages } = response.data;
+  
+//         dispatch({
+//           type: 'READ_ALL_POSTS',
+//           payload: { posts, total, totalPages, page },
+//         });
+//       } catch (error) {
+//         console.error('Error fetching posts:', error);
+//         dispatch({
+//           type: 'FETCH_POSTS_ERROR',
+//           payload: error.message || 'Failed to fetch posts.',
+//         });
+//         toast.error('Error fetching posts. Please try again.');
+//       }
+//     };
+//   };
+
 export const readAllPosts = (page, limit) => {
     return async (dispatch) => {
-      try {
-        const response = await axios.get(`${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`,httpConfig);
-        const { posts, total, totalPages } = response.data;
-  
-        // Dispatch action to update the posts in Redux store
-        dispatch({
-          type: 'FETCH_POSTS_SUCCESS',
-          payload: { posts, total, totalPages, page },
-        });
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
+        try {
+            const response = await axios.get(
+                `${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`,
+                httpConfig
+            );
+            const { posts, total, totalPages } = response.data;
+
+            dispatch({
+                type: 'FETCH_POSTS_SUCCESS',
+                payload: { posts, total, totalPages, page },
+            });
+        } catch (error) {
+            console.error('Error fetching posts:', error);
+            dispatch({
+                type: 'FETCH_POSTS_ERROR',
+                payload: error.message || 'Failed to fetch posts.',
+            });
+            toast.error('Error fetching posts. Please try again.');
+        }
     };
-  };
+};
+
   
 
 

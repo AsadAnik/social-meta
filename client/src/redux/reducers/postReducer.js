@@ -27,6 +27,11 @@ export function PostReducer(state = initialState, action) {
 
         case "POST_READ":
             return { ...state, readPost: action.payload };
+        case 'FETCH_POSTS_ERROR':
+            return {
+                ...state,
+                error: action.payload, // Capture error for global state
+            };
 
         case "POST_UPDATE":
             return { ...state, updatePost: action.payload };
