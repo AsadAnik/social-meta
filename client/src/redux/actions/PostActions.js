@@ -91,47 +91,6 @@ export function updatePost(data) {
     };
 }
 
-// Action: readAllPosts
-// export const readAllPosts = (page, limit) => async (dispatch) => {
-//     try {
-//         const response = await axios.get(`${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`, httpConfig);
-//         const { posts, total } = response.data;
-
-//         dispatch({
-//             type: "READ_ALL_POSTS",
-//             payload: { posts, total, page },
-//         });
-//         return { posts, total }; 
-//     } catch (err) {
-//         console.error('Error fetching posts:', err);
-//         throw err;
-//     }
-// };
-// In your PostActions.js or wherever your actions are defined
-// export const readAllPosts = (page, limit) => {
-//     return async (dispatch) => {
-//       try {
-//         const response = await axios.get(
-//           `${POST_API_ENDPOINT}/read_all_posts?page=${page}&limit=${limit}`,
-//           httpConfig
-//         );
-//         const { posts, total, totalPages } = response.data;
-  
-//         dispatch({
-//           type: 'READ_ALL_POSTS',
-//           payload: { posts, total, totalPages, page },
-//         });
-//       } catch (error) {
-//         console.error('Error fetching posts:', error);
-//         dispatch({
-//           type: 'FETCH_POSTS_ERROR',
-//           payload: error.message || 'Failed to fetch posts.',
-//         });
-//         toast.error('Error fetching posts. Please try again.');
-//       }
-//     };
-//   };
-
 export const readAllPosts = (page, limit) => {
     return async (dispatch) => {
         try {
@@ -156,7 +115,7 @@ export const readAllPosts = (page, limit) => {
     };
 };
 
-  
+
 
 
 
