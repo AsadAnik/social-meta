@@ -1,74 +1,76 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { FlatList, RefreshControl } from 'react-native';
+import PostCard from '@/components/widgets/PostCard';
+import { Container } from '@/styles/FeedStyles';
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from '@/hooks/useColorScheme.web';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+// Some fake Data..
+// region Fake Data
+const postData = [
+    {
+        id: '1',
+        userName: 'Asad Anik',
+        userImg: require('@/assets/images/asadanik.jpg'),
+        postTime: '2 hours ago',
+        post: 'Hey, how are you there is no interaction with my own application here. And BTW this is my first day at office life here. Dude say me nice day to wishing me at a time bla bla ..',
+        postImg: require('@/assets/images/post2.jpg'),
+        liked: true,
+        likes: 77,
+        comments: 5
+    },
+    {
+        id: '2',
+        userName: 'Arafat Armaan',
+        userImg: require('@/assets/images/avatar-male.png'),
+        postTime: '1 day ago',
+        post: 'Hey, how are you there is no interaction with my own application here. And BTW this is my first day at office life here. Dude say me nice day to wishing me at a time bla bla ..',
+        postImg: require('@/assets/images/post1.jpg'),
+        liked: true,
+        likes: 1,
+        comments: 0
+    },
+    {
+        id: '3',
+        userName: 'Tanzid Hasan',
+        userImg: require('@/assets/images/avatar-male.png'),
+        postTime: '4 days ago',
+        post: 'Hey, how are you there is no interaction with my own application here. And BTW this is my first day at office life here. Dude say me nice day to wishing me at a time bla bla ..',
+        postImg: require('@/assets/images/post3.jpg'),
+        liked: false,
+        likes: 0,
+        comments: 2
+    },
+    {
+        id: '4',
+        userName: 'Alena Jeene',
+        userImg: require('@/assets/images/alenajeene.jpeg'),
+        postTime: '10 days ago',
+        post: 'Interaction is normal, i don\'t cares all of this shades. Because there is blue and black shades interactions conflicting with each others.',
+        postImg: '',
+        liked: false,
+        likes: 231,
+        comments: 25
+    }
+];
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+// region Home Component
+const HomeTabScreen = ({ navigation }: any) => {
+    const colorScheme = useColorScheme();
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+    return (
+        <Container>
+            <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'} />
+
+            <FlatList
+                refreshControl={<RefreshControl refreshing={false} />}
+                data={postData}
+                renderItem={({ item }) => <PostCard item={item} />}
+                keyExtractor={item => item.id}
+                showsVerticalScrollIndicator={false}
+            />
+        </Container>
+    );
+};
+
+export default HomeTabScreen;
