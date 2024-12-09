@@ -1,5 +1,6 @@
 import axios from 'axios';
 import httpConfig from '../../utils/httpConfig';
+import { toast } from 'react-toastify';
 
 // POST API ENDPOINT..
 const POST_API_ENDPOINT = `${process.env.REACT_APP_BACKEND_API}/post`;

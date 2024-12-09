@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, TouchableOpacity, ImageBackground } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 

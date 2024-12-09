@@ -47,7 +47,7 @@ const Login = (props) => {
 
     // useEffect React Hook..
     React.useEffect(() => {
-        if (props.User){
+        if (props.User) {
             if (props.User.login) {
                 if (props.User.login.isAuth) {
                     // console.log('Loggedin -->> ', props.User.login);
@@ -232,10 +232,10 @@ const Login = (props) => {
                                     {
                                         login && !login.isAuth && login.message ?
                                             showResultsAlertNofity(false, login.message)
-                                        :
-                                            login ? login.isAuth && showResultsAlertNofity(true, "Successfully Logged-in.")
                                             :
-                                            null
+                                            login ? login.isAuth && showResultsAlertNofity(true, "Successfully Logged-in.")
+                                                :
+                                                null
                                     }
                                 </Grid>
 
