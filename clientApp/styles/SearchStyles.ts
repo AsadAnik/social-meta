@@ -1,11 +1,17 @@
 import styled from 'styled-components';
 
+import { Dimensions } from 'react-native';
+
+// Get the screen width
+const screenHeight = Dimensions.get('window').height;
+
 export const Container = (styled as any).View`
     flex: 1;
-    padding-top: 80px;
+    padding-top: ${screenHeight * 0.09 + 10};
     align-items: center;
     justify-content: center;
     background-color: white;
+    max-height: ${screenHeight - 80};
 `;
 
 export const InputWrapper = (styled as any).View`

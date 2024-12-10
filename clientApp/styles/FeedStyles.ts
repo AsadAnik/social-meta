@@ -1,4 +1,15 @@
 import styled from 'styled-components';
+import { Dimensions } from 'react-native';
+
+
+// Get the screen width
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
+// Get the card width and height
+const cardWidth = screenWidth - 10;
+const cardHeight = screenHeight * 0.8;
+
 
 export const Container = (styled as any).View`
     flex: 1;
@@ -6,12 +17,14 @@ export const Container = (styled as any).View`
     background-color: #fff;
     padding-left: 5px;
     padding-right: 5px;
-    margin-top: 40px;
+    margin-top: ${screenHeight * 0.06};
+    max-height: ${screenHeight - 120};
 `;
 
 export const Card = (styled as any).View`
     background-color: #f8f8f8;
-    width: 100%;
+    width: ${cardWidth};
+    max-height: ${cardHeight};
     margin-bottom: 20px;
     border-radius: 10px;
 `;

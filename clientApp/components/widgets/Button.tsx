@@ -1,5 +1,7 @@
+import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FollowButtonType } from '@/types';
 
 // Button Component..
 // region Normal Button
@@ -62,5 +64,39 @@ export const OutlineButton = ({ title, color, height, width, size, onPress, chil
             <Text style={[styles.textSign, { color: '#05375a' }]}>{title}</Text>
             {children}
         </TouchableOpacity>
+    );
+};
+
+// The Follow Button Component..
+// region Follow Button
+export const FollowButton = ({ title, size, onPress, children }: FollowButtonType) => {
+    // Styles..
+    const styles = StyleSheet.create({
+        signIn: {
+            width: size * 2.5,
+            height: size,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10
+        },
+        textSign: {
+            fontSize: size,
+            fontWeight: 'bold',
+        }
+    });
+
+    return (
+        <TouchableOpacity
+            onPress={onPress}
+            style={[styles.signIn, {
+                backgroundColor: 'blue',
+                borderWidth: 1,
+                borderColor: 'royalblue'
+            }]}
+        >
+            <Text style={[{ color: 'white', fontSize: size - 50 }]}>{title}</Text>
+            {children}
+        </TouchableOpacity>
+
     );
 };

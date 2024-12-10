@@ -3,10 +3,11 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
+
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -30,42 +31,42 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => <AntDesign name="home" size={28} color={color} /> ,
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
           title: 'Search',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="search.fill" color={color} />,
+          tabBarIcon: ({ color }) => <AntDesign name="search1" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="notification"
         options={{
           title: 'Notification',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="notification.fill" color={color} />,
+          tabBarIcon: ({ color }) => <AntDesign name="notification" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
           title: 'Chat',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="message.fill" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="chatbubble-outline" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="post"
         options={{
           title: 'Post',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="book.fill" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons name="post-add" size={28} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+          tabBarIcon: ({ color }) => <AntDesign name="user" size={28} color={color} />,
         }}
       />
     </Tabs>

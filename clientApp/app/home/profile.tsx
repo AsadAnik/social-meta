@@ -4,6 +4,7 @@ import ProfileHeader from '@/components/widgets/ProfileHeader';
 import PostCard from '@/components/widgets/PostCard';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/hooks/useColorScheme.web';
+import { Container } from '@/styles/FeedStyles';
 
 const postData = [
     {
@@ -45,7 +46,7 @@ const ProfileTabScreen = (props: any) => {
     const colorScheme = useColorScheme();
 
     return (
-        <View style={{ flex: 1, paddingTop: 40 }}>
+        <Container>
             <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'} />
             
             <ScrollView 
@@ -70,7 +71,7 @@ const ProfileTabScreen = (props: any) => {
                 />
 
             </ScrollView>
-        </View>
+        </Container>
     );
 };
 
