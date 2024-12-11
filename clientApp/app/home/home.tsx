@@ -1,10 +1,11 @@
 import React from 'react';
-import { FlatList, RefreshControl } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 import PostCard from '@/components/widgets/PostCard';
 import { Container } from '@/styles/FeedStyles';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/hooks/useColorScheme.web';
 import InstaStory from '@/components/widgets/Story';
+
 
 // Some fake Data..
 // region Fake Data
@@ -55,6 +56,22 @@ const postData = [
   },
 ];
 
+
+/**
+ *  RENDERING THE POSTS DATA LIST HERE
+ * @param data 
+ * @returns 
+ */
+const renderPostData = (data: []) => {
+    // Rendering Post Logic with List and Pending Loading and Error Handling..
+    return (
+        data.map((item, index) => (
+            <PostCard key={index} item={item} />
+        ))
+    )
+};
+
+
 // region Home Component
 const HomeTabScreen = ({ navigation }: any) => {
   const colorScheme = useColorScheme();
@@ -63,15 +80,21 @@ const HomeTabScreen = ({ navigation }: any) => {
         <Container>
             <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'} />
 
-            <InstaStory />
-
-            <FlatList
+            <ScrollView
                 refreshControl={<RefreshControl refreshing={false} />}
-                data={postData}
-                renderItem={({ item }) => <PostCard item={item} />}
-                keyExtractor={item => item.id}
-                showsVerticalScrollIndicator={false}
-            />
+            >
+                <InstaStory />
+
+            {/* WE SHOULD NOT USE FLATLIST ANYMORE, BECUASE FLATLIST IS NOT OPTIMISED WITH OUR PAGINATION LOGIC. WE SHOULD USE SCROLLVIEW INSTEAD OF FLATLIST. */}
+                {/* <FlatList
+                    data={postData}
+                    renderItem={({ item }) => <PostCard item={item} />}
+                    keyExtractor={item => item.id}
+                    showsVerticalScrollIndicator={false}
+                /> */}
+
+                {renderPostData(postData as [])}
+            </ScrollView>
         </Container>
     );
 };

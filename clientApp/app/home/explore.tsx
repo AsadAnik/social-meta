@@ -29,7 +29,7 @@ const Explore = (): JSX.Element => {
 
     const handleBottomSheetClose = () => {
         // bottomSheetRef.current?.close();
-        setIsBottomSheetOpen(false);
+        setIsBottomSheetOpen(false);3
     };
 
     // When Change Search Values...

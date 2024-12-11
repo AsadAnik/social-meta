@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Dimensions, Platform } from 'react-native';
 
 
+
 // Get the screen width
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -19,15 +20,10 @@ export const Container = (styled as any).View`
 `;
 
 export const NotifyDiv = (styled as any).TouchableOpacity`
-    background-color: #fff;
     flex-direction: row;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 10px;
     align-items: center;
     padding-top: 10px;
     padding-bottom: 10px;
-    border-radius: 10px;
 `;
 
 export const NotifyPersonText = (styled as any).Text`

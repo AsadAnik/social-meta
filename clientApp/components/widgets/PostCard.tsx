@@ -14,6 +14,8 @@ import {
     Divider
 } from '@/styles/FeedStyles';
 import { Ionicons } from '@expo/vector-icons';
+import { Card as PaperCard } from 'react-native-paper';
+
 
 
 const PostCard = ({ item }: any) => {
@@ -56,34 +58,36 @@ const PostCard = ({ item }: any) => {
 
     return (
         <Card>
-            {/* ----- User Info and Image ---- */}
-            <UserInfo>
-                <UserImg source={item.userImg} />
+            <PaperCard>
+                {/* ----- User Info and Image ---- */}
+                <UserInfo>
+                    <UserImg source={item.userImg} />
 
-                <UserInfoText>
-                    <UserName>{item.userName}</UserName>
-                    <PostTime>{item.postTime}</PostTime>
-                </UserInfoText>
-            </UserInfo>
+                    <UserInfoText>
+                        <UserName>{item.userName}</UserName>
+                        <PostTime>{item.postTime}</PostTime>
+                    </UserInfoText>
+                </UserInfo>
 
-            {/* ----- Post Text / Body ----- */}
-            <PostText>{item.post}</PostText>
+                {/* ----- Post Text / Body ----- */}
+                <PostText>{item.post}</PostText>
 
-            {/* ---- Post Image Or Divider ---- */}
-            {renderImageOrDivider(item.postImg)}
+                {/* ---- Post Image Or Divider ---- */}
+                {renderImageOrDivider(item.postImg)}
 
-            {/* ---- Likes & Comments Wrapper ---- */}
-            <InteractionWrapper>
-                <Interaction active={item.liked}>
-                    <Ionicons name={likeIcon} size={24} color={likeIconColor} />
-                    <InteractionText active={item.liked}>{likeText}</InteractionText>
-                </Interaction>
+                {/* ---- Likes & Comments Wrapper ---- */}
+                <InteractionWrapper>
+                    <Interaction active={item.liked}>
+                        <Ionicons name={likeIcon} size={24} color={likeIconColor} />
+                        <InteractionText active={item.liked}>{likeText}</InteractionText>
+                    </Interaction>
 
-                <Interaction>
-                    <Ionicons name="chatbubbles-outline" size={24} color="black" />
-                    <InteractionText>{commentText}</InteractionText>
-                </Interaction>
-            </InteractionWrapper>
+                    <Interaction>
+                        <Ionicons name="chatbubbles-outline" size={24} color="black" />
+                        <InteractionText>{commentText}</InteractionText>
+                    </Interaction>
+                </InteractionWrapper>
+            </PaperCard>
         </Card>
     );
 };
