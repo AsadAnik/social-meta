@@ -1,205 +1,201 @@
 import React, { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
 import {
     View,
     Text,
     StyleSheet,
-    TextInput,
-    TouchableOpacity,
     ImageBackground,
-    ScrollView,
-    Platform,
+    TouchableOpacity,
+    TextInput,
+    NativeSyntheticEvent,
+    TextInputEndEditingEventData,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { FontAwesome, Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { FontAwesome } from '@expo/vector-icons';
+import { Button, OutlineButton } from '../../components/widgets/Button';
 
-const Register: React.FC = () => {
-    const router = useRouter();
+type RegisterProps = {
+    navigation: any; // Replace `any` with the correct type if you have navigation types available.
+};
+
+const Register: React.FC<RegisterProps> = ({ navigation }) => {
     const [data, setData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        bio: '',
-        title: '',
-        birthday: new Date(),
-        secureTextEntry: true,
-        showDatePicker: false,
-        errorMsg: '',
+        firstName: '',
+        lastName: '',
     });
 
-    const handleInputChange = (field: string, value: string | Date) => {
-        setData((prevState) => ({
-            ...prevState,
-            [field]: value,
-        }));
-    };
+    const [error, setError] = useState({
+        firstNameErrorMsg: '',
+        lastNameErrorMsg: '',
+        isValidFirstName: true,
+        isValidLastName: true,
+    });
 
-    const toggleSecureTextEntry = () => {
-        setData((prevState) => ({
-            ...prevState,
-            secureTextEntry: !prevState.secureTextEntry,
-        }));
-    };
+    // Displaying Error Message Dynamically
+    const displayErrorMessage = (msg: string) => (
+        <Animatable.View animation="fadeInLeft" duration={500}>
+            <Text style={styles.errorMsg}>{msg}</Text>
+        </Animatable.View>
+    );
 
-    const validateForm = () => {
-        const { name, email, password, confirmPassword } = data;
-        if (!name.trim()) return 'Name is required.';
-        if (!email.includes('@')) return 'Enter a valid email.';
-        if (password.length < 8) return 'Password must be at least 8 characters.';
-        if (password !== confirmPassword) return 'Passwords do not match.';
-        return '';
-    };
+    // End Of Editing Input Fields
+    const handleEndEditing = (
+        event: NativeSyntheticEvent<TextInputEndEditingEventData>,
+        type: string
+    ) => {
+        const value = event.nativeEvent.text;
 
-    const handleSubmit = async () => {
-        const validationError = validateForm();
-        if (validationError) {
-            setData((prevState) => ({
-                ...prevState,
-                errorMsg: validationError,
-            }));
-            return;
-        }
-
-        try {
-            const response = await fetch('https://your-backend-api.com/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                    bio: data.bio,
-                    title: data.title,
-                    birthday: data.birthday,
-                }),
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                router.push('/auth/login');
+        if (type === 'FNAME') {
+            if (value.trim().length > 0 && value.trim().length <= 2) {
+                setError({
+                    ...error,
+                    firstNameErrorMsg: 'Name should be at least 3 characters.',
+                    isValidFirstName: false,
+                });
             } else {
-                setData((prevState) => ({
-                    ...prevState,
-                    errorMsg: result.message || 'Registration failed. Try again.',
-                }));
+                setError({
+                    ...error,
+                    isValidFirstName: true,
+                });
             }
-        } catch (error) {
-            setData((prevState) => ({
-                ...prevState,
-                errorMsg: 'An error occurred. Please try again later.',
-            }));
+        }
+    };
+
+    // Text Change Input Fields
+    const handleOnChange = (value: string, type: string) => {
+        if (type === 'LNAME') {
+            if (value === data.firstName) {
+                setError({
+                    ...error,
+                    lastNameErrorMsg: "Last Name & First Name can't be the same",
+                    isValidLastName: false,
+                });
+            } else {
+                setData({
+                    ...data,
+                    lastName: value,
+                });
+                setError({
+                    ...error,
+                    isValidLastName: true,
+                });
+            }
+        } else if (type === 'FNAME') {
+            setData({
+                ...data,
+                firstName: value,
+            });
+        }
+    };
+
+    const handleOnNextPress = () => {
+        if (data.firstName && data.lastName) {
+            if (error.isValidFirstName && error.isValidLastName) {
+                navigation.navigate('Register2', data);
+            }
         }
     };
 
     return (
         <ImageBackground
             style={styles.container}
-            source={require('../../assets/images/post2.jpg')}
+            source={require('../../assets/images/post1.jpg')}
         >
+            <StatusBar style="light" />
+
+            {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.text_header}>Sign Up</Text>
+                <Text style={styles.text_header}>Say Us Your Name</Text>
             </View>
+
+            {/* Footer */}
             <Animatable.View style={styles.footer} animation="fadeInUpBig">
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {['name', 'email', 'password', 'confirmPassword', 'bio', 'title'].map((field) => (
-                        <View key={field} style={styles.inputGroup}>
-                            <Text style={styles.text_footer}>
-                                {field.charAt(0).toUpperCase() + field.slice(1)}
-                            </Text>
-                            <View style={styles.action}>
-                                <FontAwesome
-                                    name={field === 'email' ? 'envelope-o' : 'user-o'}
-                                    size={20}
-                                    color="#05375a"
-                                />
-                                <TextInput
-                                    placeholder={`Your ${field}`}
-                                    secureTextEntry={field.includes('password') && data.secureTextEntry}
-                                    style={styles.textInput}
-                                    autoCapitalize="none"
-                                    onChangeText={(value) => handleInputChange(field, value)}
-                                />
-                                {field.includes('password') && (
-                                    <TouchableOpacity onPress={toggleSecureTextEntry}>
-                                        <Feather
-                                            name={data.secureTextEntry ? 'eye-off' : 'eye'}
-                                            size={20}
-                                            color="grey"
-                                        />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        </View>
-                    ))}
+                {/* FirstName */}
+                <Text style={styles.text_footer}>First Name</Text>
+                <View style={styles.action}>
+                    <FontAwesome name="user-o" size={20} color="#05375a" />
+                    <TextInput
+                        placeholder="Asad"
+                        style={styles.textInput}
+                        onChangeText={(value) => handleOnChange(value, 'FNAME')}
+                        onEndEditing={(event) => handleEndEditing(event, 'FNAME')}
+                        autoCorrect={false}
+                    />
+                </View>
+                {/* Display Error */}
+                {!error.isValidFirstName && displayErrorMessage(error.firstNameErrorMsg)}
 
-                    {/* Birthday Picker */}
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.text_footer}>Birthday</Text>
-                        <TouchableOpacity
-                            onPress={() => handleInputChange('showDatePicker', new Date())}
-                        >
-                            <Text style={styles.textInput}>
-                                {data.birthday.toDateString()}
-                            </Text>
-                        </TouchableOpacity>
-                        {data.showDatePicker && (
-                            <DateTimePicker
-                                value={data.birthday}
-                                mode="date"
-                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                onChange={(event, date) =>
-                                    handleInputChange('birthday', date || data.birthday)
-                                }
-                            />
-                        )}
+                {/* LastName */}
+                <Text style={[styles.text_footer, { marginTop: 20 }]}>Last Name</Text>
+                <View style={styles.action}>
+                    <FontAwesome name="user-o" size={20} color="#05375a" />
+                    <TextInput
+                        placeholder="Anik"
+                        style={styles.textInput}
+                        onChangeText={(value) => handleOnChange(value, 'LNAME')}
+                        autoCorrect={false}
+                    />
+                </View>
+                {/* Display Error */}
+                {!error.isValidLastName && displayErrorMessage(error.lastNameErrorMsg)}
+
+                {/* Buttons */}
+                <View style={{ marginTop: 30 }}>
+                    <Button
+                        title="Next"
+                        color1st="royalblue"
+                        color2nd="blue"
+                        size={18}
+                        textColor="white"
+                        width="100%"
+                        height={50}
+                        onPress={handleOnNextPress}
+                    />
+                    <View style={{ marginTop: 20 }}>
+                        <OutlineButton
+                            title="Sign In"
+                            color="orange"
+                            size={18}
+                            width="100%"
+                            height={50}
+                            onPress={() => navigation.navigate('Login')}
+                        />
                     </View>
-
-                    {/* Error Message */}
-                    {data.errorMsg ? (
-                        <Animatable.View animation="fadeInLeft" duration={500}>
-                            <Text style={styles.errorMsg}>{data.errorMsg}</Text>
-                        </Animatable.View>
-                    ) : null}
-
-                    {/* Submit Button */}
-                    <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                        <Text style={styles.buttonText}>Sign Up</Text>
-                    </TouchableOpacity>
-                </ScrollView>
+                </View>
             </Animatable.View>
         </ImageBackground>
     );
 };
 
+// Styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
     },
     header: {
-        flex: 1,
-        justifyContent: 'flex-end',
+        flex: 3,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    footer: {
+        flex: 2,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingVertical: 30,
         paddingHorizontal: 20,
-        paddingBottom: 30,
     },
     text_header: {
         color: '#05375a',
         fontWeight: 'bold',
-        fontSize: 28,
-    },
-    footer: {
-        flex: 3,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 20,
-        paddingVertical: 30,
+        fontSize: 30,
+        backgroundColor: 'white',
+        padding: 5,
+        opacity: 0.7,
     },
     text_footer: {
-        fontSize: 18,
         color: '#05375a',
+        fontSize: 18,
     },
     action: {
         flexDirection: 'row',
@@ -210,27 +206,15 @@ const styles = StyleSheet.create({
     },
     textInput: {
         flex: 1,
+        marginTop: -12,
         paddingLeft: 10,
         color: '#05375a',
-        fontSize: 16,
-    },
-    inputGroup: {
-        marginBottom: 20,
     },
     errorMsg: {
-        color: '#FF0000',
-        fontSize: 14,
-    },
-    button: {
-        backgroundColor: '#05375a',
-        borderRadius: 10,
-        padding: 15,
-        alignItems: 'center',
-    },
-    buttonText: {
-        color: '#fff',
+        color: 'red',
         fontWeight: 'bold',
-        fontSize: 16,
+        fontSize: 13,
+        marginTop: 5,
     },
 });
 
