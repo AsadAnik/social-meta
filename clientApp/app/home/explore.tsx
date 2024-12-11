@@ -8,7 +8,7 @@ import { Feather, Ionicons } from '@expo/vector-icons';
 import { Button } from '@/components/widgets/Button';
 
 
-const Search = () => {
+const Explore = (): JSX.Element => {
     const colorScheme = useColorScheme();
     const [searchType, setSearchType] = useState("USER");
     const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ const Search = () => {
     };
 
     // Render Content Or Loading..
-    const renderContentOrLoading = (loading: boolean) => {
+    const renderContentOrLoading = (loading: boolean): JSX.Element => {
         if (!loading) {
             return (
                 <View>
@@ -142,4 +142,4 @@ const Search = () => {
     );
 };
 
-export default Search;
+export default Explore;

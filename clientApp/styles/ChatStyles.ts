@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 
 
 // Get the screen width
@@ -18,5 +18,5 @@ export const Container = (styled as any).View`
     padding-left: 5px;
     padding-right: 5px;
     margin-top: ${screenHeight * 0.06};
-    max-height: ${screenHeight - 120};
+    max-height: ${Platform.OS === "ios" ? screenHeight - 120 : screenHeight - 50}px;
 `;

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 
 
 // Get the screen width
@@ -8,7 +8,7 @@ const screenHeight = Dimensions.get('window').height;
 
 // Get the card width and height
 const cardWidth = screenWidth - 10;
-const cardHeight = screenHeight * 0.8;
+const cardHeight = screenHeight * 0.9;
 
 
 export const Container = (styled as any).View`
@@ -17,14 +17,14 @@ export const Container = (styled as any).View`
     background-color: #fff;
     padding-left: 5px;
     padding-right: 5px;
-    margin-top: ${screenHeight * 0.06};
-    max-height: ${screenHeight - 120};
+    margin-top: ${screenHeight * 0.06}px;
+    max-height: ${Platform.OS === "ios" ? screenHeight - 120 : screenHeight - 50}px;
 `;
 
 export const Card = (styled as any).View`
     background-color: #f8f8f8;
     width: ${cardWidth};
-    max-height: ${cardHeight};
+    max-height: ${cardHeight}px;
     margin-bottom: 20px;
     border-radius: 10px;
 `;
@@ -68,7 +68,7 @@ export const PostText = (styled as any).Text`
 
 export const PostImg = (styled as any).Image`
     width: 100%;
-    height: 250px;
+    height: 450px;
     margin-top: 15px;
 `;
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Text, ScrollView, RefreshControl } from 'react-native';
-import { Container, NotifyDiv, NotifyPersonText, NotifyPersonAvatar, NotifyRightElement } from '@/styles/NotificationStyles';
+import { Container, NotifyDiv, NotifyPersonText, NotifyPersonAvatar, NotifyRightElement, NotifyLovedImg } from '@/styles/NotificationStyles';
 import { FollowButton } from '@/components/widgets/Button';
 
 const NotificationTabScreen = () => {
     return (
         <Container>
-            <ScrollView 
+            <ScrollView
                 style={{ backgroundColor: '#efefef' }}
                 refreshControl={<RefreshControl refreshing={false} />}
             >
@@ -55,6 +55,18 @@ const NotificationTabScreen = () => {
 
                     <NotifyRightElement>
                         <FollowButton title="Follow" size={30} />
+                    </NotifyRightElement>
+                </NotifyDiv>
+
+                <NotifyDiv>
+                    <NotifyPersonAvatar source={{ uri: 'https://images.unsplash.com/photo-1464863979621-258859e62245?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZmVtYWxlJTIwcHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D' }} />
+
+                    <Text style={{ maxWidth: 200 }}>
+                        <NotifyPersonText>Sarah</NotifyPersonText> loved your photo.{" \n" + `1mo ago`}
+                    </Text>
+
+                    <NotifyRightElement>
+                        <NotifyLovedImg source={{ uri: 'https://media.licdn.com/dms/image/v2/D5603AQGxket1fQPy6A/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1718551521910?e=2147483647&v=beta&t=mrc3mFtlInpBfuG-_eJojdoBI5dxRAZEhoAtwkt0qSU' }} />
                     </NotifyRightElement>
                 </NotifyDiv>
             </ScrollView>

@@ -94,7 +94,7 @@ export const FollowButton = ({ title, size, onPress, children }: FollowButtonTyp
                 borderColor: 'royalblue'
             }]}
         >
-            <Text style={[{ color: 'white', fontSize: size - 50 }]}>{title}</Text>
+            <Text style={[{ color: 'white', fontSize: Math.abs(size - 15) }]}>{title}</Text>
             {children}
         </TouchableOpacity>
 
