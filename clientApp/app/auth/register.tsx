@@ -13,12 +13,14 @@ import {
 import * as Animatable from 'react-native-animatable';
 import { FontAwesome } from '@expo/vector-icons';
 import { Button, OutlineButton } from '../../components/widgets/Button';
+import { useRouter } from 'expo-router';
 
 type RegisterProps = {
     navigation: any; // Replace `any` with the correct type if you have navigation types available.
 };
 
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
+    const router = useRouter();
     const [data, setData] = useState({
         firstName: '',
         lastName: '',
@@ -91,7 +93,15 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
     const handleOnNextPress = () => {
         if (data.firstName && data.lastName) {
             if (error.isValidFirstName && error.isValidLastName) {
-                navigation.navigate('Register2', data);
+                // navigation.navigate('Register2', data);
+                
+                router.push({
+                    pathname: "/auth/register2",
+                    params: {
+                        navigation: navigation as any,
+                        params: data as any,
+                    },
+                });
             }
         }
     };

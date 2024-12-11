@@ -19,6 +19,7 @@ export default function Root() {
             <Text style={{ fontSize: 50 }}>Hello World</Text>
             <Link href="/home/home" style={styles.navButton}>Go to Home</Link>
             <Link href="/auth/login" style={styles.navButton}>Go to Auth</Link>
+            <Link href="/onBoarding" style={styles.navButton}>Go to On-Boarding</Link>
         </View>
     );
 }

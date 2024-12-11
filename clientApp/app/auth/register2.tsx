@@ -14,6 +14,7 @@ import {
 import * as Animatable from 'react-native-animatable';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, OutlineButton } from '../../components/widgets/Button';
+import { useLocalSearchParams } from 'expo-router';
 
 // Define Props for Register2
 type Register2Props = {
@@ -45,9 +46,11 @@ type ErrorState = {
     isValidRePassword: boolean;
 };
 
-const Register2: React.FC<Register2Props> = ({ navigation, route }) => {
+const Register2: React.FC<Register2Props> = () => {
+    const { navigation, params } = useLocalSearchParams();
+
     const [data, setData] = useState<DataState>({
-        ...route.params,
+        ...(params as any),
         email: '',
         password: '',
         retypePassword: '',
@@ -128,7 +131,8 @@ const Register2: React.FC<Register2Props> = ({ navigation, route }) => {
     // Handle next button press
     const handleOnNextPress = () => {
         if (error.isValidEmail && error.isValidPassword && error.isValidRePassword) {
-            navigation.navigate('Register3', data);
+            // Navaigate..
+            // navigation.navigate('Register3', data);
         }
     };
 
