@@ -4,6 +4,7 @@ import PostCard from '@/components/widgets/PostCard';
 import { Container } from '@/styles/FeedStyles';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from '@/hooks/useColorScheme.web';
+import InstaStory from '@/components/widgets/Story';
 
 // Some fake Data..
 // region Fake Data
@@ -61,6 +62,8 @@ const HomeTabScreen = ({ navigation }: any) => {
     return (
         <Container>
             <StatusBar style={colorScheme === 'light' ? 'dark' : 'light'} />
+
+            <InstaStory />
 
             <FlatList
                 refreshControl={<RefreshControl refreshing={false} />}

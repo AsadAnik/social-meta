@@ -1,6 +1,12 @@
 import React from 'react';
 import { Link } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { LogBox } from 'react-native';
+
+// Suppress specific warning messages
+LogBox.ignoreLogs([
+  'Support for defaultProps will be removed from function components in a future major release',
+]);
 
 export default function Root() {
     return (
