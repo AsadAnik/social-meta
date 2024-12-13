@@ -15,11 +15,12 @@ import * as Animatable from 'react-native-animatable';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, OutlineButton } from '../../components/widgets/Button';
 import { useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 // Define Props for Register2
 type Register2Props = {
     navigation: {
-        navigate: (screen: string, params?: any) => void;
+        navigate: any,
     };
     route: {
         params: {
@@ -47,7 +48,8 @@ type ErrorState = {
 };
 
 const Register2: React.FC<Register2Props> = () => {
-    const { navigation, params } = useLocalSearchParams();
+    const { params } = useLocalSearchParams();
+    const router = useRouter();
 
     const [data, setData] = useState<DataState>({
         ...(params as any),
@@ -131,8 +133,15 @@ const Register2: React.FC<Register2Props> = () => {
     // Handle next button press
     const handleOnNextPress = () => {
         if (error.isValidEmail && error.isValidPassword && error.isValidRePassword) {
-            // Navaigate..
-            // navigation.navigate('Register3', data);
+            // Navigate..
+            router.push({
+                pathname: '/auth/register3' as const,
+                params: {
+                    email: data.email,
+                    password: data.password,
+                    retypePassword: data.retypePassword,
+                },
+            });
         }
     };
 
@@ -208,7 +217,7 @@ const Register2: React.FC<Register2Props> = () => {
                 <View style={{ marginTop: 30 }}>
                     <Button title="Next" color1st="royalblue" color2nd="blue" textColor="white" onPress={handleOnNextPress} />
                     <View style={{ marginTop: 20 }}>
-                        <OutlineButton title="Back" color="red" onPress={() => navigation.navigate('Register')} />
+                        <OutlineButton title="Back" color="red" onPress={() => router.back()} />
                     </View>
                 </View>
             </Animatable.View>
@@ -217,14 +226,65 @@ const Register2: React.FC<Register2Props> = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    header: { flex: 3, justifyContent: 'center', alignItems: 'center' },
-    footer: { flex: 3, backgroundColor: '#fff', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 20 },
-    text_header: { color: '#05375a', fontWeight: 'bold', fontSize: 30, backgroundColor: 'white', opacity: 0.7 },
-    text_footer: { color: '#05375a', fontSize: 18 },
-    action: { flexDirection: 'row', marginTop: 10, borderBottomWidth: 1, borderBottomColor: '#f2f2f2', paddingBottom: 5 },
-    textInput: { flex: 1, paddingLeft: 10, color: '#05375a' },
-    errorMsg: { color: 'red', fontSize: 13, marginTop: 5 },
+    container: {
+        flex: 1,
+        // backgroundColor: 'royalblue',
+    },
+    header: {
+        flex: 3,
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: 'black'
+    },
+    footer: {
+        flex: 3,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingVertical: 30,
+        paddingHorizontal: 20
+    },
+    text_header: {
+        color: '#05375a',
+        fontWeight: 'bold',
+        fontSize: 30,
+        backgroundColor: 'white',
+        padding: 5,
+        opacity: 0.7
+    },
+    text_footer: {
+        color: '#05375a',
+        fontSize: 18
+    },
+    action: {
+        flexDirection: 'row',
+        marginTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
+        paddingBottom: 5
+    },
+    textInput: {
+        flex: 1,
+        marginTop: Platform.OS === 'ios' ? 0 : -12,
+        paddingLeft: 10,
+        color: '#05375a',
+    },
+    signIn: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10
+    },
+    textSign: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    errorMsg: {
+        color: 'red',
+        fontWeight: 'bold',
+        fontSize: 13,
+        marginTop: 5,
+    }
 });
-
 export default Register2;
