@@ -5,3 +5,10 @@ export type FollowButtonType = {
     children?: any
 };
 
+
+
+export type RootStackParamList = {
+    UploadProfile: undefined;
+    MainTabs: undefined;
+    // Add other routes as needed
+};
