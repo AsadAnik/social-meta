@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home as HomeScreen, Details as DetailsScreen } from './src/screens';
+import ProfileScreen from './src/screens/Profile';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -35,7 +36,7 @@ const App = () => {
         />
         <Tab.Screen 
           name="Details" 
-          component={DetailsScreen} 
+          component={ProfileScreen} 
           options={{
             title: 'Details Screen',
             tabBarIcon: ({ color, size }) => (
