@@ -19,10 +19,10 @@ import { Button, OutlineButton } from '../../components/widgets/Button';
 
 // Define Props for Register2
 type Register2Props = {
-    navigation: {
+    navigation?: {
         navigate: any,
     };
-    route: {
+    route?: {
         params: {
             [key: string]: any;
         };

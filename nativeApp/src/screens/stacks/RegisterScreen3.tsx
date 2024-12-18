@@ -16,10 +16,10 @@ import { Button, OutlineButton } from "../../components/widgets/Button";
 // import { useLocalSearchParams, useRouter } from "expo-router";
 
 type Register3Props = {
-  navigation: {
+  navigation?: {
     navigate: any;
   };
-  push: {
+  push?: {
     params: {
       [key: string]: any;
     };
