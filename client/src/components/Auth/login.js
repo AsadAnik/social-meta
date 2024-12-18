@@ -25,6 +25,7 @@ import AlertNotify from '../widgets/AlertNotify';
 import { connect } from 'react-redux';
 import { loginUser } from '../../redux/actions/UserActions';
 import BackdropLoading from '../widgets/BackdropLoading';
+import { handleApiError } from '../../utils/errorHandler';
 
 // react validator..
 const validator = new SimpleReactValidator({ messagesShown: false });
@@ -102,33 +103,68 @@ const Login = (props) => {
     };
 
     // submit form..
-    const handleSubmit = (event) => {
+    // const handleSubmit = (event) => {
+    //     event.preventDefault();
+    //     const data = new FormData(event.currentTarget);
+
+    //     if (validator.allValid()) {
+    //         setFormData({ ...formData, validForm: true, formMessage: 'You are logged in successfully.' });
+
+    //         // dispatching action method of redux..
+    //         props.dispatch(loginUser({
+    //             email: data.get('email'),
+    //             password: data.get('password')
+    //         }));
+
+    //         // showing the Backdrop Loading after register user..
+    //         // setFormData({ ...formData, backdropLoading: true });
+    //         // console.log('loading');
+
+    //     } else {
+    //         validator.showMessages();
+    //         setFormData({ ...formData, validForm: false, formMessage: 'Your form is not valid please try again' });
+
+    //         // Again make normal the Alert Notify..
+    //         setTimeout(() => {
+    //             setFormData({ ...formData, validForm: null, formMessage: 'Keep filling' });
+    //         }, 2000);
+    //     }
+    // };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-
+    
         if (validator.allValid()) {
-            setFormData({ ...formData, validForm: true, formMessage: 'You are logged in successfully.' });
-
-            // dispatching action method of redux..
-            props.dispatch(loginUser({
-                email: data.get('email'),
-                password: data.get('password')
-            }));
-
-            // showing the Backdrop Loading after register user..
-            // setFormData({ ...formData, backdropLoading: true });
-            // console.log('loading');
-
+            setFormData({ ...formData, validForm: true, formMessage: 'Attempting to log in...' });
+    
+            try {
+                // Dispatching login action
+                await props.dispatch(
+                    loginUser({
+                        email: data.get('email'),
+                        password: data.get('password'),
+                    })
+                );
+    
+                // Successful login (if Redux updates state correctly)
+                setFormData({ ...formData, backdropLoading: true });
+            } catch (error) {
+                // Handle API error gracefully
+                const errorMessage = handleApiError(error, 'Login failed. Please try again.');
+                setFormData({ ...formData, validForm: false, formMessage: errorMessage });
+            }
         } else {
             validator.showMessages();
-            setFormData({ ...formData, validForm: false, formMessage: 'Your form is not valid please try again' });
-
-            // Again make normal the Alert Notify..
+            setFormData({ ...formData, validForm: false, formMessage: 'Your form is not valid. Please try again.' });
+    
+            // Reset alert after 2 seconds
             setTimeout(() => {
                 setFormData({ ...formData, validForm: null, formMessage: 'Keep filling' });
             }, 2000);
         }
     };
+    
 
     // Destructuring for props data..
     const { login } = props.User;

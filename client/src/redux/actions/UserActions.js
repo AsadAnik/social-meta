@@ -1,5 +1,7 @@
 import axios from 'axios';
 import httpConfig from '../../utils/httpConfig';
+import { handleApiError } from '../../utils/errorHandler';
+import { toast } from 'react-toastify';
 
 // initial themeMode setting..
 const initialThemeModeSetting = {
@@ -69,16 +71,34 @@ export function logout(){
 }
 
 // Login User..
-export function loginUser(data){
-    const request = axios.post(`${AUTH_API_ENDPOINT}/login`, data, httpConfig)
-        .then(response => response.data)
-        .catch(err => console.log('ERR! when try to post user login -> ', err.message));
+// export function loginUser(data){
+//     const request = axios.post(`${AUTH_API_ENDPOINT}/login`, data, httpConfig)
+//         .then(response => response.data)
+//         .catch(err => console.log('ERR! when try to post user login -> ', err.message));
 
-    return {
-        type: "USER_LOGIN",
-        payload: request
-    };
-}
+//     return {
+//         type: "USER_LOGIN",
+//         payload: request
+//     };
+// }
+
+export const loginUser = (data) => async (dispatch) => {
+    try {
+        const response = await axios.post(`${AUTH_API_ENDPOINT}/login`, data, httpConfig);
+        dispatch({
+            type: 'USER_LOGIN',
+            payload: response.data,
+        });
+        toast.success('Login successful!');
+    } catch (error) {
+        const message = handleApiError(error, 'Login failed. Please check your credentials.');
+        dispatch({
+            type: 'USER_LOGIN_ERROR',
+            payload: message,
+        });
+    }
+};
+
 
 // Sign Up User..
 export function register(data){
