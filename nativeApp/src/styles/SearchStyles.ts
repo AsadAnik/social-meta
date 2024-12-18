@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-
 import { Dimensions, Platform } from 'react-native';
 
 // Get the screen width

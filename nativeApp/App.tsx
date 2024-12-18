@@ -1,50 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home as HomeScreen, Details as DetailsScreen } from './src/screens';
-import ProfileScreen from './src/screens/Profile';
+import { HomeScreen, OnboardingScreen, PostScreen, SplashScreen } from './src/screens';
+import ProfileScreen from './src/screens/tabs/ProfileScreen';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
 
 const App = () => {
+  const [isFirstLaunch, setIsFirstLaunch] = useState(false);
+
   return (
     <NavigationContainer>
-      <Tab.Navigator
-        initialRouteName='Home'
+      <Stack.Navigator 
+        initialRouteName="Onboarding"
         screenOptions={{
-          headerStyle: {
-            backgroundColor: '#f4511e',
-          },
-          headerTintColor: '#fff',
+          headerShown: false
         }}
       >
-        <Tab.Screen
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+        />
+        <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+        />
+        <Stack.Screen
           name="Home"
           component={HomeScreen}
           options={{
             title: 'Home Screen',
-            tabBarIcon: ({ color, size }) => (
-              <AntDesign name="home" color={color} size={size} />
-            )
           }}
         />
-        <Tab.Screen 
-          name="Details" 
-          component={ProfileScreen} 
+        <Stack.Screen
+          name="Post"
+          component={PostScreen}
           options={{
-            title: 'Details Screen',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-details" color={color} size={size} />
-            )
+            title: 'Home Screen',
           }}
         />
-      </Tab.Navigator>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
