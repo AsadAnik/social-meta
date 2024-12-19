@@ -1,9 +1,10 @@
 export { default as HomeScreen } from './tabs/HomeScreen';
 export { default as ExploreScreen } from './tabs/ExploreScreen';
-export { default as ChatScreen } from './tabs/ChatScreen';
+export { default as ChatTabScreen } from './tabs/ChatScreen';
 export { default as NotificationScreen } from './tabs/NotificationScreen';
 export { default as ProfileScreen } from './tabs/ProfileScreen';
 export { default as PostScreen } from './tabs/PostScreen';
+export {default as MessageScreen} from './stacks/MessagesScreen'
 
 
 export { default as LoginScreen } from './stacks/LoginScreen';

@@ -5,7 +5,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 
 
 // import HomeScreen from './Home';
-import { ProfileScreen, PostScreen, ChatScreen, ExploreScreen, HomeScreen } from '../screens';
+import { ProfileScreen, PostScreen, ChatTabScreen,MessageScreen, ExploreScreen, HomeScreen } from '../screens';
 
 // const HomeStack = createNativeStackNavigator();
 // const ProfileStack = createNativeStackNavigator();
@@ -63,11 +63,13 @@ const MainTabs = () => {
                     //   )
                 }}
             />
-            <Tab.Screen
+           
+             <Tab.Screen
                 name="Chat"
-                component={ChatScreen}
+                component={ChatTabScreen}
                 options={{
                     tabBarLabel: 'Chat',
+                    headerShown: true,
                     //   tabBarIcon: ({ color }) => (
                     //     <AntDesign name="wechat" size={24} color={color} />
                     //   )
