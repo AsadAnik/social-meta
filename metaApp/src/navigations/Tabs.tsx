@@ -55,7 +55,7 @@ const MainTabs = () => {
         }}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Chat"
         component={ChatScreen}
         options={{
@@ -63,7 +63,7 @@ const MainTabs = () => {
             <Entypo name="notification" size={24} color={color} />
           ),
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Profile"

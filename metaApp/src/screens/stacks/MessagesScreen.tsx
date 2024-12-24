@@ -1,4 +1,4 @@
-import React, {useRef, useState, useLayoutEffect, useCallback} from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -23,17 +23,17 @@ interface Message {
   user: 'me' | 'bot';
 }
 
-const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
+const MessagesScreen: React.FC<{ navigation: any; route: any }> = ({
   navigation,
   route,
 }) => {
   const [messages, setMessages] = useState<Message[]>([
-    {id: '1', text: 'Hello! How can I help you today?', user: 'bot'},
+    { id: '1', text: 'Hello! How can I help you today?', user: 'bot' },
   ]);
   const [input, setInput] = useState('');
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
 
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList<Message>>(null);
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   const userName = route?.params?.userName || 'John Doe';
@@ -52,12 +52,12 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
       text: input,
       user: 'me',
     };
-    setMessages(prevMessages => [...prevMessages, newMessage]);
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
     setInput('');
 
     // Simulate bot response
     setTimeout(() => {
-      setMessages(prevMessages => [
+      setMessages((prevMessages) => [
         ...prevMessages,
         {
           id: Date.now().toString(),
@@ -71,7 +71,9 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
   const handleEdit = () => {
     if (!selectedMessage) return;
     setInput(selectedMessage.text);
-    setMessages(messages.filter(msg => msg.id !== selectedMessage.id));
+    setMessages((messages) =>
+      messages.filter((msg) => msg.id !== selectedMessage.id)
+    );
     bottomSheetModalRef.current?.dismiss();
   };
 
@@ -89,27 +91,31 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            setMessages(messages.filter(msg => msg.id !== selectedMessage.id));
+            setMessages((messages) =>
+              messages.filter((msg) => msg.id !== selectedMessage.id)
+            );
             bottomSheetModalRef.current?.dismiss();
           },
         },
-      ],
+      ]
     );
   };
 
-  const renderMessage = ({item}: {item: Message}) => {
+  const renderMessage = ({ item }: { item: Message }) => {
     const isUser = item.user === 'me';
     return (
       <TouchableOpacity
         onLongPress={() => {
           setSelectedMessage(item);
           bottomSheetModalRef.current?.present();
-        }}>
+        }}
+      >
         <View
           style={[
             styles.messageContainer,
             isUser ? styles.userMessage : styles.botMessage,
-          ]}>
+          ]}
+        >
           <Text style={isUser ? styles.userText : styles.botText}>
             {item.text}
           </Text>
@@ -122,19 +128,20 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
     <BottomSheetModalProvider>
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         {/* Messages List */}
         <FlatList
           ref={flatListRef}
           data={messages}
           renderItem={renderMessage}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.chatContainer}
           extraData={messages}
           onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({animated: true})
+            flatListRef.current?.scrollToEnd({ animated: true })
           }
-          onLayout={() => flatListRef.current?.scrollToEnd({animated: true})}
+          onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
 
         {/* Input Section */}
@@ -154,21 +161,24 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
         <BottomSheetModal
           ref={bottomSheetModalRef}
           index={0}
-          snapPoints={['25%']}>
+          snapPoints={['25%']}
+        >
           <BottomSheetView style={styles.bottomSheetContent}>
             <View style={styles.optionContainer}>
               <TouchableOpacity
                 onPress={handleEdit}
-                style={[styles.optionButton, {backgroundColor: '#4CAF50'}]}>
-                <Icon name="edit" size={24} color="#fff" />
+             
+              >
+                <Icon name="edit" size={24} color="#000" />
               </TouchableOpacity>
               <Text style={styles.optionText}>Edit</Text>
             </View>
             <View style={styles.optionContainer}>
               <TouchableOpacity
                 onPress={handleDelete}
-                style={[styles.optionButton, {backgroundColor: '#F44336'}]}>
-                <Icon name="delete" size={24} color="#fff" />
+                // style={{ backgroundColor: '#000' }}
+              >
+                <Icon name="delete" size={24} color="#000" />
               </TouchableOpacity>
               <Text style={styles.optionText}>Delete</Text>
             </View>
@@ -178,8 +188,8 @@ const MessagesScreen: React.FC<{navigation: any; route: any}> = ({
     </BottomSheetModalProvider>
   );
 };
-export default MessagesScreen;
 
+export default MessagesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -235,26 +245,38 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bottomSheetContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: 'column', 
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    width: '100%',
   },
   optionContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    padding: 10,
+    width: '100%',
   },
   optionButton: {
-    width: 50,
+    width: '100%',
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderEndStartRadius: 10,
-    borderBottomEndRadius: 10,
+    borderRadius: 10,
     marginBottom: 8,
   },
   optionText: {
-    fontSize: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: '#000',
+    borderBottomWidth: 1,
+    borderBottomColor: '#D1D1D1',
+    width: '100%',
   },
 });

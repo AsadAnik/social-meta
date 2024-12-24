@@ -196,8 +196,8 @@ const ChatTabScreen: React.FC<MessagesScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     padding: 16,
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
@@ -211,14 +211,14 @@ const styles = StyleSheet.create({
 
   optionWrapperContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     gap: 10,
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#D1D1D1',
+    width: '100%',
   }
 });
-
 
 export default ChatTabScreen;

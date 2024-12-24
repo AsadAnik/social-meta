@@ -1,9 +1,11 @@
 import React from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import {
+  ChatScreen,
   LoginScreen,
   MessageScreen,
   OnboardingScreen,
@@ -13,22 +15,20 @@ import {
   SplashScreen,
   UploadProfileScreen,
 } from './src/screens';
-import { Tabs } from './src/navigations';
-
+import {Tabs} from './src/navigations';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  // const [isFirstLaunch, setIsFirstLaunch] = useState(false);
-
   /**
    * CUSTOM HEADERS TITLE FOR BOTTOM TABS
-   * @param route 
-   * @returns 
+   * @param route
+   * @returns
    */
   const getHeaderTitle = (route: any) => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
-    const titleMap: { [key: string]: string } = {
+    const titleMap: {[key: string]: string} = {
       Home: 'Home',
       Profile: 'Profile',
       Explore: 'Explore',
@@ -65,7 +65,6 @@ const App = () => {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
             name="Register"
             component={RegisterScreen}
@@ -73,7 +72,6 @@ const App = () => {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
             name="Register2"
             component={RegisterScreen2}
@@ -81,7 +79,6 @@ const App = () => {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
             name="Register3"
             component={RegisterScreen3}
@@ -89,7 +86,6 @@ const App = () => {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
             name="UploadProfile"
             component={UploadProfileScreen}
@@ -97,19 +93,42 @@ const App = () => {
               headerShown: false,
             }}
           />
-
           <Stack.Screen
             name="Tabs"
             component={Tabs}
-            options={({ route }: any): any => ({
-              headerShown: true,
-              headerTitle: getHeaderTitle(route) || 'Home',
-            })}
+            options={({route, navigation}: any) => {
+              const focusedRouteName =
+                getFocusedRouteNameFromRoute(route) ?? 'Home'; 
+
+              return {
+                headerShown: true,
+                headerTitle: getHeaderTitle(route) || 'Home',
+                headerRight: () =>
+                  focusedRouteName === 'Home' ? (
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Chat')}>
+                      <Entypo
+                        name="chat"
+                        size={24}
+                        color="#A4C400"
+                        style={{marginRight: 15}}
+                      />
+                    </TouchableOpacity>
+                  ) : null, 
+              };
+            }}
           />
 
           <Stack.Screen
             name="Messages"
             component={MessageScreen}
+            options={{
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="Chat"
+            component={ChatScreen}
             options={{
               headerShown: true,
             }}
