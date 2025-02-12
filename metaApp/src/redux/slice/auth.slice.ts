@@ -1,14 +1,13 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import toaster from "react-hot-toast";
-import { RootState, store } from "@/redux/store";
-import axiosInstance from "@/lib/axios.interceptor";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createSlice } from "@reduxjs/toolkit";
+import Toast from "react-native-toast-message";
+import axiosInstance from "../../lib/axiosInstance";
 
-
+// Base API URL
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
-// region Axios instance with default configuration
+// Custom base query with Axios
 const customBaseQuery = async ({ url, method, data }: any) => {
   try {
     const result = await axiosInstance({ url, method, data });
@@ -18,21 +17,18 @@ const customBaseQuery = async ({ url, method, data }: any) => {
   }
 };
 
-
-// region Auth API Slice
+// Auth API Slice
 export const authAPISlice = createApi({
   reducerPath: "api",
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
-    // region Get Posts Query
     getPosts: builder.query({
       query: ({ page = 1, limit = 5 }) => ({
         url: `/post/read_all_posts?page=${page}&limit=${limit}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
-    // region Add Posts Mutation
     addPost: builder.mutation({
       query: (body) => ({
         url: "posts",
@@ -41,7 +37,6 @@ export const authAPISlice = createApi({
       }),
     }),
 
-    // region Login Mutation..
     login: builder.mutation({
       query: (body) => ({
         url: "/auth/login",
@@ -51,21 +46,24 @@ export const authAPISlice = createApi({
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-
-          // Destructure response to extract token and user
           const { accessToken, refreshToken, user } = data;
           dispatch(setCredentials({ accessToken, refreshToken, user }));
-          console.log('Login successful!', accessToken)
 
-          toaster.success("Login successful!");
+          Toast.show({
+            type: "success",
+            text1: "Login Successful!",
+          });
         } catch (error) {
           console.error("Login failed: ", error);
-          toaster.error("Login failed. Please check your credentials.");
+          Toast.show({
+            type: "error",
+            text1: "Login failed",
+            text2: "Please check your credentials.",
+          });
         }
       },
     }),
 
-    // region Register Mutation..
     register: builder.mutation({
       query: (body) => ({
         url: "/auth/register",
@@ -75,23 +73,23 @@ export const authAPISlice = createApi({
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log('data', data);
+          const { accessToken, refreshToken, user } = data;
 
-
-          if (data) {
-            const { accessToken, refreshToken, user } = data;
-
-            dispatch(setCredentials({ accessToken, refreshToken, user }));
-            toaster.success("Registration successful!");
-          }
+          dispatch(setCredentials({ accessToken, refreshToken, user }));
+          Toast.show({
+            type: "success",
+            text1: "Registration Successful!",
+          });
         } catch (error) {
           console.error("Registration failed: ", error);
-          toaster.error("Registration failed. Please check your credentials.");
+          Toast.show({
+            type: "error",
+            text1: "Registration failed",
+          });
         }
       },
     }),
 
-    // region Logout Mutation
     logout: builder.mutation({
       query: () => ({
         url: "/auth/logout",
@@ -101,19 +99,30 @@ export const authAPISlice = createApi({
         try {
           await queryFulfilled;
           dispatch(clearCredentials());
-          toaster.success("Logout successful!");
+          Toast.show({
+            type: "success",
+            text1: "Logout Successful!",
+          });
         } catch (error) {
           console.error("Logout failed: ", error);
-          toaster.error("Logout failed. Please try again.");
+          Toast.show({
+            type: "error",
+            text1: "Logout failed",
+          });
         }
       },
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetPostsQuery, useLogoutMutation } = authAPISlice;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useGetPostsQuery,
+  useLogoutMutation,
+} = authAPISlice;
 
-// region Auth Slice
+// Auth State Interface
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
@@ -125,7 +134,7 @@ interface AuthState {
   } | null;
 }
 
-// regioon Auth Initial State
+// Auth Initial State
 const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
@@ -136,15 +145,11 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // region Set Credentials
     setCredentials: (state, action) => {
-      console.log('action', action);
-
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.user = action.payload.user;
     },
-    // region clear Credentials
     clearCredentials: (state) => {
       state.accessToken = null;
       state.refreshToken = null;

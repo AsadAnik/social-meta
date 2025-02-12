@@ -105,10 +105,9 @@ class PostController {
    */
   public createPost = async (req: Request, res: Response) => {
     const currentLoggedInUserId = String((req as any).user._id);
-    const post = {
-      title: req.body.title,
-      description: req.body.description,
-      image: req.file?.originalname,
+    const post: any = {
+      body: req.body.content,
+      // image: req.file?.originalname,
       ownerId: currentLoggedInUserId,
       user: new Types.ObjectId(currentLoggedInUserId),
     };
@@ -119,6 +118,8 @@ class PostController {
       post.image = req.file.originalname;
     }
 
+    console.log('post', post);
+    
     try {
       await this.postService.createPost(post);
 

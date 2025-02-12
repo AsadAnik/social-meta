@@ -3,6 +3,8 @@
     width: 100%; // Full width within the parent
     display: flex;
     justify-content: center; // Align in center horizontally
+    position: absolute;
+    top: 28%;
 }
 
 .tweet-card {

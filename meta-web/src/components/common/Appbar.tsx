@@ -23,9 +23,17 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { ModeSwitch } from '@/components/widgets';
 import appbarStyles from '@/styles/components/appbar.module.scss';
 import { useRouter } from 'next/navigation';
+import { useLogoutMutation } from '@/redux/slice/auth.slice';
+import { clearCredentials } from '@/redux/slice/auth.slice';
+import { toast } from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
 
 // region AppBar Component
 export default function PrimarySearchAppBar(props: any) {
+
+    const [logout, { isLoading }] = useLogoutMutation();
+    const dispatch = useDispatch();
+
     const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
@@ -49,6 +57,21 @@ export default function PrimarySearchAppBar(props: any) {
 
     const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setMobileMoreAnchorEl(event.currentTarget);
+    };
+
+    // region Logout Handler
+    const handleLogout = async () => {
+        try {
+            await logout({});
+            dispatch(clearCredentials());
+            toast.success("Logout successful!");
+            router.push('/login'); // Redirect user to login after logout
+        } catch (error) {
+            console.error("Logout failed: ", error);
+            toast.error("Logout failed. Please try again.");
+        } finally {
+            handleMenuClose();
+        }
     };
 
     // region Default Menu
