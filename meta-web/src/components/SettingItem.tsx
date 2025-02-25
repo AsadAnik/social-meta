@@ -1,7 +1,5 @@
-"use client"
-
-import type React from "react"
-import { useState } from "react"
+import type React from "react";
+import { useState } from "react";
 import {
     Box,
     List,
@@ -15,9 +13,8 @@ import {
     TextField,
     Collapse,
     useTheme,
-} from "@mui/material"
-import { Person, Settings, Chat, Videocam, Palette, NotificationsNone, Search, ExpandMore } from "@mui/icons-material"
-
+} from "@mui/material";
+import { Person, Settings, Chat, Videocam, Palette, NotificationsNone, Search, ExpandMore } from "@mui/icons-material";
 
 const menuItems = [
     { text: "Profile", icon: <Person sx={{ color: "action.active" }} /> },
@@ -26,23 +23,23 @@ const menuItems = [
     { text: "Voice & video", icon: <Videocam sx={{ color: "action.active" }} /> },
     { text: "Appearance", icon: <Palette sx={{ color: "action.active" }} /> },
     { text: "Notification", icon: <NotificationsNone sx={{ color: "action.active" }} /> },
-]
+];
 
 const SettingItem: React.FC = () => {
-    const [searchVisible, setSearchVisible] = useState(false)
-    const [activeItem, setActiveItem] = useState("")
-    const theme = useTheme()
+    const [searchVisible, setSearchVisible] = useState(false);
+    const [activeItem, setActiveItem] = useState("");
+    const theme = useTheme();
 
     return (
         <Box
             sx={{
-                width: 300,
+                width: "100%", // Allow full width for smaller screens
                 bgcolor: "background.paper",
                 borderRight: "1px solid",
                 borderColor: "divider",
-                display: { xs: "none", md: "block" },
+                display: { xs: "block", md: "block" }, // Ensure block layout on all screens
                 boxShadow: theme.shadows[3],
-                height: "100vh",
+                height: "100%",
                 overflow: "auto",
                 transition: "all 0.3s ease",
                 "&:hover": {
@@ -119,7 +116,7 @@ const SettingItem: React.FC = () => {
                                     justifyContent: "center",
                                     transition: "all 0.3s ease",
                                     boxShadow: activeItem === item.text ? theme.shadows[4] : "none",
-                                    mr: 1
+                                    mr: 1,
                                 }}
                             >
                                 {item.icon}
@@ -147,8 +144,7 @@ const SettingItem: React.FC = () => {
                 ))}
             </List>
         </Box>
-    )
-}
+    );
+};
 
-export default SettingItem
-
+export default SettingItem;
