@@ -21,17 +21,24 @@ import { Container, Fab, Fade } from '@mui/material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { ModeSwitch } from '@/components/widgets';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useLogoutMutation } from '@/redux/slice/auth.slice';
 import { clearCredentials } from '@/redux/slice/auth.slice';
 import { toast } from 'react-hot-toast';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 // region AppBar Component
 export default function PrimarySearchAppBar(props: any) {
 
     const [logout, { isLoading }] = useLogoutMutation();
     const dispatch = useDispatch();
+    const authUser = useSelector((state: RootState) => state.auth.user); // Get user from Redux
+    console.log(authUser?.id);
+    const userId = authUser?.id;
+      
+
+    
 
     const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -92,7 +99,7 @@ export default function PrimarySearchAppBar(props: any) {
             onClose={handleMenuClose}
         >
             <MenuItem onClick={() => {
-                router.push('/profile/me');
+                router.push(`/profile/me/${userId}`);
                 handleMenuClose();
             }}>
                 <IconButton size="large" color="inherit">
@@ -120,7 +127,7 @@ export default function PrimarySearchAppBar(props: any) {
             </MenuItem>
 
             <MenuItem onClick={() => {
-                // handleLogout();
+                handleLogout();
                 handleMenuClose();
             }}>
                 <IconButton size="large" color="inherit">

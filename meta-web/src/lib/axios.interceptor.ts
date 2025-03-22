@@ -34,12 +34,22 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (!error.response) {
+      console.error("Network error: Unable to connect to the server.");
+      return Promise.reject({ message: "Network error: Unable to connect." });
+    }
+
     // Check if the error is due to an expired token
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         const state = store.getState() as RootState;
+        if (!state.auth.refreshToken) {
+          store.dispatch(clearCredentials());
+          window.location.href = "/login";
+          return Promise.reject(error);
+        }
         console.log("State: ", state);
         // Attempt to refresh the access token
         const refreshResponse = await axios.post(

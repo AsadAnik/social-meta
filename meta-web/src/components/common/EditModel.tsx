@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -14,31 +14,57 @@ import {
   Stack,
 } from "@mui/material";
 import { Close, PhotoLibrary } from "@mui/icons-material";
-import { useCreatePostMutation, useFetchPostsQuery, addPosts, setPosts, Post } from "@/redux/slice/post.slice";
-import { useDispatch, useSelector } from "react-redux";
+import { useUpdatePostMutation, useFetchPostsQuery } from "@/redux/slice/post.slice";
 import toaster from "react-hot-toast";
-import { AppDispatch } from "@/redux/store";
 
 
-interface CreatePostDialogProps {
-  avatarSrc: string;
-  open: boolean;
-  setOpen: (value: boolean) => void;
-  onPostCreated: () => void;
+interface Post {
+  _id: string;
+  content: string;
+  createdAt: string;
+  likes_count: number;
+  comments_count: number;
+  image?: string; // Include post image field
+  owner: {
+    firstname: string;
+    lastname: string;
+    profilePhoto?: string;
+    title: string;
+  };
 }
 
-export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePostDialogProps) {
-  const dispatch = useDispatch<AppDispatch>();
-  const [body, setBody] = useState("");
-  const [image, setImage] = useState<File | null>(null);
-  const [createPost] = useCreatePostMutation();
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { refetch } = useFetchPostsQuery({ page: 1, limit: 5 });
-  const data = useSelector((state: {
-    posts(arg0: string, posts: any): unknown; postsApi: any
-  }) => state)
-  console.log('data from post model', data.posts);
+interface EditPostDialogProps {
+  open: boolean;
+  setOpen: (value: boolean) => void;
+  post: Post;
+  onPostUpdated?: () => void;
+}
 
+export default function EditPostDialog({ open, setOpen, post, onPostUpdated }: EditPostDialogProps) {
+  const [content, setContent] = useState(post.content);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(post.image || null);
+  const { refetch } = useFetchPostsQuery({ page: 1, limit: 5 });
+
+  const [updatePost, { isLoading }] = useUpdatePostMutation();
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Pre-fill state when modal opens
+  useEffect(() => {
+    if (open) {
+      setContent(post.content);
+      setImagePreview(post.image || null); // Use actual post image
+      setImage(null);
+    }
+  }, [open, post]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,25 +73,36 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
       setImagePreview(URL.createObjectURL(file));
     }
   };
-  const handleSubmit = async () => {
-    if (!body.trim()) return;
+
+  const handleUpdate = async () => {
+    if (!content.trim()) {
+      toaster.error("Content cannot be empty.");
+      return;
+    }
 
     const postData = new FormData();
-    postData.append("content", body);
-    if (image) postData.append("file", image);
+    postData.append('content', content);
+
+    if (image) {
+      postData.append('image', image);
+    }
 
     try {
-      await createPost(postData).unwrap();
-      onPostCreated();
-      toaster.success("Post created successfully!");
+      const updatedPost = await updatePost({ id: post._id, postData }).unwrap();
+      refetch();
+      console.log("Updated post:", updatedPost);
+
+      toaster.success("Post updated successfully!");
+
+      // Call the update function to refresh UI state
+      onPostUpdated?.();
 
       setOpen(false);
-      await refetch();
     } catch (error) {
-      toaster.error("Failed to create post.");
+      console.error("Update error:", error);
+      toaster.error("Failed to update post. Try again.");
     }
   };
-
 
   return (
     <Dialog
@@ -84,7 +121,7 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
         }}
       >
         <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center", fontWeight: "bold" }}>
-          Create Post
+          Edit Post
         </Typography>
         <IconButton onClick={() => setOpen(false)} sx={{ color: "rgba(0,0,0,0.7)" }}>
           <Close />
@@ -92,29 +129,38 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
       </DialogTitle>
 
       <DialogContent sx={{ pt: 2 }}>
+        {/* User Info */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-          <Avatar src={avatarSrc} sx={{ width: 50, height: 50 }} />
+          <Avatar
+            src={post.owner.profilePhoto || "https://via.placeholder.com/150"}
+            sx={{ width: 50, height: 50 }}
+          />
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              Yaseen Arafat
+              {post.owner.firstname} {post.owner.lastname}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "gray" }}>
+              {formatDate(post.createdAt)}
             </Typography>
           </Box>
         </Box>
 
+        {/* Content Input */}
         <TextField
           fullWidth
           multiline
           rows={4}
-          placeholder="What's on your mind?"
+          placeholder="Edit your post..."
           variant="standard"
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           InputProps={{
             disableUnderline: true,
             sx: { fontSize: "1.25rem", p: 1, borderRadius: 1 },
           }}
         />
 
+        {/* Image Preview */}
         {imagePreview && (
           <Box
             sx={{
@@ -139,6 +185,7 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
           </Box>
         )}
 
+        {/* Image Upload */}
         <Box
           sx={{
             mt: 2,
@@ -149,16 +196,16 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
             justifyContent: "space-between",
           }}
         >
-          <Typography>Add to your post</Typography>
+          <Typography>Change image</Typography>
           <Stack direction="row" spacing={1}>
             <input
               accept="image/*"
               type="file"
               style={{ display: "none" }}
-              id="image-upload"
+              id="image-upload-edit"
               onChange={handleImageChange}
             />
-            <label htmlFor="image-upload">
+            <label htmlFor="image-upload-edit">
               <IconButton component="span" sx={{ color: "#4CAF50" }}>
                 <PhotoLibrary />
               </IconButton>
@@ -166,11 +213,12 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
           </Stack>
         </Box>
 
+        {/* Update Button */}
         <Button
           fullWidth
           variant="contained"
-          onClick={handleSubmit}
-          disabled={!body.trim() && !image}
+          onClick={handleUpdate}
+          disabled={!content.trim() || isLoading}
           sx={{
             mt: 2,
             textTransform: "none",
@@ -180,7 +228,7 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
             "&:hover": { bgcolor: "#145db2" },
           }}
         >
-          Post
+          Update
         </Button>
       </DialogContent>
     </Dialog>

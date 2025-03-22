@@ -71,7 +71,7 @@ export default function InstagramSuggestions() {
 
     return (
         <ThemeProvider theme={darkTheme}>
-            <Box sx={{ backgroundColor: "background.default", color: "text.primary", padding: "36px" }}>
+            <Box sx={{ backgroundColor: "background.default", color: "text.primary", padding: "36px" , }}>
                 {/* User Profile Section */}
                 <Box sx={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
                     <Box sx={{ position: "relative", width: 56, height: 56, marginRight: "12px", borderRadius: "50%", overflow: "hidden" }}>

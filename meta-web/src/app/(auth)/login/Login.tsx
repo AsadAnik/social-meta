@@ -54,7 +54,7 @@ export default function LoginPage() {
         password: formData.password,
       }).unwrap();
 
-      dispatch(setCredentials({ user: null, accessToken: authLoginResponse.data.accessToken, refreshToken: authLoginResponse.data.refreshToken }));
+      dispatch(setCredentials({ user: authLoginResponse.data.user, accessToken: authLoginResponse.data.accessToken, refreshToken: authLoginResponse.data.refreshToken }));
       console.log('Login successful!', setCredentials({ accessToken: authLoginResponse.data.accessToken }));
 
       // toast.success("Login successful!");

@@ -23,23 +23,6 @@ export const authAPISlice = createApi({
   reducerPath: "api",
   baseQuery: customBaseQuery,
   endpoints: (builder) => ({
-    // region Get Posts Query
-    getPosts: builder.query({
-      query: ({ page = 1, limit = 5 }) => ({
-        url: `/post/read_all_posts?page=${page}&limit=${limit}`,
-        method: 'GET',
-      }),
-    }),
-
-    // region Add Posts Mutation
-    addPost: builder.mutation({
-      query: (body) => ({
-        url: "posts",
-        method: "POST",
-        body,
-      }),
-    }),
-
     // region Login Mutation..
     login: builder.mutation({
       query: (body) => ({
@@ -107,7 +90,7 @@ export const authAPISlice = createApi({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetPostsQuery, useLogoutMutation } = authAPISlice;
+export const { useLoginMutation, useRegisterMutation, useLogoutMutation } = authAPISlice;
 
 // region Auth Slice
 interface AuthState {

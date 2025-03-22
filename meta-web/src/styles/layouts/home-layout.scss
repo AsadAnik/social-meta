@@ -2,7 +2,7 @@
 @import "../mixins";
 
 .tweets-area {
-  width: 500px; // Central content feed width
+  width: 100%; // Central content feed width
   margin: 0 auto; // Center horizontally
   padding: 16px; // Padding around the tweets area
   // background-color: #f5f8fa; // Light background
@@ -16,3 +16,5 @@
     margin-top: 16px; // Spacing between tweet cards
   }
 }
+
+
