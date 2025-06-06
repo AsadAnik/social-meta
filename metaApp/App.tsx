@@ -17,11 +17,12 @@ import {
   SplashScreen,
   UploadProfileScreen,
 } from './src/screens';
-import { Tabs } from './src/navigations';
+import { Tabs } from './src/navigations/index';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/store';
 import Toast from 'react-native-toast-message';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,102 +50,104 @@ const App = () => {
   // region Navigations
   return (
     <Provider store={store}>
-      <GestureHandlerRootView>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Onboarding">
-            <Stack.Screen
-              name="Onboarding"
-              component={OnboardingScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Splash"
-              component={SplashScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Register2"
-              component={RegisterScreen2}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Register3"
-              component={RegisterScreen3}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="UploadProfile"
-              component={UploadProfileScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
+      <PaperProvider>
+        <GestureHandlerRootView>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Onboarding">
+              <Stack.Screen
+                name="Onboarding"
+                component={OnboardingScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Splash"
+                component={SplashScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Register2"
+                component={RegisterScreen2}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="Register3"
+                component={RegisterScreen3}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="UploadProfile"
+                component={UploadProfileScreen}
+                options={{
+                  headerShown: false,
+                }}
+              />
 
-            {/* TAB SCREENS */}
-            <Stack.Screen
-              name="Tabs"
-              component={Tabs}
-              options={({ route, navigation }: any) => {
-                const focusedRouteName = getFocusedRouteNameFromRoute(route) ?? 'Home';
-                return {
+              {/* TAB SCREENS */}
+              <Stack.Screen
+                name="Tabs"
+                component={Tabs}
+                options={({ route, navigation }: any) => {
+                  const focusedRouteName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+                  return {
+                    headerShown: true,
+                    headerTitle: getHeaderTitle(route) || 'Home',
+                    headerRight: () =>
+                      focusedRouteName === 'Home' ? (
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('Chat')}>
+                          <Entypo
+                            name="chat"
+                            size={24}
+                            color="#A4C400"
+                            style={{ marginRight: 15 }}
+                          />
+                        </TouchableOpacity>
+                      ) : null,
+                  };
+                }}
+              />
+
+              <Stack.Screen
+                name="Messages"
+                component={MessageScreen}
+                options={{
                   headerShown: true,
-                  headerTitle: getHeaderTitle(route) || 'Home',
-                  headerRight: () =>
-                    focusedRouteName === 'Home' ? (
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('Chat')}>
-                        <Entypo
-                          name="chat"
-                          size={24}
-                          color="#A4C400"
-                          style={{ marginRight: 15 }}
-                        />
-                      </TouchableOpacity>
-                    ) : null,
-                };
-              }}
-            />
-
-            <Stack.Screen
-              name="Messages"
-              component={MessageScreen}
-              options={{
-                headerShown: true,
-              }}
-            />
-            <Stack.Screen
-              name="Chat"
-              component={ChatScreen}
-              options={{
-                headerShown: true,
-              }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <Toast />
-      </GestureHandlerRootView>
+                }}
+              />
+              <Stack.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{
+                  headerShown: true,
+                }}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <Toast />
+        </GestureHandlerRootView>
+      </PaperProvider>
     </Provider>
   );
 };
