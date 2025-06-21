@@ -47,11 +47,10 @@ export const postAPI = createApi({
                 return {
                   url: "/posts",
                   method: "POST",
-                  // headers: {
-                  //   "Content-Type": "multipart/form-data;",
-                  // },
                   data: formData,
-                  formData: true,
+                  headers: {
+                    'Content-Type': 'multipart/form-data',
+                  },
                 };
             },
             invalidatesTags: ['Posts'],

@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { store } from '../../../redux/store';
 import { setCredentials, clearCredentials } from '../../../redux/slice/auth.slice';
 import Toast from 'react-native-toast-message';
+import { Platform } from 'react-native';
+import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from './debugUtils';
 
 declare global {
   var navigationRef: {
@@ -12,17 +14,12 @@ declare global {
   };
 }
 
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
-
 const API_URL = process.env.REACT_PUBLIC_API_URL ?? 'https://social-meta.onrender.com/api/v1';
 
 let isRefreshing = false;
-let refreshPromise: Promise<string | null> | null = null;
 
 const waitForRefresh = () =>
-  new Promise<string | null>((resolve, reject) => {
+  new Promise<string | null>((resolve) => {
     const interval = setInterval(() => {
       if (!isRefreshing) {
         clearInterval(interval);
@@ -36,6 +33,7 @@ const waitForRefresh = () =>
 const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+  timeout: 30000, // 30 seconds timeout
 });
 
 
@@ -43,6 +41,17 @@ const axiosInstance = axios.create({
 // region Request Interceptor
 axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    const isFormData = config.data instanceof FormData;
+    const contentType = config.headers?.['Content-Type'] || config.headers?.['content-type'];
+
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android' && isFormData) {
+      debugNetworkRequest(config);
+    }
+
+    console.log('[REQUEST] - ', config.method?.toUpperCase(), config.url, isFormData ? '[FormData]' : config.data);
+    console.log('[REQUEST-CONTENT-TYPE] - ', contentType);
+
     try {
       const token = store.getState().auth.accessToken;
       const accessToken = token ?? await AsyncStorage.getItem('accessToken');
@@ -50,6 +59,15 @@ axiosInstance.interceptors.request.use(
       if (accessToken) {
         if (config.headers) {
           config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      }
+
+      // Handle FormData specifically for Android
+      if (isFormData && Platform.OS === 'android') {
+        // Remove Content-Type header to let the browser set it with boundary
+        if (config.headers) {
+          delete config.headers['Content-Type'];
+          delete config.headers['content-type'];
         }
       }
     } catch (error) {
@@ -67,8 +85,25 @@ axiosInstance.interceptors.request.use(
 // region Response Interceptor
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android') {
+      debugNetworkResponse(response);
+    }
+
+    console.log('[RESPONSE] - ', response.config.url, response.status, response.data);
+    console.log('[RESPONSE STATUS] - ', response.status);
+    console.log('[RESPONSE DATA] - ', response.data);
+    console.log('[RESPONSE HEADERS] - ', response.headers);
+
+    return response;
+  },
   async (error) => {
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android') {
+      debugNetworkError(error);
+    }
+
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
