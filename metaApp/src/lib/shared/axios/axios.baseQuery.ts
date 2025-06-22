@@ -1,68 +1,58 @@
 import type { BaseQueryFn } from '@reduxjs/toolkit/query';
-import axios, { AxiosRequestConfig } from 'axios';
-import { store } from '../../../redux/store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL } from '../../../config/environment';
+import { AxiosRequestConfig } from 'axios';
+import axiosInstance from './axios.Interceptor';
 
 /**
- * Base Interceptor to creating for Post
- * This will make axios adaptor for post issue which is the formData issue for Android.
- * Android formData as not abled to send network requset for some reason.
- * @returns
+ * Axios-based custom base query for RTK Query
+ * Compatible with FormData (Android-friendly)
  */
-const axiosBaseQuery =
-    (): BaseQueryFn<
-        {
-            url: string;
-            method: AxiosRequestConfig['method'];
-            data?: AxiosRequestConfig['data'];
-            params?: AxiosRequestConfig['params'];
-            headers?: AxiosRequestConfig['headers'];
-            skipAuth?: boolean;
-        },
-        unknown,
-        unknown
-    > =>
-        async ({ url, method, data, params, headers }) => {
-            try {
-                const token = store.getState().auth.accessToken ?? (await AsyncStorage.getItem('accessToken'));
-                const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+const axiosBaseQuery = (): BaseQueryFn<
+    {
+        url: string;
+        method: AxiosRequestConfig['method'];
+        data?: AxiosRequestConfig['data'];
+        params?: AxiosRequestConfig['params'];
+        headers?: AxiosRequestConfig['headers'];
+    },
+    unknown,
+    unknown
+> =>
+    async ({ url, method, data, params, headers }) => {
+        try {
+            const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
 
-                const result = await axios({
-                    baseURL: API_URL,
-                    url,
-                    method,
-                    data,
-                    params,
-                    headers: {
-                        ...(headers ?? {}),
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                        ...(isFormData
-                            ? {
-                                // Let Axios auto-set multipart boundary
-                                'Content-Type': undefined,
-                            }
-                            : { 'Content-Type': 'application/json' }),
-                    },
-                    transformRequest: isFormData
-                        ? [(formData, reqHeaders) => {
-                            // Delete Content-Type so Axios sets it correctly
-                            delete reqHeaders['Content-Type'];
-                            return formData;
-                        }]
-                        : undefined,
-                });
+            const result = await axiosInstance({
+                url,
+                method,
+                data,
+                params,
+                headers: {
+                    ...(headers ?? {}),
+                    ...(isFormData
+                        ? {
+                            // Let Axios auto-set Content-Type with boundary
+                            'Content-Type': undefined,
+                        }
+                        : { 'Content-Type': 'application/json' }),
+                },
+                transformRequest: isFormData
+                    ? [(formData, reqHeaders) => {
+                        delete reqHeaders['Content-Type'];
+                        return formData;
+                    }]
+                    : undefined,
+            });
 
-                return { data: result.data };
+            return { data: result.data };
 
-            } catch (axiosError: any) {
-                return {
-                    error: {
-                        status: axiosError.response?.status || 500,
-                        data: axiosError.response?.data || axiosError.message,
-                    },
-                };
-            }
-        };
+        } catch (axiosError: any) {
+            return {
+                error: {
+                    status: axiosError.response?.status || 500,
+                    data: axiosError.response?.data || axiosError.message,
+                },
+            };
+        }
+    };
 
 export default axiosBaseQuery;

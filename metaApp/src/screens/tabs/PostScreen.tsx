@@ -42,7 +42,7 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
       setSelectedMedia(null);
       onPostCreated?.();
       navigation?.goBack();
-      refetch(); // ✅ Refresh posts list
+      refetch(); // Refresh posts list
     };
 
     setIsSubmitting(true);

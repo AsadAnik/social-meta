@@ -1,35 +1,8 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { createSlice } from '@reduxjs/toolkit';
-import { axiosInstance } from '../../lib/shared';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import { BaseQueryFn } from '@reduxjs/toolkit/query';
-
-/**
- * The Custom Base query for Axios Interceptor
- * @param param
- * @returns
- */
-// region Custom Base Query
-const axiosBaseQuery = (): BaseQueryFn<
-  { url: string; method: string; data?: any; params?: any },
-  unknown,
-  unknown
-> => async ({ url, method, data, params }) => {
-  try {
-    const result = await axiosInstance({ url, method, data, params });
-    return { data: result.data };
-
-  } catch (axiosError) {
-    let err = axiosError as any;
-    return {
-      error: {
-        status: err.response?.status,
-        data: err.response?.data || err.message,
-      },
-    };
-  }
-};
+import { axiosBaseQuery } from '../../lib/shared';
 
 // Auth API
 // region Auth API
@@ -61,6 +34,7 @@ export const authAPI = createApi({
       },
     }),
 
+    // region Register Mutation
     register: builder.mutation({
       query: (body) => ({
         url: '/auth/register',
@@ -70,9 +44,9 @@ export const authAPI = createApi({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log('data', data)
           const { accessToken, refreshToken, user } = data;
           dispatch(setCredentials({ accessToken, refreshToken, user }));
+
         } catch (err: any) {
           console.error('Register error:', err?.response?.data || err);
           Toast.show({
@@ -81,7 +55,6 @@ export const authAPI = createApi({
             text2: err?.response?.data?.message || err?.message || "Something went wrong",
           });
         }
-
       },
     }),
 
