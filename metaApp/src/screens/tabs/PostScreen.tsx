@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, Keyboard } from 'react-native';
+import { Alert, Keyboard, Platform } from 'react-native';
 import { PostContainer } from '../../styles/AddPostStyles';
-import { useCreatePostMutation } from '../../redux/slice/post.slice';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { useCreatePostMutation, useGetAllPostsQuery } from '../../redux/slice/post.slice';
+// import { launchImageLibrary } from 'react-native-image-picker';
 import { FloatingAction, PostPlayground } from '../../components/ui/CreatePost';
+import { useAndroidFormDataPost } from '../../hooks';
 
 // Define action types for better type safety
-type ActionType = 'image' | 'video' | 'file';
+// type ActionType = 'image' | 'video' | 'file';
 
 interface PostProps {
   navigation?: any;
@@ -21,6 +22,12 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
   // RTK Query hook for creating posts
   const [createPost] = useCreatePostMutation();
 
+  // Custom hook for Android FormData uploads
+  const { postFormData: androidCreatePost } = useAndroidFormDataPost();
+
+  // Fetch to update the Screen while creating post from Android devices.
+  const { refetch } = useGetAllPostsQuery({ page: 1, limit: 5 });
+
   // Handle post submission
   // region Submit Post
   const handleSubmitPost = async () => {
@@ -28,6 +35,15 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
       Alert.alert('Error', 'Please write something to post');
       return;
     }
+
+    // reset the UI for android refetch thing
+    const resetUI = () => {
+      setPostContent('');
+      setSelectedMedia(null);
+      onPostCreated?.();
+      navigation?.goBack();
+      refetch(); // ✅ Refresh posts list
+    };
 
     setIsSubmitting(true);
     Keyboard.dismiss();
@@ -45,20 +61,22 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
         });
       }
 
-      console.log('Selected Media - ', selectedMedia);
-      console.log('Post Content - ', postContent);
-      console.log('(FormData) Post Content - ', formData);
+      if (Platform.OS === 'android') {
+        await androidCreatePost({
+          formData,
+          onSuccess: () => resetUI(),
+        });
 
-      await createPost(formData).unwrap();
+      } else {
+        // Use RTK Query for iOS
+        await createPost(formData).unwrap();
+        onPostCreated?.();
+        navigation?.goBack();
+      }
 
       // Reset form
       setPostContent('');
       setSelectedMedia(null);
-
-      // Notify parent component
-      // Navigate back if navigation is provided
-      onPostCreated?.();
-      navigation?.goBack();
 
     } catch (error) {
       console.error('Error creating post:', error);
@@ -71,36 +89,36 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
 
   // Handle media selection
   // region Select Media
-  const handleMediaSelection = async (type: ActionType) => {
-    try {
-      if (type === 'image') {
-        const result = await launchImageLibrary({
-          mediaType: 'photo',
-          quality: 0.8,
-          selectionLimit: 1,
-        });
+  // const handleMediaSelection = async (type: ActionType) => {
+  //   try {
+  //     if (type === 'image') {
+  //       const result = await launchImageLibrary({
+  //         mediaType: 'photo',
+  //         quality: 0.8,
+  //         selectionLimit: 1,
+  //       });
 
-        if (result.assets && result.assets[0]) {
-          setSelectedMedia(result.assets[0]);
-        }
-      } else if (type === 'video') {
-        const result = await launchImageLibrary({
-          mediaType: 'video',
-          quality: 0.8,
-          selectionLimit: 1,
-        });
+  //       if (result.assets && result.assets[0]) {
+  //         setSelectedMedia(result.assets[0]);
+  //       }
+  //     } else if (type === 'video') {
+  //       const result = await launchImageLibrary({
+  //         mediaType: 'video',
+  //         quality: 0.8,
+  //         selectionLimit: 1,
+  //       });
 
-        if (result.assets && result.assets[0]) {
-          setSelectedMedia(result.assets[0]);
-        }
-      } else if (type === 'file') {
-        // Implement document picker if needed
-        Alert.alert('Coming Soon', 'File upload will be available soon!');
-      }
-    } catch (error) {
-      console.error('Error selecting media:', error);
-    }
-  };
+  //       if (result.assets && result.assets[0]) {
+  //         setSelectedMedia(result.assets[0]);
+  //       }
+  //     } else if (type === 'file') {
+  //       // Implement document picker if needed
+  //       Alert.alert('Coming Soon', 'File upload will be available soon!');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error selecting media:', error);
+  //   }
+  // };
 
   // Handle floating action button press
   // region Press Action

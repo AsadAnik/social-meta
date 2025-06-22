@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authSliceReducer, { authAPI } from './slice/auth.slice';
-import postSliceReducer,{postAPI} from './slice/post.slice'
+import postSliceReducer, { postAPI } from './slice/post.slice';
 
 // region Persist-Config
 const persistConfig = {

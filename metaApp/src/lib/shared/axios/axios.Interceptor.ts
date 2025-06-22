@@ -4,7 +4,8 @@ import { store } from '../../../redux/store';
 import { setCredentials, clearCredentials } from '../../../redux/slice/auth.slice';
 import Toast from 'react-native-toast-message';
 import { Platform } from 'react-native';
-import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from './debugUtils';
+import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from '../../../utils/debugUtils';
+import { API_URL } from '../../../config/environment';
 
 declare global {
   var navigationRef: {
@@ -14,9 +15,7 @@ declare global {
   };
 }
 
-const API_URL = process.env.REACT_PUBLIC_API_URL ?? 'https://social-meta.onrender.com/api/v1';
-
-let isRefreshing = false;
+let isRefreshing: boolean = false;
 
 const waitForRefresh = () =>
   new Promise<string | null>((resolve) => {

@@ -1,40 +1,18 @@
-import { BaseQueryFn, createApi } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../lib/shared/axios/axiosInstance';
+import axiosBaseQuery from '../../lib/shared/axios/axios.baseQuery';
 import Toast from 'react-native-toast-message';
 
-// Custom base query for Axios
-// region Custom Base Query
-const axiosBaseQuery = (): BaseQueryFn<
-    { url: string; method: string; data?: any; params?: any },
-    unknown,
-    unknown
-> => async ({ url, method, data, params }) => {
-    try {
-        const result = await axiosInstance({ url, method, data, params });
-        return { data: result.data };
-
-    } catch (axiosError) {
-        let err = axiosError as any;
-        return {
-            error: {
-                status: err.response?.status,
-                data: err.response?.data || err.message,
-            },
-        };
-    }
-};
-
-// region API CALLS
+// region Post API
 export const postAPI = createApi({
     reducerPath: 'postAPI',
     baseQuery: axiosBaseQuery(),
     tagTypes: ['Posts'],
     endpoints: (builder) => ({
-        // region Gets All Posts
-        getAllPosts: builder.query({
+        // region Get All Posts
+        getAllPosts: builder.query<any, { page?: number; limit?: number }>({
             query: ({ page = 1, limit = 5 }) => ({
-                url: `/posts`,
+                url: '/posts',
                 method: 'GET',
                 params: { page, limit },
             }),
@@ -42,17 +20,15 @@ export const postAPI = createApi({
         }),
 
         // region Create Post
-        createPost: builder.mutation<any, any>({
-            query: (formData: FormData) => {
-                return {
-                  url: "/posts",
-                  method: "POST",
-                  data: formData,
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                };
-            },
+        createPost: builder.mutation<any, FormData>({
+            query: (formData) => ({
+                url: '/posts',
+                method: 'POST',
+                data: formData,
+                headers: {
+                    Accept: 'application/json',
+                },
+            }),
             invalidatesTags: ['Posts'],
             async onQueryStarted(_, { queryFulfilled }) {
                 try {
@@ -64,10 +40,7 @@ export const postAPI = createApi({
                     });
                 } catch (err: any) {
                     const message =
-                        err?.error?.data?.message ||
-                        err?.error?.message ||
-                        'Failed to create post';
-
+                        err?.error?.data?.message || err?.error?.message || 'Failed to create post';
                     Toast.show({
                         type: 'error',
                         text1: 'Error',
@@ -78,7 +51,7 @@ export const postAPI = createApi({
         }),
 
         // region Update Post
-        updatePost: builder.mutation({
+        updatePost: builder.mutation<any, { id: string; content: string }>({
             query: ({ id, content }) => ({
                 url: `/posts/${id}`,
                 method: 'PUT',
@@ -105,7 +78,7 @@ export const postAPI = createApi({
         }),
 
         // region Delete Post
-        deletePost: builder.mutation({
+        deletePost: builder.mutation<any, string>({
             query: (postId) => ({
                 url: `/posts/${postId}`,
                 method: 'DELETE',
@@ -130,8 +103,8 @@ export const postAPI = createApi({
             },
         }),
 
-        // region Like Post
-        likePost: builder.mutation({
+        // region Like/Unlike Post
+        likePost: builder.mutation<any, { postId: string }>({
             query: ({ postId }) => ({
                 url: '/likes/toggle',
                 method: 'POST',
@@ -140,7 +113,7 @@ export const postAPI = createApi({
             async onQueryStarted(_, { queryFulfilled }) {
                 try {
                     await queryFulfilled;
-                } catch (err) {
+                } catch (error) {
                     Toast.show({
                         type: 'error',
                         text1: 'Error',
@@ -149,7 +122,6 @@ export const postAPI = createApi({
                 }
             },
         }),
-
     }),
 });
 
@@ -161,12 +133,11 @@ export const {
     useLikePostMutation,
 } = postAPI;
 
-
-// region POST SLICES
+// region Post Slice
 const postSlice = createSlice({
     name: 'post',
     initialState: {
-        selectedPost: null,
+        selectedPost: null as any,
     },
     reducers: {
         setSelectedPost: (state, action) => {
