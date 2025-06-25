@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import axiosInstance from '../lib/shared/axios/axios.Interceptor';
+import axiosInstance from '../shared/axios/axios.Interceptor';
 import Toast from 'react-native-toast-message';
 
 /**

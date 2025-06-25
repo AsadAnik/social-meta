@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 
+// region Debug Network Request
 export const debugNetworkRequest = (config: any) => {
   console.log('=== NETWORK DEBUG INFO ===');
   console.log('Platform:', Platform.OS);
@@ -20,6 +21,7 @@ export const debugNetworkRequest = (config: any) => {
   console.log('========================');
 };
 
+// region Debug Network Response
 export const debugNetworkResponse = (response: any) => {
   console.log('=== RESPONSE DEBUG INFO ===');
   console.log('Status:', response.status);
@@ -29,6 +31,7 @@ export const debugNetworkResponse = (response: any) => {
   console.log('==========================');
 };
 
+// region Debug Network Error
 export const debugNetworkError = (error: any) => {
   console.log('=== ERROR DEBUG INFO ===');
   console.log('Error Message:', error.message);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { runNetworkTests, showNetworkTestResults } from '../../utils/networkTest';
+import { runNetworkTests, showNetworkTestResults } from '../../lib/utils/networkTest';
 
 const NetworkTestButton: React.FC = () => {
   const handleNetworkTest = async () => {

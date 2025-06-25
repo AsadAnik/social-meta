@@ -2,18 +2,33 @@ import React, { useState } from 'react';
 import { Alert, Keyboard, Platform } from 'react-native';
 import { PostContainer } from '../../styles/AddPostStyles';
 import { useCreatePostMutation, useGetAllPostsQuery } from '../../redux/slice/post.slice';
-// import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { FloatingAction, PostPlayground } from '../../components/ui/CreatePost';
 import { useAndroidFormDataPost } from '../../hooks';
+import { ensureMediaPermission } from '../../lib/utils/permissionUtils';
 
 // Define action types for better type safety
-// type ActionType = 'image' | 'video' | 'file';
+type ActionType = 'image' | 'video' | 'file';
 
 interface PostProps {
   navigation?: any;
   onPostCreated?: () => void;
 }
 
+// region Utility function to format media object for FormData
+const formatMediaForFormData = (media: any) => {
+  if (!media) {
+    return null;
+  }
+
+  const uri = media.uri || media.path;
+  const type = media.type || media.mimeType || 'image/jpeg';
+  const fileName = media.fileName || media.name || `media-${Date.now()}.${type.split('/')[1] || 'jpg'}`;
+
+  return { uri, type, name: fileName };
+};
+
+// region Post Screen
 const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
   const [postContent, setPostContent] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -28,6 +43,15 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
   // Fetch to update the Screen while creating post from Android devices.
   const { refetch } = useGetAllPostsQuery({ page: 1, limit: 5 });
 
+  // reset the UI for android refetch thing
+  const resetUI = () => {
+    setPostContent('');
+    setSelectedMedia(null);
+    onPostCreated?.();
+    navigation?.goBack();
+    refetch(); // Refresh posts list
+  };
+
   // Handle post submission
   // region Submit Post
   const handleSubmitPost = async () => {
@@ -36,47 +60,29 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
       return;
     }
 
-    // reset the UI for android refetch thing
-    const resetUI = () => {
-      setPostContent('');
-      setSelectedMedia(null);
-      onPostCreated?.();
-      navigation?.goBack();
-      refetch(); // Refresh posts list
-    };
-
     setIsSubmitting(true);
     Keyboard.dismiss();
 
     try {
-      // Create form data for media upload if needed
       const formData = new FormData();
       formData.append('content', postContent.trim());
 
       if (selectedMedia) {
-        formData.append('media', {
-          uri: selectedMedia.uri,
-          type: selectedMedia.type,
-          name: selectedMedia.fileName || `media-${Date.now()}.${selectedMedia.type.split('/')[1]}`,
-        });
+        const fileObject = formatMediaForFormData(selectedMedia);
+
+        if (fileObject) {
+          formData.append('file', fileObject as any);
+        }
       }
 
       if (Platform.OS === 'android') {
-        await androidCreatePost({
-          formData,
-          onSuccess: () => resetUI(),
-        });
+        await androidCreatePost({ formData, onSuccess: () => resetUI() });
 
       } else {
-        // Use RTK Query for iOS
+        // Text-only post for iOS
         await createPost(formData).unwrap();
-        onPostCreated?.();
-        navigation?.goBack();
+        resetUI();
       }
-
-      // Reset form
-      setPostContent('');
-      setSelectedMedia(null);
 
     } catch (error) {
       console.error('Error creating post:', error);
@@ -88,54 +94,95 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
   };
 
   // Handle media selection
-  // region Select Media
-  // const handleMediaSelection = async (type: ActionType) => {
-  //   try {
-  //     if (type === 'image') {
-  //       const result = await launchImageLibrary({
-  //         mediaType: 'photo',
-  //         quality: 0.8,
-  //         selectionLimit: 1,
-  //       });
+  // region Handle Media
+  const handleMediaSelection = async (type: ActionType) => {
+    try {
+      // Determine permission type based on action
+      let permissionType: 'photo' | 'video' = 'photo';
+      if (type === 'video') {
+        permissionType = 'video';
+      }
 
-  //       if (result.assets && result.assets[0]) {
-  //         setSelectedMedia(result.assets[0]);
-  //       }
-  //     } else if (type === 'video') {
-  //       const result = await launchImageLibrary({
-  //         mediaType: 'video',
-  //         quality: 0.8,
-  //         selectionLimit: 1,
-  //       });
+      // Check and request permission before accessing media
+      const hasPermission = await ensureMediaPermission(
+        permissionType,
+        () => {
+          // Permission granted - proceed with media selection
+          proceedWithMediaSelection(type);
+        },
+        () => {
+          // Permission denied - user cancelled or denied
+          console.log('Permission denied for media access');
+        }
+      );
 
-  //       if (result.assets && result.assets[0]) {
-  //         setSelectedMedia(result.assets[0]);
-  //       }
-  //     } else if (type === 'file') {
-  //       // Implement document picker if needed
-  //       Alert.alert('Coming Soon', 'File upload will be available soon!');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error selecting media:', error);
-  //   }
-  // };
+      // If permission is already granted, proceed immediately
+      if (hasPermission) {
+        proceedWithMediaSelection(type);
+      }
+
+    } catch (error) {
+      console.error('Error in media selection:', error);
+      Alert.alert('Error', 'Failed to access media. Please try again.');
+    }
+  };
+
+  // Helper function to proceed with media selection after permission check
+  // region Proceed With Media Selection
+  const proceedWithMediaSelection = async (type: ActionType) => {
+    try {
+      if (type === 'image') {
+        const result = await launchImageLibrary({
+          mediaType: 'photo',
+          quality: 0.8,
+          selectionLimit: 1,
+          includeBase64: false,
+        });
+
+        if (result.assets && result.assets[0]) {
+          setSelectedMedia(result.assets[0]);
+        }
+
+      } else if (type === 'video') {
+        const result = await launchImageLibrary({
+          mediaType: 'video',
+          quality: 0.8,
+          selectionLimit: 1,
+          includeBase64: false,
+        });
+
+        if (result.assets && result.assets[0]) {
+          setSelectedMedia(result.assets[0]);
+        }
+
+      } else if (type === 'file') {
+        Alert.alert('Coming Soon', 'File upload will be available soon!');
+      }
+
+    } catch (error) {
+      console.error('Error selecting media:', error);
+      Alert.alert('Error', 'Failed to select media. Please try again.');
+    }
+  };
 
   // Handle floating action button press
-  // region Press Action
+  // region Handle Action
   const handleActionPress = (name?: string) => {
-    if (!name) return;
+    if (!name) {
+      return;
+    }
 
     switch (name) {
       case 'bt_image':
-        console.log('Image action selected');
+        handleMediaSelection('image');
         break;
 
       case 'bt_video':
-        console.log('Video action selected');
+        handleMediaSelection('video');
         break;
 
       case 'bt_file':
-        console.log('File action selected');
+        handleMediaSelection('file');
         break;
 
       default:
@@ -143,10 +190,9 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
     }
   };
 
-
+  // region UI
   return (
     <PostContainer>
-      {/* region PostPlayground */}
       <PostPlayground
         textContent={postContent}
         onChangeTextContent={(text) => setPostContent(text)}
@@ -156,7 +202,6 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
         setSelectedMedia={setSelectedMedia}
       />
 
-      {/* region Floating Button */}
       <FloatingAction handleActionPress={handleActionPress} />
     </PostContainer>
   );

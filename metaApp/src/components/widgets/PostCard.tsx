@@ -11,7 +11,7 @@ import {
     InteractionWrapper,
     Interaction,
     InteractionText,
-    Divider
+    Divider,
 } from '../../styles/FeedStyles.ts';
 import { Card as PaperCard } from 'react-native-paper';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -27,7 +27,7 @@ interface PostItem {
     userImg: any;
     postTime: string;
     post: string;
-    postImg?: any;
+    image?: any;
     liked: boolean;
     likes: number;
     comments: number;
@@ -122,8 +122,8 @@ const PostCard: React.FC<PostCardProps> = ({
                 <PostText>{item.post}</PostText>
 
                 {/* Post Image or Divider */}
-                {item.postImg ? (
-                    <PostImg source={item.postImg} resizeMode="cover" />
+                {item.image ? (
+                    <PostImg source={item.image} resizeMode="cover" />
                 ) : (
                     <Divider />
                 )}

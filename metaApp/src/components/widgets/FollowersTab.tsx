@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import ChatTabScreen from '../../screens/stacks/ChatScreen.tsx';
+// import ChatTabScreen from '../../screens/stacks/ChatScreen';
 
 const FollowersTab: React.FC = () => {
   return (

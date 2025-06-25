@@ -4,7 +4,7 @@ import { store } from '../../../redux/store';
 import { setCredentials, clearCredentials } from '../../../redux/slice/auth.slice';
 import Toast from 'react-native-toast-message';
 import { Platform } from 'react-native';
-import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from '../../../utils/debugUtils';
+import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from '../../utils/debugUtils';
 import { API_URL } from '../../../config/environment';
 
 declare global {
@@ -79,10 +79,8 @@ axiosInstance.interceptors.request.use(
 );
 
 
-
 // Handle Refresh Token Mechanism
 // region Response Interceptor
-
 axiosInstance.interceptors.response.use(
   (response) => {
     // Debug logging for Android FormData issues
@@ -142,7 +140,9 @@ axiosInstance.interceptors.response.use(
       try {
         const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
 
-        if (!storedRefreshToken) throw new Error('No refresh token found');
+        if (!storedRefreshToken) {
+          throw new Error('No refresh token found');
+        }
 
         const refreshResponse = await axiosInstance.post(
           `${API_URL}/auth/refresh_token`,

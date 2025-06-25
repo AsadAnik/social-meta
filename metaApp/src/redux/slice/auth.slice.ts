@@ -52,7 +52,7 @@ export const authAPI = createApi({
           Toast.show({
             type: 'error',
             text1: 'Registration Failed',
-            text2: err?.response?.data?.message || err?.message || "Something went wrong",
+            text2: err?.response?.data?.message || err?.message || 'Something went wrong',
           });
         }
       },

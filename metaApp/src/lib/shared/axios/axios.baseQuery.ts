@@ -21,6 +21,12 @@ const axiosBaseQuery = (): BaseQueryFn<
         try {
             const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
 
+            // Debug FormData for iOS
+            if (isFormData) {
+                console.log('[AXIOS-BASE-QUERY] FormData detected');
+                console.log('[AXIOS-BASE-QUERY] FormData object:', data);
+            }
+
             const result = await axiosInstance({
                 url,
                 method,
@@ -30,14 +36,17 @@ const axiosBaseQuery = (): BaseQueryFn<
                     ...(headers ?? {}),
                     ...(isFormData
                         ? {
-                            // Let Axios auto-set Content-Type with boundary
+                            // For iOS, let the browser set the Content-Type with boundary
                             'Content-Type': undefined,
                         }
                         : { 'Content-Type': 'application/json' }),
                 },
                 transformRequest: isFormData
                     ? [(formData, reqHeaders) => {
+                        // Remove Content-Type to let browser set it with boundary
                         delete reqHeaders['Content-Type'];
+                        delete reqHeaders['content-type'];
+                        console.log('[AXIOS-BASE-QUERY] FormData transformRequest - removed Content-Type');
                         return formData;
                     }]
                     : undefined,
@@ -46,6 +55,8 @@ const axiosBaseQuery = (): BaseQueryFn<
             return { data: result.data };
 
         } catch (axiosError: any) {
+            console.error('[AXIOS-BASE-QUERY] Error:', axiosError);
+            console.error('[AXIOS-BASE-QUERY] Response:', axiosError.response?.data);
             return {
                 error: {
                     status: axiosError.response?.status || 500,

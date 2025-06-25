@@ -38,9 +38,9 @@ export const postAPI = createApi({
                         text1: 'Post Created',
                         text2: 'Your post was successfully published!',
                     });
+
                 } catch (err: any) {
-                    const message =
-                        err?.error?.data?.message || err?.error?.message || 'Failed to create post';
+                    const message = err?.error?.data?.message || err?.error?.message || 'Failed to create post';
                     Toast.show({
                         type: 'error',
                         text1: 'Error',
@@ -66,6 +66,7 @@ export const postAPI = createApi({
                         text1: 'Post Updated',
                         text2: 'Your post was successfully updated!',
                     });
+
                 } catch (err: any) {
                     const message = err?.error?.data?.message || 'Failed to update post';
                     Toast.show({
@@ -92,6 +93,7 @@ export const postAPI = createApi({
                         text1: 'Post Deleted',
                         text2: 'Your post was successfully deleted!',
                     });
+
                 } catch (err: any) {
                     const message = err?.error?.data?.message || 'Failed to delete post';
                     Toast.show({
@@ -113,6 +115,7 @@ export const postAPI = createApi({
             async onQueryStarted(_, { queryFulfilled }) {
                 try {
                     await queryFulfilled;
+
                 } catch (error) {
                     Toast.show({
                         type: 'error',
@@ -125,13 +128,7 @@ export const postAPI = createApi({
     }),
 });
 
-export const {
-    useGetAllPostsQuery,
-    useCreatePostMutation,
-    useUpdatePostMutation,
-    useDeletePostMutation,
-    useLikePostMutation,
-} = postAPI;
+export const { useGetAllPostsQuery, useCreatePostMutation, useUpdatePostMutation, useDeletePostMutation, useLikePostMutation } = postAPI;
 
 // region Post Slice
 const postSlice = createSlice({
