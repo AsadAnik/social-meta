@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -23,10 +23,16 @@ import { Provider } from 'react-redux';
 import { store } from './src/redux/store';
 import Toast from 'react-native-toast-message';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { initializeNetworkListener } from './src/lib/utils/networkUtils';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  // Initialize network connectivity listener
+  useEffect(() => {
+    initializeNetworkListener();
+  }, []);
+
   /**
    * CUSTOM HEADERS TITLE FOR BOTTOM TABS
    * @param route

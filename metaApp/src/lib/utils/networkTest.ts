@@ -16,6 +16,11 @@ export interface NetworkTestResult {
   };
 }
 
+
+/**
+ * Run the network tests
+ * @returns The network test results
+ */
 // region Run Network Test
 export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
   const results: NetworkTestResult[] = [];
@@ -42,6 +47,7 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
     });
 
     console.log('✅ Basic connectivity test:', response.ok ? 'PASSED' : 'FAILED');
+
   } catch (error) {
     results.push({
       success: false,
@@ -52,12 +58,14 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
         method: 'HEAD',
       },
     });
+
     console.log('❌ Basic connectivity test: FAILED');
   }
 
   // Test 2: API endpoint test
   try {
     console.log('🔍 Test 2: API endpoint test');
+
     const startTime = Date.now();
     const response = await fetch('https://social-meta.onrender.com/api/v1/health', {
       method: 'GET',
@@ -65,6 +73,7 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
         'Accept': 'application/json',
       },
     });
+
     const endTime = Date.now();
 
     let responseData;
@@ -87,6 +96,7 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
     });
 
     console.log('✅ API endpoint test:', response.ok ? 'PASSED' : 'FAILED');
+
   } catch (error) {
     results.push({
       success: false,
@@ -97,12 +107,14 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
         method: 'GET',
       },
     });
+
     console.log('❌ API endpoint test: FAILED');
   }
 
   // Test 3: Axios instance test
   try {
     console.log('🔍 Test 3: Axios instance test');
+
     const startTime = Date.now();
     const response = await axiosInstance.get('/health');
     const endTime = Date.now();
@@ -120,6 +132,7 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
     });
 
     console.log('✅ Axios instance test: PASSED');
+
   } catch (error: any) {
     results.push({
       success: false,
@@ -132,7 +145,9 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
         responseData: error.response?.data,
       },
     });
+
     console.log('❌ Axios instance test: FAILED');
+
   }
 
   // Test 4: FormData test (Android specific)
@@ -159,6 +174,7 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
       });
 
       console.log('✅ FormData test: PASSED');
+
     } catch (error: any) {
       results.push({
         success: false,
@@ -171,30 +187,42 @@ export const runNetworkTests = async (): Promise<NetworkTestResult[]> => {
           responseData: error.response?.data,
         },
       });
+
       console.log('❌ FormData test: FAILED');
+
     }
   }
 
   // Print summary
   console.log('📊 Network Test Summary:');
+
   results.forEach((result, index) => {
     console.log(`Test ${index + 1}: ${result.success ? '✅ PASSED' : '❌ FAILED'}`);
+
     if (!result.success) {
-      console.log(`   Error: ${result.error}`);
+      console.log(`Error: ${result.error}`);
     }
-    console.log(`   URL: ${result.details.url}`);
-    console.log(`   Method: ${result.details.method}`);
+
+    console.log(`URL: ${result.details.url}`);
+    console.log(`Method: ${result.details.method}`);
+
     if (result.details.responseTime) {
-      console.log(`   Response Time: ${result.details.responseTime}ms`);
+      console.log(`Response Time: ${result.details.responseTime}ms`);
     }
+
     if (result.details.statusCode) {
-      console.log(`   Status Code: ${result.details.statusCode}`);
+      console.log(`Status Code: ${result.details.statusCode}`);
     }
   });
 
   return results;
 };
 
+
+/**
+ * Show the network test results
+ * @param results - The network test results
+ */
 // region Show Network Test
 export const showNetworkTestResults = (results: NetworkTestResult[]) => {
   const passedTests = results.filter(r => r.success).length;
@@ -208,21 +236,26 @@ export const showNetworkTestResults = (results: NetworkTestResult[]) => {
 
   // Log detailed results
   console.log('🔍 Detailed Network Test Results:');
+
   results.forEach((result, index) => {
     console.log(`\n--- Test ${index + 1} ---`);
     console.log('Success:', result.success);
     console.log('Platform:', result.details.platform);
     console.log('URL:', result.details.url);
     console.log('Method:', result.details.method);
+
     if (result.details.responseTime) {
       console.log('Response Time:', result.details.responseTime + 'ms');
     }
+
     if (result.details.statusCode) {
       console.log('Status Code:', result.details.statusCode);
     }
+
     if (result.error) {
       console.log('Error:', result.error);
     }
+
     if (result.details.responseData) {
       console.log('Response Data:', result.details.responseData);
     }

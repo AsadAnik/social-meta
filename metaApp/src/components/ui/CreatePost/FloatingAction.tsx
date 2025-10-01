@@ -8,6 +8,7 @@ type FloatingActionProps = {
   handleActionPress: (name?: string) => void;
 };
 
+// region Main Component
 const FloatingActionWrapper: React.FC<FloatingActionProps> = ({ handleActionPress }) => {
   const floatingActionRef = useRef<any>(null);
 
@@ -36,6 +37,7 @@ const FloatingActionWrapper: React.FC<FloatingActionProps> = ({ handleActionPres
     },
   ];
 
+  // region UI
   return (
      <FloatingActionButton
        ref={floatingActionRef}

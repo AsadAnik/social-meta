@@ -22,9 +22,11 @@ const getPermission = (type: MediaPermissionType): Permission => {
             default:
                 return PERMISSIONS.IOS.PHOTO_LIBRARY;
         }
+
     } else {
         // Android permissions
         const androidVersion = parseInt(Platform.Version.toString(), 10);
+
         if (androidVersion >= 33) {
             // Android 13+ uses granular permissions
             switch (type) {
@@ -37,6 +39,7 @@ const getPermission = (type: MediaPermissionType): Permission => {
                 default:
                     return PERMISSIONS.ANDROID.READ_MEDIA_IMAGES;
             }
+
         } else {
             // Android 12 and below
             switch (type) {
@@ -63,8 +66,8 @@ export const checkMediaPermission = async (type: MediaPermissionType): Promise<b
     try {
         const permission = getPermission(type);
         const result = await check(permission);
-
         return result === RESULTS.GRANTED;
+
     } catch (error) {
         console.error('Error checking permission:', error);
         return false;
@@ -82,8 +85,8 @@ export const requestMediaPermission = async (type: MediaPermissionType): Promise
     try {
         const permission = getPermission(type);
         const result = await request(permission);
-
         return result === RESULTS.GRANTED;
+
     } catch (error) {
         console.error('Error requesting permission:', error);
         return false;
@@ -115,6 +118,7 @@ export const ensureMediaPermission = async (type: MediaPermissionType, onSuccess
         if (granted) {
             onSuccess?.();
             return true;
+
         } else {
             // Permission denied - show alert with option to open settings
             Alert.alert(
@@ -137,6 +141,7 @@ export const ensureMediaPermission = async (type: MediaPermissionType, onSuccess
             );
             return false;
         }
+
     } catch (error) {
         console.error('Error ensuring permission:', error);
         onFailure?.();
@@ -153,11 +158,9 @@ export const ensureMediaPermission = async (type: MediaPermissionType, onSuccess
 // region Check Multiple Permissions
 export const checkMultipleMediaPermissions = async (types: MediaPermissionType[]): Promise<boolean> => {
     try {
-        const permissionChecks = await Promise.all(
-            types.map(type => checkMediaPermission(type))
-        );
-
+        const permissionChecks = await Promise.all(types.map(type => checkMediaPermission(type)));
         return permissionChecks.every(hasPermission => hasPermission);
+
     } catch (error) {
         console.error('Error checking multiple permissions:', error);
         return false;
@@ -173,11 +176,9 @@ export const checkMultipleMediaPermissions = async (types: MediaPermissionType[]
 // region Request Multiple Permissions
 export const requestMultipleMediaPermissions = async (types: MediaPermissionType[]): Promise<boolean> => {
     try {
-        const permissionRequests = await Promise.all(
-            types.map(type => requestMediaPermission(type))
-        );
-
+        const permissionRequests = await Promise.all(types.map(type => requestMediaPermission(type)));
         return permissionRequests.every(granted => granted);
+
     } catch (error) {
         console.error('Error requesting multiple permissions:', error);
         return false;

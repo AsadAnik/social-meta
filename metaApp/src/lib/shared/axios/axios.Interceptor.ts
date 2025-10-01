@@ -6,6 +6,7 @@ import Toast from 'react-native-toast-message';
 import { Platform } from 'react-native';
 import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from '../../utils/debugUtils';
 import { API_URL } from '../../../config/environment';
+import { checkNetworkConnectivity, showNetworkError } from '../../utils/networkUtils';
 
 declare global {
   var navigationRef: {
@@ -17,6 +18,10 @@ declare global {
 
 let isRefreshing: boolean = false;
 
+/**
+ * Wait for refresh
+ * @returns The access token
+ */
 const waitForRefresh = () =>
   new Promise<string | null>((resolve) => {
     const interval = setInterval(() => {
@@ -25,10 +30,12 @@ const waitForRefresh = () =>
         resolve(AsyncStorage.getItem('accessToken'));
       }
     }, 200);
-  });
+});
 
-
-// Create Axios instance
+/**
+ * Create Axios instance
+ * @returns The Axios instance
+ */
 const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -52,7 +59,16 @@ axiosInstance.interceptors.request.use(
     console.log('[REQUEST-CONTENT-TYPE] - ', contentType);
 
     try {
-      const token = store.getState().auth.accessToken;
+      // Check network connectivity before making request
+      const isConnected = await checkNetworkConnectivity();
+      if (!isConnected) {
+        showNetworkError();
+        return Promise.reject(new Error('No internet connection'));
+      }
+
+      // Fix the linter error by properly typing the store state
+      const state = store.getState() as any;
+      const token = state.auth?.accessToken;
       const accessToken = token ?? await AsyncStorage.getItem('accessToken');
 
       if (accessToken) {
@@ -103,6 +119,39 @@ axiosInstance.interceptors.response.use(
 
     const originalRequest = error.config;
 
+    // Handle network connectivity errors
+    if (error.message === 'Network Error' || error.code === 'NETWORK_ERROR' || !error.response) {
+      const isConnected = await checkNetworkConnectivity();
+      if (!isConnected) {
+        showNetworkError();
+        return Promise.reject(new Error('No internet connection. Please check your network settings.'));
+      }
+    }
+
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      Toast.show({
+        type: 'error',
+        text1: 'Request Timeout',
+        text2: 'The request took too long. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+      return Promise.reject(error);
+    }
+
+    // Handle server errors (5xx)
+    if (error.response?.status >= 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Something went wrong on our end. Please try again later.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       console.log('🔁 Attempting token refresh...');
@@ -144,8 +193,7 @@ axiosInstance.interceptors.response.use(
           throw new Error('No refresh token found');
         }
 
-        const refreshResponse = await axiosInstance.post(
-          `${API_URL}/auth/refresh_token`,
+        const refreshResponse = await axiosInstance.post(`${API_URL}/auth/refresh_token`,
           { refreshToken: storedRefreshToken },
           { headers: { 'Content-Type': 'application/json' } }
         );

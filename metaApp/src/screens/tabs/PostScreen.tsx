@@ -15,7 +15,7 @@ interface PostProps {
   onPostCreated?: () => void;
 }
 
-// region Utility function to format media object for FormData
+// region Utility function to media
 const formatMediaForFormData = (media: any) => {
   if (!media) {
     return null;
@@ -104,8 +104,7 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
       }
 
       // Check and request permission before accessing media
-      const hasPermission = await ensureMediaPermission(
-        permissionType,
+      const hasPermission = await ensureMediaPermission(permissionType,
         () => {
           // Permission granted - proceed with media selection
           proceedWithMediaSelection(type);
@@ -128,7 +127,7 @@ const Post: React.FC<PostProps> = ({ navigation, onPostCreated }) => {
   };
 
   // Helper function to proceed with media selection after permission check
-  // region Proceed With Media Selection
+  // region Proceed With Media
   const proceedWithMediaSelection = async (type: ActionType) => {
     try {
       if (type === 'image') {
