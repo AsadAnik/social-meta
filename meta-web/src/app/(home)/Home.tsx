@@ -15,7 +15,7 @@ const Home = () => {
     const [accumulatedPosts, setAccumulatedPosts] = useState<IPost[]>([]);
 
     // Fetch posts using RTK Query for the current page
-    const {data, isLoading, error, refetch} = useFetchPostsQuery({page, limit: 5});
+    const { data, isLoading, error, refetch } = useFetchPostsQuery({page, limit: 5});
 
     // Extract hasNextPage from the query result
     const hasMore = data?.hasNextPage ?? false;

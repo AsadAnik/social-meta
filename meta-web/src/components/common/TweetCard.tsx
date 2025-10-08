@@ -1,21 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import {
-    Card, CardHeader, CardMedia, CardContent, CardActions, Collapse, Avatar, IconButton, Typography, Menu, MenuItem,
-    Box,
-    List,
-    ListItem,
-    ListItemText,
-    Divider,
-    TextField,
-    Button
-} from '@mui/material';
+import { Card, CardHeader, CardMedia, CardContent, CardActions, Collapse, Avatar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useRouter } from 'next/navigation';
 import EditPostDialog from './EditModel';
 import { useMediaQuery } from '@mui/material';
@@ -23,25 +12,13 @@ import { useDeletePostMutation, useToggleLikeMutation } from '@/redux/slice/post
 import { useAddCommentMutation } from '@/redux/slice/comment.slice';
 import CommentSection from '../CommentSection';
 import { socket } from '@/lib/socket';
+import { IPost } from '@/shared/types';
 
 interface TweetCardProps {
-    post: {
-        content: string;
-        _id: string;
-        createdAt: string;
-        likes_count: number;
-        comments_count: number;
-        dislikes_count: number;
-        owner: {
-            _id: any;
-            firstname: string;
-            lastname: string;
-            profilePhoto?: string;
-            title: string;
-        };
-    };
+    post: IPost;
 }
 
+// region CARD COMPONENT
 export default function TweetCard({ post }: TweetCardProps) {
     const [expanded, setExpanded] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -53,7 +30,6 @@ export default function TweetCard({ post }: TweetCardProps) {
     const [newComment, setNewComment] = useState("");
 
     const router = useRouter(); // ✅ Initialize router
-
 
     // Use the deletePost mutation from RTK Query
     const [deletePost] = useDeletePostMutation();
@@ -77,7 +53,7 @@ export default function TweetCard({ post }: TweetCardProps) {
         setIsEditOpen(true);
         handleClose();
     };
-    
+
 
     const handleTitleClick = () => {
         console.log("Title clicked!");
@@ -97,9 +73,9 @@ export default function TweetCard({ post }: TweetCardProps) {
         try {
           const isAlreadyLiked = likes > post.likes_count;
           setLikes((prev) => (isAlreadyLiked ? prev - 1 : prev + 1));
-      
+
           await likePost({ postId: post._id }).unwrap();
-      
+
           if (!isAlreadyLiked) {
             console.log("📢 Emitting like notification...", {
               recipientId: post.owner._id,
@@ -108,22 +84,24 @@ export default function TweetCard({ post }: TweetCardProps) {
               type: "like",
               message: `Someone liked your post.`,
             });
-      
-            socket.emit("notification", {
-              recipientId: post.owner._id,
-              senderId: "CURRENT_USER_ID",
-              postId: post._id,
-              type: "like",
-              message: `Someone liked your post.`,
-            });
+
+            // THIS HAVE TO SEND REQUEST FOR EMIT NOTIFICATION
+            // TESTING IS REQUIRED
+            // socket.emit("notification", {
+            //   recipientId: post.owner._id,
+            //   senderId: "CURRENT_USER_ID",
+            //   postId: post._id,
+            //   type: "like",
+            //   message: `Someone liked your post.`,
+            // });
           }
         } catch (err) {
           console.error("Error liking post:", err);
           setLikes(post.likes_count);
         }
       };
-      
-    
+
+
 
     // const handleDislike = async () => {
     //     try {
@@ -152,12 +130,13 @@ export default function TweetCard({ post }: TweetCardProps) {
         content: post.content,
     };
 
+    // region Main UI
     return (
         <Card
             sx={{
                 width: "100%", // Full width for all screens
-                maxWidth: 499, // Prevents card from being too wide
-                minWidth: 320, // Ensures the card doesn't shrink too much
+                maxWidth: 650, // Prevents card from being too wide
+                minWidth: 600, // Ensures the card doesn't shrink too much
                 margin: "auto",
                 my: 2,
                 boxShadow: 3,

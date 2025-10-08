@@ -24,7 +24,8 @@ const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreat
           display: "flex",
           alignItems: "center",
           width: "100%",
-          maxWidth: 500,
+          maxWidth: 650,
+          minWidth: 600,
           borderRadius: "16px",
           boxShadow: theme.palette.mode === "dark" ? "0px 4px 12px rgba(255, 255, 255, 0.1)" : "0px 4px 12px rgba(0, 0, 0, 0.1)",
           backgroundColor: theme.palette.background.paper,
@@ -63,11 +64,11 @@ const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreat
         />
       </Card>
 
-      <CreatePostDialog 
-        avatarSrc={userProfileImage} 
-        open={open} 
-        setOpen={setOpen} 
-        onPostCreated={onPostCreated} 
+      <CreatePostDialog
+        avatarSrc={userProfileImage}
+        open={open}
+        setOpen={setOpen}
+        onPostCreated={onPostCreated}
       />
     </>
   );

@@ -98,10 +98,6 @@ export const postsApi = createApi({
         data: postData,
       }),
       async onQueryStarted(postData, { dispatch, queryFulfilled }) {
-
-        console.log('POST DATA = ', postData);
-        debugger;
-
         // Optimistic update: Add a temporary post to the cache
         const tempPost: Partial<IPost> = {
           _id: Date.now().toString(),

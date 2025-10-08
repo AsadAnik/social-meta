@@ -69,6 +69,7 @@ const footerLinks = [
 export default function InstagramSuggestions() {
     const [showAllFooterLinks, setShowAllFooterLinks] = useState(false)
 
+    // region Main UI
     return (
         <ThemeProvider theme={darkTheme}>
             <Box sx={{ backgroundColor: "background.default", color: "text.primary", padding: "36px" , }}>
