@@ -21,7 +21,7 @@ import { Container, Fab, Fade } from '@mui/material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { ModeSwitch } from '@/components/widgets';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useLogoutMutation } from '@/redux/slice/auth.slice';
 import { clearCredentials } from '@/redux/slice/auth.slice';
 import { toast } from 'react-hot-toast';
@@ -30,15 +30,11 @@ import { RootState } from '@/redux/store';
 
 // region AppBar Component
 export default function PrimarySearchAppBar(props: any) {
-
     const [logout, { isLoading }] = useLogoutMutation();
     const dispatch = useDispatch();
     const authUser = useSelector((state: RootState) => state.auth.user); // Get user from Redux
-    console.log(authUser?.id);
+    // console.log(authUser?.id);
     const userId = authUser?.id;
-      
-
-    
 
     const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

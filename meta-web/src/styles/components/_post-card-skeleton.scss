@@ -1,15 +1,45 @@
-.postCardSkeleton {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  .content {
-    width: 100%;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  }
-  
-  
+.tweetCardWrapper {
+  width: 100%;
+  max-width: 499px;
+  min-width: 320px;
+  margin: 16px auto;
+  box-shadow: 0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12);
+  border-radius: 8px;
+  padding: 8px;
+  background-color: white;
+  overflow: hidden;
+}
+
+.tweetCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  position: relative;
+}
+
+.headerContent {
+  margin-left: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardContent {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardActions {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

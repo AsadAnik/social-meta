@@ -1,35 +1,20 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axiosInstance from "@/lib/axios.interceptor";
 import { io } from "socket.io-client";
+import { IPost } from '@/shared/types';
 
-// Initialize WebSocket Connection
+// region Socket Initialization
 const socket = io("http://localhost:8080"!, {
   withCredentials: true,
   transports: ["websocket", "polling"],
 });
 
+// region Types
 interface LikeResponse {
   success: boolean;
   message: string;
   likeStatus: boolean;
-}
-
-export interface Post {
-  id: string;
-  comments: any;
-  likedByCurrentUser: any;
-  _id: string;
-  content: string;
-  privacy: string;
-  createdAt: string;
-  likes_count?: number;
-  owner: {
-    firstname: string;
-    lastname: string;
-    profilePhoto?: string;
-    title: string;
-  };
 }
 
 // Custom Base Query using Axios
@@ -42,89 +27,109 @@ const customBaseQuery = async ({ url, method, data }: any) => {
   }
 };
 
-// Define the API using RTK Query
+// region Posts API Slice
 export const postsApi = createApi({
   reducerPath: "postsApi",
   baseQuery: customBaseQuery,
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    // Fetch posts with pagination
+    // region Fetch Posts
     fetchPosts: builder.query<{
-      posts: Post[];
+      posts: IPost[];
       hasNextPage: boolean;
     }, { page: number; limit: number }>({
       query: ({ page, limit }) => ({
         url: `/posts?page=${page}&limit=${limit}`,
         method: "GET",
       }),
-      transformResponse: (response) => response.posts,
+      providesTags: ["Post"],
     }),
-    fetchPost: builder.query({
+
+    // region Fetch Post
+    fetchPost: builder.query<IPost, string>({
       query: (postId) => ({
         url: `/posts/${postId}`,
         method: "GET",
-      })
+      }),
+      providesTags: (result, error, id) => [{ type: "Post", id }],
     }),
+
+    // region Current User
     getCurrentUser: builder.query({
       query: (userId) => ({
         url: `/users/${userId}`,
         method: "GET",
-      })
+      }),
     }),
-    getUserPosts: builder.query({
+
+    // region User Post
+    getUserPosts: builder.query<IPost[], string>({
       query: (userId) => ({
         url: `/posts/${userId}/posts`,
         method: "GET",
       }),
-      transformResponse: (response) => response.posts || [],
+      transformResponse: (response: any) => response.posts || [],
+      providesTags: ["Post"],
     }),
+
+    // region Upload Profile Pic
     uploadProfilePhoto: builder.mutation({
-      query: ({ userId, formData }) => ({
+      query: ({ userId, formData }: { userId: string; formData: FormData }) => ({
         url: `/users/update-photo`,
         method: 'PATCH',
         data: formData,
       }),
     }),
+
+    // region Upload Cover Pic
     uploadCoverPhoto: builder.mutation({
-      query: ({ userId, formData }) => ({
+      query: ({ userId, formData }: { userId: string; formData: FormData }) => ({
         url: `/users/update-cover`,
         method: 'PATCH',
         data: formData,
       }),
     }),
-    // Create a new post
-    createPost: builder.mutation({
+
+    // region Create Post
+    createPost: builder.mutation<IPost, FormData>({
       query: (postData) => ({
         url: "/posts",
         method: "POST",
         data: postData,
       }),
       async onQueryStarted(postData, { dispatch, queryFulfilled }) {
-        const tempPost = {
+
+        console.log('POST DATA = ', postData);
+        debugger;
+
+        // Optimistic update: Add a temporary post to the cache
+        const tempPost: Partial<IPost> = {
           _id: Date.now().toString(),
-          content: postData.get("content"),
-          privacy: "public",
+          content: postData.get("content") as string || "",
+          body: "",
           createdAt: new Date().toISOString(),
+          likes_count: 0,
+          dislikes_count: 0,
+          comments_count: 0,
+          image: "",
           owner: {
-            firstname: "Yaseen",
-            lastname: "Arafat",
+            _id: "temp",
+            firstname: "Current", // TODO: Replace with actual current user data
+            lastname: "User",
             profilePhoto: "https://via.placeholder.com/150",
-            title: "Mr.",
+            title: "User",
           },
         };
 
         const patchResult = dispatch(
           postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
-            draft.posts.unshift({
-              ...tempPost, likedByCurrentUser: false,
-              comments: undefined,
-              id: ""
-            });
+            draft.posts.unshift(tempPost as IPost);
           })
         );
 
         try {
           const { data: newPost } = await queryFulfilled;
+          // Replace temp post with actual post
           dispatch(
             postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
               const index = draft.posts.findIndex((p) => p._id === tempPost._id);
@@ -137,34 +142,30 @@ export const postsApi = createApi({
           patchResult.undo();
         }
       },
+      invalidatesTags: ["Post"],
     }),
-    // Update a post
-    updatePost: builder.mutation<Post, { id: string; postData: FormData }>({
-      query: ({ id, postData }) => ({
-        url: `/posts/${id}`,
+
+    // region Update Post
+    updatePost: builder.mutation<IPost, { postId: string; postData: FormData }>({
+      query: ({ postId, postData }) => ({
+        url: `/posts/${postId}`,
         method: "PUT",
         data: postData,
       }),
-      async onQueryStarted({ id, postData }, { dispatch, queryFulfilled }) {
-        try {
-          await queryFulfilled;
-          dispatch(postsApi.util.invalidateTags(["Post"]));
-        } catch {
-          // Optionally handle error
-        }
-      },
-      invalidatesTags: ["Post"],
+      invalidatesTags: (result, error, { postId }) => [{ type: "Post", id: postId }],
     }),
-    // Delete a post
-    deletePost: builder.mutation<{ id: string }, string>({
-      query: (id) => ({
-        url: `/posts/${id}`,
+
+    // region Delete Post
+    deletePost: builder.mutation<{ _id: string }, string>({
+      query: (postId) => ({
+        url: `/posts/${postId}`,
         method: "DELETE",
       }),
-      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+      async onQueryStarted(postId, { dispatch, queryFulfilled }) {
+        // Optimistic delete
         const patchResult = dispatch(
           postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
-            draft.posts = draft.posts.filter((post) => post._id !== id);
+            draft.posts = draft.posts.filter((post) => post._id !== postId);
           })
         );
         try {
@@ -173,49 +174,46 @@ export const postsApi = createApi({
           patchResult.undo();
         }
       },
-      invalidatesTags: ["Post"],
+      invalidatesTags: (result, error, postId) => [{ type: "Post", id: postId }],
     }),
-    // Toggle Like/Dislike
-    // Toggle Like/Dislike mutation inside postsApi
+
+    // region Toggle Like
     toggleLike: builder.mutation<LikeResponse, { postId: string }>({
       query: ({ postId }) => ({
         url: `/likes/toggle`,
         method: "POST",
-        data: { postId }, // Removed the extra "to" field
+        data: { postId },
       }),
       async onQueryStarted({ postId }, { dispatch, queryFulfilled }) {
-        // Optimistically update the UI
+        // Optimistic update for like toggle
         const patchResult = dispatch(
           postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
             const post = draft.posts.find((p) => p._id === postId);
             if (post) {
-              const userAlreadyLiked = post.likedByCurrentUser;
-              // Toggle the like count based on the current state
-              post.likes_count = (post.likes_count ?? 0) + (userAlreadyLiked ? -1 : 1);
-              post.likedByCurrentUser = !userAlreadyLiked;
+              const wasLiked = post.likedByCurrentUser || false;
+              post.likes_count = (post.likes_count || 0) + (wasLiked ? -1 : 1);
+              post.likedByCurrentUser = !wasLiked;
             }
           })
         );
 
         try {
           const { data } = await queryFulfilled;
-          if (!data.success) throw new Error("Failed to like post");
+          if (!data.success) throw new Error("Failed to toggle like");
 
-          // Only if the post was just liked, emit a notification
-          // (Assuming the backend handles the dislike case separately.)
-          if (data.likeStatus === true) {
-            socket.emit("notification", { postId });
-            console.log('post id by like', postId)
+          // Emit notification if liked
+          if (data.likeStatus) {
+            socket.emit("notification", { postId, type: "like" });
           }
         } catch {
           patchResult.undo();
         }
       },
     }),
-
   }),
 });
 
+// region Hooks Export
 export const {
   useFetchPostsQuery,
   useFetchPostQuery,
@@ -225,13 +223,13 @@ export const {
   useDeletePostMutation,
   useToggleLikeMutation,
   useGetUserPostsQuery,
-  useUploadProfilePhotoMutation, 
-  useUploadCoverPhotoMutation
+  useUploadProfilePhotoMutation,
+  useUploadCoverPhotoMutation,
 } = postsApi;
 
-// Redux Slice for storing posts (to be used with useSelector)
+// region Post State Slice
 interface PostState {
-  posts: Post[];
+  posts: IPost[];
   hasNextPage: boolean;
   isFetching: boolean;
 }
@@ -242,15 +240,16 @@ const initialState: PostState = {
   isFetching: false,
 };
 
+// region POST SLICE
 const postSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    setPosts: (state, action: PayloadAction<{ posts: Post[]; hasNextPage: boolean }>) => {
+    setPosts: (state, action: PayloadAction<{ posts: IPost[]; hasNextPage: boolean }>) => {
       state.posts = action.payload.posts;
       state.hasNextPage = action.payload.hasNextPage;
     },
-    addPosts: (state, action: PayloadAction<{ posts: Post[]; hasNextPage: boolean }>) => {
+    addPosts: (state, action: PayloadAction<{ posts: IPost[]; hasNextPage: boolean }>) => {
       state.posts = [...state.posts, ...action.payload.posts];
       state.hasNextPage = action.payload.hasNextPage;
     },
@@ -259,25 +258,26 @@ const postSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addMatcher(postsApi.endpoints.fetchPosts.matchFulfilled, (state, action) => {
-      const { posts, hasNextPage } = action.payload;
-      if (state.posts.length === 0) {
-        state.posts = posts;
-      } else {
-        state.posts = [
-          ...state.posts,
-          ...posts.filter((newPost) => !state.posts.some((post) => post._id === newPost._id)),
-        ];
-      }
-      state.hasNextPage = hasNextPage;
-      state.isFetching = false;
-    });
-    builder.addMatcher(postsApi.endpoints.fetchPosts.matchPending, (state) => {
-      state.isFetching = true;
-    });
-    builder.addMatcher(postsApi.endpoints.fetchPosts.matchRejected, (state) => {
-      state.isFetching = false;
-    });
+    builder
+      .addMatcher(postsApi.endpoints.fetchPosts.matchFulfilled, (state, action) => {
+        const { posts, hasNextPage } = action.payload;
+        if (state.posts.length === 0) {
+          state.posts = posts;
+        } else {
+          state.posts = [
+            ...state.posts,
+            ...posts.filter((newPost) => !state.posts.some((post) => post._id === newPost._id)),
+          ];
+        }
+        state.hasNextPage = hasNextPage;
+        state.isFetching = false;
+      })
+      .addMatcher(postsApi.endpoints.fetchPosts.matchPending, (state) => {
+        state.isFetching = true;
+      })
+      .addMatcher(postsApi.endpoints.fetchPosts.matchRejected, (state) => {
+        state.isFetching = false;
+      });
   },
 });
 

@@ -1235,6 +1235,8 @@ PODS:
     - Yoga
   - react-native-insta-story (1.1.9):
     - React
+  - react-native-netinfo (11.4.1):
+    - React-Core
   - react-native-pager-view (6.7.0):
     - DoubleConversion
     - glog
@@ -1936,6 +1938,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-insta-story (from `../node_modules/react-native-insta-story`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
@@ -2061,6 +2064,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-image-picker"
   react-native-insta-story:
     :path: "../node_modules/react-native-insta-story"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -2182,6 +2187,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 51e7813abf875408a0f367e473a65bbab6aa8481
   react-native-image-picker: 84b261e109faa7312bca59f1f65c8f2b22865496
   react-native-insta-story: 2f1028459065547b4b4cd81dd0a3f5a08fa25eb1
+  react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-pager-view: cda3e94765176877702695c4b8c4b5ca69cb2f16
   react-native-safe-area-context: 7e513d737b0b5c1d10bbe0e5fcc9f925a7be144c
   React-nativeconfig: cd0fbb40987a9658c24dab5812c14e5522a64929

@@ -5,31 +5,20 @@ import {
   Box,
   Container,
   Typography,
-  TextField,
   Button,
-  MenuItem,
-  InputLabel,
-  Select,
-  FormControl,
   Tabs,
   Tab,
-  Avatar,
-  IconButton,
   Fade,
 } from "@mui/material";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useRouter } from "next/navigation";
 import { useRegisterMutation, setCredentials } from "@/redux/slice/auth.slice";
 import { useDispatch } from "react-redux";
-import toaster, { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useStep } from "@/hooks/useStep";
 import { useFormHandler } from "@/hooks/useForm";
 import RenderStepForms from "@/components/auth/register/StepForms";
-
-const genders = ["Male", "Female", "Non-binary", "Other"];
-const professions = ["Student", "Engineer", "Designer", "Developer", "Other"];
 
 // Validation Rules
 const validationRules = {
@@ -52,6 +41,7 @@ const validationRules = {
     !value ? "Confirm Password is required." : "",
 };
 
+// region REGISTER COMPONENT
 export default function RegisterPage() {
   const router = useRouter();
   const [register, { isLoading }] = useRegisterMutation();
@@ -80,12 +70,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async () => {
     if (!validateForm()) return;
-  
+
     const formDataToSubmit = {
       ...formData,
       profileImage: undefined, // Skip image in the JSON payload
     };
-  
+
     try {
       console.log("Submitting Data:", formDataToSubmit);
       const response = await register(formDataToSubmit).unwrap();
@@ -113,6 +103,7 @@ export default function RegisterPage() {
     )
   };
 
+  // region Main UI
   return (
     <Container className='register-container'>
       <Box className='leftSection'>

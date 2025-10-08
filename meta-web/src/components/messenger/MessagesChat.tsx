@@ -6,6 +6,7 @@ import { MessageBox } from "react-chat-elements";
 import TopHeading from './TopHeading';
 import MessageSendInput from './MessageSendInput';
 
+// region MESSAGES CHAT
 const MessagesChat = () => {
     const { mode } = useColorScheme();
     const themeClass = mode === 'dark' ? 'dark-theme' : 'light-theme';
@@ -136,8 +137,7 @@ const MessagesChat = () => {
         }
     };
 
-
-
+    // region Main UI
     return (
         <Paper
             elevation={3}

@@ -14,7 +14,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Close, PhotoLibrary } from "@mui/icons-material";
-import { useCreatePostMutation, useFetchPostsQuery, addPosts, setPosts, Post } from "@/redux/slice/post.slice";
+import { useCreatePostMutation, useFetchPostsQuery } from "@/redux/slice/post.slice";
 import { useDispatch, useSelector } from "react-redux";
 import toaster from "react-hot-toast";
 import { AppDispatch } from "@/redux/store";
@@ -27,18 +27,19 @@ interface CreatePostDialogProps {
   onPostCreated: () => void;
 }
 
+// region CREATE POST DIALOG
 export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePostDialogProps) {
   const dispatch = useDispatch<AppDispatch>();
   const [body, setBody] = useState("");
   const [image, setImage] = useState<File | null>(null);
-  const [createPost] = useCreatePostMutation();
+  const [createPost, { isLoading }] = useCreatePostMutation();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { refetch } = useFetchPostsQuery({ page: 1, limit: 5 });
   const data = useSelector((state: {
     posts(arg0: string, posts: any): unknown; postsApi: any
-  }) => state)
-  console.log('data from post model', data.posts);
+  }) => state);
 
+  console.log('data from post model', data.posts);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,7 +67,7 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
     }
   };
 
-
+  // region Main UI
   return (
     <Dialog
       open={open}
@@ -75,6 +76,7 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
       maxWidth="sm"
       PaperProps={{ sx: { borderRadius: 3 } }}
     >
+      {/* ---- TITLE DIALOG ---- */}
       <DialogTitle
         sx={{
           borderBottom: "1px solid rgba(0,0,0,0.1)",
@@ -86,11 +88,13 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
         <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center", fontWeight: "bold" }}>
           Create Post
         </Typography>
+
         <IconButton onClick={() => setOpen(false)} sx={{ color: "rgba(0,0,0,0.7)" }}>
           <Close />
         </IconButton>
       </DialogTitle>
 
+      {/* ---- CONTENT DIALOG ---- */}
       <DialogContent sx={{ pt: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
           <Avatar src={avatarSrc} sx={{ width: 50, height: 50 }} />
@@ -168,6 +172,8 @@ export default function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreat
 
         <Button
           fullWidth
+          loading={isLoading}
+          loadingPosition="start"
           variant="contained"
           onClick={handleSubmit}
           disabled={!body.trim() && !image}

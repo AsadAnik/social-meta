@@ -7,7 +7,7 @@ import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import ReduxProvider from "@/redux/ReduxProvider";
 import { Toaster } from "react-hot-toast";
 import "../styles/main.scss";
-import Notification from "@/components/Notification";
+// import Notification from "@/components/Notification";
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
@@ -21,6 +21,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           rel="stylesheet"
         />
       </head>
+
       <body suppressHydrationWarning>
         <ReduxProvider>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
@@ -35,7 +36,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
                   top: 80,
                 }}
               />
-              <Notification />
+              {/*<Notification />*/}
               {props.children}
             </ThemeProvider>
           </AppRouterCacheProvider>
