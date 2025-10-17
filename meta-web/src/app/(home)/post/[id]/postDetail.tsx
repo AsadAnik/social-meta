@@ -5,7 +5,7 @@ import { useFetchPostQuery } from "@/redux/slice/post.slice";
 import { NotFound } from "@/components/widgets";
 import { TweetCard } from "@/components/common";
 import TweetCardSkeleton from "@/components/widgets/CardSkeletion";
-import CommentsSection from "@/components/CommentSection";
+// import CommentsSection from "@/components/CommentSection";
 
 const PostDetail = () => {
     const { id } = useParams();

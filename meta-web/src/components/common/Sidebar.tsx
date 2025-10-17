@@ -66,6 +66,7 @@ const footerLinks = [
     "Meta Verified",
 ]
 
+// region SIDEBAR COMPONENT
 export default function InstagramSuggestions() {
     const [showAllFooterLinks, setShowAllFooterLinks] = useState(false)
 

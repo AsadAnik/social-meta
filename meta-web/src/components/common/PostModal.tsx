@@ -19,7 +19,6 @@ import { useDispatch, useSelector } from "react-redux";
 import toaster from "react-hot-toast";
 import { AppDispatch } from "@/redux/store";
 
-
 interface CreatePostDialogProps {
   avatarSrc: string;
   open: boolean;

@@ -3,15 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardMedia, CardContent, CardActions, Collapse, Avatar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useRouter } from 'next/navigation';
 import EditPostDialog from './EditModel';
-import { useMediaQuery } from '@mui/material';
 import { useDeletePostMutation, useToggleLikeMutation } from '@/redux/slice/post.slice';
-import { useAddCommentMutation } from '@/redux/slice/comment.slice';
+// import { useAddCommentMutation } from '@/redux/slice/comment.slice';
 import CommentSection from '../CommentSection';
-import { socket } from '@/lib/socket';
+// import { socket } from '@/lib/socket';
 import { IPost } from '@/shared/types';
 
 interface TweetCardProps {
@@ -20,27 +18,19 @@ interface TweetCardProps {
 
 // region CARD COMPONENT
 export default function TweetCard({ post }: TweetCardProps) {
-    const [expanded, setExpanded] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const [likes, setLikes] = useState(post.likes_count);
     const [dislikes, setDislikes] = useState(post.dislikes_count);
     const [comments, setComments] = useState<any[]>([]);
-    const [newComment, setNewComment] = useState("");
 
     const router = useRouter(); // ✅ Initialize router
 
     // Use the deletePost mutation from RTK Query
     const [deletePost] = useDeletePostMutation();
     const [likePost] = useToggleLikeMutation();
-    // const [dislikePost] = useDislikePostMutation();
-    const [addComment] = useAddCommentMutation();
 
-    // Detect screen size
-    const isMobile = useMediaQuery("(max-width: 600px)");
-
-    const handleExpandClick = () => setExpanded(!expanded);
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
@@ -49,11 +39,11 @@ export default function TweetCard({ post }: TweetCardProps) {
         setDislikes(post.dislikes_count);
         setComments([]); // Initialize comments as an empty array
     }, [post]);
+
     const handleEdit = () => {
         setIsEditOpen(true);
         handleClose();
     };
-
 
     const handleTitleClick = () => {
         console.log("Title clicked!");
@@ -63,6 +53,7 @@ export default function TweetCard({ post }: TweetCardProps) {
     const handleDelete = async () => {
         try {
             await deletePost(post._id).unwrap();
+
         } catch (err) {
             console.error("Error deleting post:", err);
         }
@@ -95,34 +86,12 @@ export default function TweetCard({ post }: TweetCardProps) {
             //   message: `Someone liked your post.`,
             // });
           }
+
         } catch (err) {
           console.error("Error liking post:", err);
           setLikes(post.likes_count);
         }
       };
-
-
-
-    // const handleDislike = async () => {
-    //     try {
-    //         // await dislikePost(post._id).unwrap();
-    //         setDislikes((prev) => prev + 1);
-    //     } catch (err) {
-    //         console.error("Error disliking post:", err);
-    //     }
-    // };
-
-    const handleAddComment = async () => {
-        if (newComment.trim()) {
-            try {
-                const response = await addComment({ postId: post._id, comment: newComment }).unwrap();
-                setComments((prev) => [...prev, response]); // Add the new comment to the list
-                setNewComment(""); // Clear the input field
-            } catch (err) {
-                console.error("Error adding comment:", err);
-            }
-        }
-    };
 
     // Create a new post object for editing
     const editPost = {
@@ -145,7 +114,6 @@ export default function TweetCard({ post }: TweetCardProps) {
                 overflow: "hidden", // Prevents scroll issues
             }}
         >
-
             {/* HEADER */}
             <CardHeader
                 avatar={
@@ -172,30 +140,27 @@ export default function TweetCard({ post }: TweetCardProps) {
             </Menu>
 
             {/* MEDIA */}
-            <CardMedia
-                component="img"
-                sx={{
-                    height: "auto",
-                    maxHeight: 220, // Adjust height within the range
-                    objectFit: "cover",
-                    width: "100%", // Prevents overflow issues
-                    maxWidth: "100%",
-                }}
-                image={
-                    post.owner?.profilePhoto === "avatar" || !post.owner?.profilePhoto?.trim()
-                        ? "https://www.stuff.tv/wp-content/uploads/sites/2/2024/09/meta-ai.jpg?w=1080"
-                        : post.owner.profilePhoto
-                }
-                alt={post?.owner?.title || "Default Image"}
-            />
-
+            {(post.image && post.image.trim() !== '') ? (
+                <CardMedia
+                    component="img"
+                    sx={{
+                        height: "auto",
+                        maxHeight: 220, // Adjust height within the range
+                        objectFit: "cover",
+                        width: "100%", // Prevents overflow issues
+                        maxWidth: "100%",
+                    }}
+                    image={post.image}
+                    alt={post?.owner?.title || "Default Image"}
+                />
+            ) : null}
 
             {/* CONTENT */}
             <CardContent>
-                <Typography variant={isMobile ? "h6" : "h5"} color="text.primary" onClick={handleTitleClick}>
+                <Typography variant={"h6"} color="text.primary" onClick={handleTitleClick}>
                     {post?.owner?.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body1" color="text.secondary">
                     {post.content}
                 </Typography>
             </CardContent>
@@ -204,40 +169,9 @@ export default function TweetCard({ post }: TweetCardProps) {
             <CardActions>
                 <IconButton onClick={handleLike}><FavoriteIcon color={likes > post.likes_count ? "primary" : "inherit"} /></IconButton>
                 <Typography>{likes} Likes</Typography>
-                <IconButton onClick={handleExpandClick}><ExpandMoreIcon /></IconButton>
             </CardActions>
-            {/* <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <Typography paragraph>Comments</Typography>
-                    <List>
-                        {Array.isArray(comments) && comments.map((comment, index) => (
-                            <React.Fragment key={index}>
-                                <ListItem>
-                                    <ListItemText primary={comment.text} secondary={comment.user} />
-                                </ListItem>
-                                <Divider />
-                            </React.Fragment>
-                        ))}
-                    </List>
-                    <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
-                        <TextField fullWidth label="Write a comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)} />
-                        <Button variant="contained" onClick={handleAddComment}>Post</Button>
-                    </Box>
-                </CardContent>
-            </Collapse> */}
+
             <CommentSection postId={post._id} initialComments={comments} />
-
-
-            {/* COLLAPSIBLE SECTION */}
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent sx={{ maxHeight: "200px", overflowY: "auto" }}>
-                    <Typography paragraph>Post created on: {new Date(post?.createdAt).toLocaleDateString()}</Typography>
-                    <Typography paragraph>
-                        This is an additional expandable section. You can modify this text to display more details.
-                    </Typography>
-                </CardContent>
-            </Collapse>
-
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (

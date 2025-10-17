@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { TweetCard } from "@/components/common";
 import CreateInput from "@/components/common/CreateInput";
@@ -8,6 +7,7 @@ import TweetCardSkeleton from "@/components/widgets/CardSkeletion";
 import { NotFound } from "@/components/widgets";
 import { useFetchPostsQuery } from "@/redux/slice/post.slice";
 import { IPost } from '@/shared/types';
+
 
 // region HOME COMPONENT
 const Home = () => {
@@ -43,7 +43,7 @@ const Home = () => {
 
     const { loaderRef } = useInfiniteScroll(loadMorePosts, hasMore, isLoading);
 
-    //region Optionally, refresh posts when a new post is created.
+    // region Optionally, refresh posts when a new post is created.
     const refreshPosts = async () => {
         setPage(1);
         setAccumulatedPosts([]);
@@ -73,7 +73,7 @@ const Home = () => {
                 accumulatedPosts.map((post: IPost) => <TweetCard key={post._id} post={{
                     ...post,
                     content: post.content || '',
-                    owner: {...post.owner, _id: post.owner._id || ''}
+                    owner: { ...post.owner, _id: post.owner._id || ''}
                 }} />)
             ) : (
                 !isLoading && <NotFound label="No Post available" />
