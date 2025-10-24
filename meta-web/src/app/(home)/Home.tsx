@@ -15,7 +15,8 @@ const Home = () => {
     const [accumulatedPosts, setAccumulatedPosts] = useState<IPost[]>([]);
 
     // Fetch posts using RTK Query for the current page
-    const { data, isLoading, error, refetch } = useFetchPostsQuery({page, limit: 5});
+    // Use isFetching to track loading state for all requests
+    const { data, isLoading, isFetching, error, refetch } = useFetchPostsQuery({page, limit: 5});
 
     // Extract hasNextPage from the query result
     const hasMore = data?.hasNextPage ?? false;
@@ -25,6 +26,7 @@ const Home = () => {
             if (page === 1) {
                 setAccumulatedPosts(data.posts as unknown as IPost[]);
             } else {
+                // Prevent adding duplicate posts
                 setAccumulatedPosts((prevPosts) => {
                     const newPosts = (data.posts as unknown as IPost[]).filter(
                         (post) => !prevPosts.some((prevPost) => prevPost._id === post._id)
@@ -36,17 +38,18 @@ const Home = () => {
     }, [data, page]);
 
     const loadMorePosts = () => {
-        if (hasMore && !isLoading) {
+        // Check hasMore and isFetching to prevent multiple requests
+        if (hasMore && !isFetching) {
             setPage((prevPage) => prevPage + 1);
         }
     };
 
-    const { loaderRef } = useInfiniteScroll(loadMorePosts, hasMore, isLoading);
+    // Pass isFetching to the infinite scroll hook
+    const { loaderRef } = useInfiniteScroll(loadMorePosts, hasMore, isFetching);
 
     // region Optionally, refresh posts when a new post is created.
     const refreshPosts = async () => {
         setPage(1);
-        setAccumulatedPosts([]);
         await refetch();
     };
 
@@ -58,12 +61,15 @@ const Home = () => {
         return <NotFound label={`Failed to load posts: ${errorMessage}`}/>;
     }
 
+    // A small improvement: show a loading spinner at the bottom when fetching more pages
+    const isFetchingMore = isFetching && page > 1;
+
     // region Main UI
     return (
         <div className="tweets-area">
             <CreateInput userProfileImage="https://via.placeholder.com/150" onPostCreated={refreshPosts}/>
 
-            {/* ---- THE LOADING FOR UI ----- */}
+            {/* ---- THE LOADING FOR UI (Only on initial load) ----- */}
             {isLoading &&
                 Array.from({length: 3}).map((_, index) => <TweetCardSkeleton key={index} />)
             }
@@ -79,7 +85,11 @@ const Home = () => {
                 !isLoading && <NotFound label="No Post available" />
             )}
 
-            <div ref={loaderRef} className="min-h-[50px]" />
+            {/* ---- LOADER FOR INFINITE SCROLL ----- */}
+            {/* The ref is here, and we can show a spinner when fetching more */}
+            <div ref={loaderRef} className="min-h-[50px] flex justify-center items-center">
+                {isFetchingMore && <TweetCardSkeleton />}
+            </div>
         </div>
     );
 };

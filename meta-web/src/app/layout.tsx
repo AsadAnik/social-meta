@@ -13,6 +13,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <title>Social Meta</title>
         {/* Move InitColorSchemeScript inside head */}
         <InitColorSchemeScript attribute="class" />
         {/* Move Google Fonts to head */}
