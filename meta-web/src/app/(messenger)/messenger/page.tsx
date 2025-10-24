@@ -1,4 +1,4 @@
-import { EmptyChat } from '@/components/messenger';
+import { EmptyChat } from '@/components/screens/messenger';
 
 const page = () => {
   return (

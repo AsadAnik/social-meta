@@ -1,6 +1,17 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardMedia, CardContent, CardActions, Collapse, Avatar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
+import {
+    Avatar,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
+    CardMedia,
+    IconButton,
+    Menu,
+    MenuItem,
+    Typography
+} from '@mui/material';
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -17,7 +28,7 @@ interface TweetCardProps {
 }
 
 // region CARD COMPONENT
-export default function TweetCard({ post }: TweetCardProps) {
+export default function TweetCard({post}: TweetCardProps) {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -62,36 +73,36 @@ export default function TweetCard({ post }: TweetCardProps) {
 
     const handleLike = async () => {
         try {
-          const isAlreadyLiked = likes > post.likes_count;
-          setLikes((prev) => (isAlreadyLiked ? prev - 1 : prev + 1));
+            const isAlreadyLiked = likes > post.likes_count;
+            setLikes((prev) => (isAlreadyLiked ? prev - 1 : prev + 1));
 
-          await likePost({ postId: post._id }).unwrap();
+            await likePost({postId: post._id}).unwrap();
 
-          if (!isAlreadyLiked) {
-            console.log("📢 Emitting like notification...", {
-              recipientId: post.owner._id,
-              senderId: "CURRENT_USER_ID",  // Replace with actual logged-in user ID
-              postId: post._id,
-              type: "like",
-              message: `Someone liked your post.`,
-            });
+            if (!isAlreadyLiked) {
+                console.log("📢 Emitting like notification...", {
+                    recipientId: post.owner._id,
+                    senderId: "CURRENT_USER_ID",  // Replace with actual logged-in user ID
+                    postId: post._id,
+                    type: "like",
+                    message: `Someone liked your post.`,
+                });
 
-            // THIS HAVE TO SEND REQUEST FOR EMIT NOTIFICATION
-            // TESTING IS REQUIRED
-            // socket.emit("notification", {
-            //   recipientId: post.owner._id,
-            //   senderId: "CURRENT_USER_ID",
-            //   postId: post._id,
-            //   type: "like",
-            //   message: `Someone liked your post.`,
-            // });
-          }
+                // THIS HAVE TO SEND REQUEST FOR EMIT NOTIFICATION
+                // TESTING IS REQUIRED
+                // socket.emit("notification", {
+                //   recipientId: post.owner._id,
+                //   senderId: "CURRENT_USER_ID",
+                //   postId: post._id,
+                //   type: "like",
+                //   message: `Someone liked your post.`,
+                // });
+            }
 
         } catch (err) {
-          console.error("Error liking post:", err);
-          setLikes(post.likes_count);
+            console.error("Error liking post:", err);
+            setLikes(post.likes_count);
         }
-      };
+    };
 
     // Create a new post object for editing
     const editPost = {
@@ -119,14 +130,14 @@ export default function TweetCard({ post }: TweetCardProps) {
                 avatar={
                     <Avatar
                         src={post?.owner?.profilePhoto || ''}
-                        sx={{ bgcolor: red[500] }}
+                        sx={{bgcolor: red[500]}}
                     >
                         {post?.owner?.firstname[0] || ''}
                     </Avatar>
                 }
                 action={
                     <IconButton aria-label="settings" onClick={handleClick}>
-                        <MoreVertIcon />
+                        <MoreVertIcon/>
                     </IconButton>
                 }
                 title={`${post?.owner?.firstname} ${post?.owner?.lastname} || ${post?.owner?.title}`}
@@ -167,11 +178,13 @@ export default function TweetCard({ post }: TweetCardProps) {
 
             {/* ACTIONS */}
             <CardActions>
-                <IconButton onClick={handleLike}><FavoriteIcon color={likes > post.likes_count ? "primary" : "inherit"} /></IconButton>
+                <IconButton onClick={handleLike}><FavoriteIcon
+                    color={likes > post.likes_count ? "primary" : "inherit"}/></IconButton>
                 <Typography>{likes} Likes</Typography>
             </CardActions>
 
-            <CommentSection postId={post._id} initialComments={comments} />
+            {/* COMMENT SECTION */}
+            <CommentSection postId={post._id} initialComments={comments}/>
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (

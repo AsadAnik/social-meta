@@ -1,12 +1,18 @@
 .skeleton {
+  --skeleton-base-color: #e8e8e8;
+  --skeleton-shimmer-color: #fafafa;
   border-radius: 2px;
   display: block;
   line-height: 100%;
   width: 100%;
-  background-color: #ccc;
   background-size: 1000px 1000px;
-  background-image: linear-gradient(100deg, #e8e8e8 20%, #fafafa 50%, #e8e8e8 60%);
+  background-image: linear-gradient(100deg, var(--skeleton-base-color) 20%, var(--skeleton-shimmer-color) 50%, var(--skeleton-base-color) 60%);
   animation: placeholderShimmer 1.5s linear infinite forwards;
+
+  .dark & {
+    --skeleton-base-color: #333;
+    --skeleton-shimmer-color: #444;
+  }
 }
 
 @keyframes placeholderShimmer {
@@ -21,4 +27,3 @@
 .circle {
   border-radius: 50%;
 }
-

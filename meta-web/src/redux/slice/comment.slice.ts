@@ -1,7 +1,6 @@
-// src/redux/slice/comment.slice.ts
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { axiosInstance } from '@/lib';
 import { postsApi } from './post.slice';
 import { socket } from '@/lib/socket';
@@ -10,10 +9,10 @@ import { socket } from '@/lib/socket';
 interface Comment {
   comment: any;
   success: any;
-  id: string;
+  _id: string;
   postId: string;
   text: string;
-  user: string;
+  user: any; // Can be a user object
   createdAt: string;
 }
 
@@ -37,80 +36,91 @@ const customBaseQuery = async ({ url, method, body }: any) => {
     return { data: result.data };
   } catch (error: unknown) {
     console.error("🚨 API Error:", error);
-
     if (axios.isAxiosError(error)) {
       return {
         error: {
           status: error.response?.status || 500,
-          data: error.response?.data || "Server error",
+          data: error.response?.data || 'Server error',
         },
       };
     }
-
-    return { error: { status: 500, data: "Network error: Server unreachable" } };
+    return { error: { status: 500, data: 'Network error: Server unreachable' } };
   }
 };
-
 
 // RTK Query API definition for comments
 export const commentsApi = createApi({
   reducerPath: 'commentsApi',
   baseQuery: customBaseQuery,
+  tagTypes: ['Comment'],
   endpoints: (builder) => ({
-    getComments: builder.query<Comment[], string>({
+    fetchComments: builder.query<Comment[], string>({
       query: (postId) => `/comments/${postId}`,
+      providesTags: (result, error, postId) => [{ type: 'Comment', id: postId }],
     }),
-    addComment: builder.mutation<Comment, { postId: string; comment: string }>({
+    addComment: builder.mutation<{ comment: Comment }, { postId: string; comment: string }>({
       query: ({ postId, comment }) => ({
         url: `/comments/`,
-        method: "POST",
-        body: { postId, comment }, // Ensure correct data is sent
+        method: 'POST',
+        body: { postId, comment },
       }),
       async onQueryStarted({ postId, comment }, { dispatch, queryFulfilled }) {
+        const tempId = `temp_${Date.now()}`;
         const tempComment = {
-          id: Date.now().toString(),
+          _id: tempId,
           comment,
           postId,
-          user: { name: "You" },
+          user: { name: 'You' }, // Placeholder for optimistic update
           createdAt: new Date().toISOString(),
         };
-    
-        // Optimistically update UI
-        const patchResult = dispatch(
-          postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
-            const post = draft.posts.find((p) => p.id === postId);
+
+        // Optimistically update the list of posts (e.g., on the home feed)
+        const postsListPatch = dispatch(
+          postsApi.util.updateQueryData('fetchPosts', { page: 1, limit: 5 }, (draft) => {
+            const post = draft.posts.find((p) => p._id === postId);
             if (post) {
-              post.comments = [...(post.comments || []), tempComment];
+              post.comments.push(tempComment as any);
+              post.comments_count = (post.comments_count ?? 0) + 1;
             }
           })
         );
-    
+
+        // Optimistically update the single post view
+        const postDetailPatch = dispatch(
+          postsApi.util.updateQueryData('fetchPost', postId, (draft) => {
+            if (draft.post) {
+              draft.post.comments.push(tempComment as any);
+              draft.post.comments_count = (draft.post.comments_count ?? 0) + 1;
+            }
+          })
+        );
+
         try {
           const { data } = await queryFulfilled;
-          if (!data.success) throw new Error("Failed to add comment");
-    
-          // Emit real-time update
-          socket.emit("comment", { postId, comment: data.comment });
-        } catch (error) {
-          console.error("Error adding comment:", error);
-          patchResult.undo();
-        }
-      },    }),    
+          // Invalidate comments for the post to refetch and get the real comment from the server
+          dispatch(commentsApi.util.invalidateTags([{ type: 'Comment', id: postId }]));
 
+          // Emit real-time update after successful API call
+          socket.emit('comment', { postId, comment: data.comment });
+        } catch (error) {
+          console.error('Error adding comment:', error);
+          // If the API call fails, undo both optimistic updates
+          postsListPatch.undo();
+          postDetailPatch.undo();
+        }
+      },
+    }),
   }),
 });
 
 // Export the auto-generated hooks for these endpoints
-export const { useGetCommentsQuery, useAddCommentMutation } = commentsApi;
+export const { useFetchCommentsQuery, useAddCommentMutation } = commentsApi;
 
 // Create a slice for managing local state (optional, if you need to manage local state)
 const commentSlice = createSlice({
   name: 'comments',
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    // Optional: handle some local state logic if necessary
-  },
 });
 
 export default commentSlice.reducer;
