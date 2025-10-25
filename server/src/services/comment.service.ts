@@ -70,7 +70,10 @@ class CommentService {
                 },
             ]);
 
-            return { success: true, ...comments };
+            // Extracting Data & Return
+            const result = comments[0];
+            const total = result.total.length > 0 ? result.total[0].total : 0;
+            return { success: true, data: result.data, total };
 
         } catch (error) {
             console.error(`Error in fetchComments service: ${error}`);
