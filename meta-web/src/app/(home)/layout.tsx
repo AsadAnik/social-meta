@@ -26,6 +26,7 @@ const HomeLayout = (props: { children: React.ReactNode }) => {
                     height: "87vh",
                     overflow: "hidden",
                     position: "relative",
+                    width: isTabletOrMobile ? "auto" : "100vw",
                 }}
             >
                 {/* Sidebar Toggle Buttons (Visible on Small Screens) */}
@@ -68,7 +69,7 @@ const HomeLayout = (props: { children: React.ReactNode }) => {
                     </Box>
                 )}
 
-                {/* Left Sidebar - Drawer for Small Screens */}
+                {/* ==== Left Sidebar - Drawer for Small Screens ==== */}
                 {isTabletOrMobile ? (
                     <Drawer anchor="left" open={openLeftSidebar} onClose={() => setOpenLeftSidebar(false)}>
                         <Box sx={{width: isSmallMobile ? 180 : 250, p: 2}}>
@@ -78,45 +79,44 @@ const HomeLayout = (props: { children: React.ReactNode }) => {
                 ) : (
                     <Box
                         sx={{
-                            width: isUltraWide ? 300 : 250,
+                            width: isUltraWide ? 350 : 400,
                             p: 1,
-                            // borderRight: "1px solid #ddd",
                             flexShrink: 0,
-                            height: "100vh",
-                            position: "relative",
+                            height: "100%",
+                            overflow: "hidden",
                         }}
                     >
                         <ActiveFriends />
                     </Box>
                 )}
 
-                {/* Main Content Area */}
+                {/* ==== Main Content Area ==== */}
                 <Box
                     sx={{
                         flex: 1,
-                        maxWidth: isUltraWide ? 1200 : "100%",
-                        height: "90vh",
+                        maxWidth: isTabletOrMobile ? (isUltraWide ? 1200 : "100%") : "none",
+                        height: "100%",
                         overflowY: "auto",
+                        overflowX: "hidden",
                     }}
                 >
                     {props.children}
                 </Box>
 
-                {/* Right Sidebar - Drawer for Small Screens */}
+                {/* ==== Right Sidebar - Drawer for Small Screens ==== */}
                 {isTabletOrMobile ? (
                     <Drawer anchor="right" open={openRightSidebar} onClose={() => setOpenRightSidebar(false)}>
-                        <Box sx={{width: isSmallMobile ? 220 : 'none', p: 2}}>
+                        <Box sx={{width: isSmallMobile ? 220 : 280, p: 2}}>
                             <Sidebar />
                         </Box>
                     </Drawer>
                 ) : (
                     <Box
                         sx={{
-                            width: isUltraWide ? 400 : 380,
+                            width: isUltraWide ? 400 : 450,
                             // p: 2,
-                            // borderLeft: "1px solid #ddd",
                             flexShrink: 1,
-                            height: "100vh",
+                            height: "100%",
                             overflow: "hidden",
                         }}
                     >

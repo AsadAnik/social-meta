@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessagesChat } from '@/components/messenger';
+import { MessagesChat } from '@/components/screens/messenger';
 
 const Messenger = () => {
   return (

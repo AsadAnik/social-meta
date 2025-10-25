@@ -1,7 +1,7 @@
 // import "react-chat-elements/dist/main.css"; // USING CUSTOM CSS FROM THE LIBRARY FOR DARK MODE IS MISSING INTO THE LIBRARY..
 import React from 'react';
 import { Grid } from '@mui/material';
-import { SidebarChat } from '@/components/messenger';
+import { SidebarChat } from '@/components/screens/messenger';
 
 const MessengerLayout = (props: { children: React.ReactNode }) => {
     return (

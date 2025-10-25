@@ -1,102 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button, List, ListItem, ListItemText, Divider, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Divider, List, ListItem, ListItemText, TextField, Typography, } from '@mui/material';
 import { useAddCommentMutation } from '@/redux/slice/comment.slice';
-import useSocket from '@/hooks/useSocket';
+import CommentModal from './CommentModal';
+import { IComment } from '@/shared/types';
 
 interface CommentSectionProps {
-  postId: string;
-  initialComments: any[];
+    postId: string;
+    commentsCount: number;
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ postId, initialComments }) => {
-  const [comments, setComments] = useState(initialComments);
-  const [newComment, setNewComment] = useState("");
-  const [addComment] = useAddCommentMutation();
+// region COMMENT SECTION
+const CommentSection: React.FC<CommentSectionProps> = ({ postId, commentsCount }) => {
+    const [comments, setComments] = useState<IComment[]>([]);
+    const [newComment, setNewComment] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // Create a new state for the total count
+    const [currentTotalComments, setCurrentTotalComments] = useState<number>(commentsCount);
+    const [addComment, { isLoading: isAddingComment }] = useAddCommentMutation();
 
+    /**
+     * Handles the addition of a new comment to a post.
+     * @async
+     * @function handleAddComment
+     * @returns {Promise<void>} Resolves when the comment is successfully added or handles
+     * the error if the addition fails.
+     */
+    const handleAddComment = async () => {
+        if (newComment.trim()) {
+            try {
+                const response = await addComment({
+                    postId,
+                    comment: newComment,
+                }).unwrap();
 
-  const socket = useSocket("notification", (newNotificationData) => {
-    if (newNotificationData.type === "comment" && newNotificationData.postId === postId) {
-      // Push the entire comment object from the notification
-      setComments((prevComments) => [...prevComments, newNotificationData.comment]);
-    }
-  });
-
-  // If your socket is a shared global instance, you may not want to disconnect on unmount.
-  useEffect(() => {
-    return () => {
-      // Uncomment if you have a dedicated socket instance per component
-      // socket.disconnect();
-    };
-  }, [socket]);
-
-  // Sync initial comments when they change
-  useEffect(() => {
-    setComments(initialComments);
-  }, [initialComments]);
-
-  // Handle adding a new comment
-  const handleAddComment = async () => {
-    if (newComment.trim()) {
-      try {
-        // Send the correct payload: { postId, comment }
-        const response = await addComment({
-          postId,
-          comment: newComment, 
-        }).unwrap();
-
-        console.log("API Response:", response);
-        // The API response is expected to be an object with a "comment" property
-        if (response && response.comment) {
-          // Add the complete comment object from the API response
-          setComments((prev) => [...prev, response.comment]);
-        } else {
-          console.error("Error: No comment returned in the response");
-        }
-        setNewComment("");
-      } catch (err) {
-        console.error("Error adding comment:", err);
-      }
-    }
-  };
-
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 2 }}>
-      <Typography paragraph>Comments</Typography>
-      <List>
-        {Array.isArray(comments) &&
-          comments.map((comment, index) => {
-            if (!comment || typeof comment !== "object") {
-              console.error("Invalid comment format:", comment);
-              return null;
+                if (response && response.comment) {
+                    // Update both the comments list and the total count
+                    setComments((prev) => [...prev, response.comment]);
+                    setCurrentTotalComments((prev) => prev + 1);
+                }
+                setNewComment('');
+            } catch (err) {
+                console.error('Error adding comment:', err);
             }
-            return (
-              <React.Fragment key={comment._id || `comment-${index}`}>
-                <ListItem>
-                  <ListItemText
-                    // Render the comment text. If it's not a string, stringify it.
-                    primary={typeof comment.comment === 'string' ? comment.comment : JSON.stringify(comment.comment)}
-                    // Render the user's name if available; otherwise "Anonymous"
-                    secondary={comment?.user?.name ? comment.user.name : "Anonymous"}
-                  />
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            );
-          })}
-      </List>
-      <Box sx={{ display: "flex", gap: 1 }}>
-        <TextField
-          fullWidth
-          label="Write a comment..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-        />
-        <Button variant="contained" onClick={handleAddComment}>
-          Comment
-        </Button>
-      </Box>
-    </Box>
-  );
+        }
+    };
+
+    const visibleComments: IComment[] = comments.length ? comments.slice(0, 2) : [];
+
+    // region Main UI
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+            <Typography variant="h6">Comments</Typography>
+            <List disablePadding>
+                {visibleComments.map((comment, index) => (
+                    <React.Fragment key={comment._id || `comment-${index}`}>
+                        <ListItem>
+                            <ListItemText
+                                primary={comment.comment}
+                                secondary={comment.user?.name || 'Anonymous'}
+                            />
+                        </ListItem>
+                        <Divider/>
+                    </React.Fragment>
+                ))}
+            </List>
+
+            {/* Use the new state variable for the condition */}
+            {currentTotalComments > 2 && (
+                <Button onClick={() => setIsModalOpen(true)}>
+                    View all {currentTotalComments} comments
+                </Button>
+            )}
+
+            <Box sx={{ display: 'flex', gap: 1 }}>
+                <TextField
+                    fullWidth
+                    label="Write a comment..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                />
+                <Button
+                    variant="contained"
+                    onClick={handleAddComment}
+                    disabled={isAddingComment}
+                    loading={isAddingComment}
+                    // loadingPosition="start"
+                >
+                    Comment
+                </Button>
+            </Box>
+
+            <CommentModal open={isModalOpen} onClose={() => setIsModalOpen(false)} postId={postId}/>
+        </Box>
+    );
 };
 
 export default CommentSection;
