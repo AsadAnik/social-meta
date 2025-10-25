@@ -89,10 +89,10 @@ export default function EditPostDialog({ open, setOpen, post, onPostUpdated }: E
             postData.append('image', image);
         }
 
-        // Log FormData entries for easier debugging
-        for (const entry of postData.entries()) {
-            console.log('formdata entry - ', entry[0], entry[1]);
-        }
+        // // Log FormData entries for easier debugging
+        // postData.forEach((value, key) => {
+        //     console.log('formdata entry - ', key, value);
+        // });
 
         try {
             // updatePost expects { postId, postData } per the RTK Query slice

@@ -10,8 +10,8 @@ class CommentController {
 
     /**
      * ---- Get/Read Comments ----
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Request} req
+     * @param {Response} res
      */
     public async getComments(req: Request, res: Response, next: NextFunction) {
         const postId: string = req.params.postId;
@@ -37,8 +37,8 @@ class CommentController {
 
     /**
      * ---- Create Comment ----
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Request} req
+     * @param {Response} res
      */
     public async createComment(req: Request, res: Response) {
         const { postId, comment } = req.body;
@@ -65,8 +65,8 @@ class CommentController {
 
     /**
      * ---- Update Comment ----
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Request} req
+     * @param {Response} res
      */
     public async updateComment(req: Request, res: Response) {
         const { commentId, comment } = req.body;
@@ -91,8 +91,8 @@ class CommentController {
 
     /**
      * ---- Delete Comment ----
-     * @param {Request} req 
-     * @param {Response} res 
+     * @param {Request} req
+     * @param {Response} res
      */
     public async deleteComment(req: Request, res: Response) {
         const commentId: string = req.params.commentId;

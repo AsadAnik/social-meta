@@ -12,11 +12,9 @@ import { IPost } from '@/shared/types';
 const Home = () => {
     const [page, setPage] = useState<number>(1);
     const [accumulatedPosts, setAccumulatedPosts] = useState<IPost[]>([]);
-
-    const {data, isLoading, isFetching, error, refetch} = useFetchPostsQuery({page, limit: 5});
+    const { data, isLoading, isFetching, error, refetch } = useFetchPostsQuery({ page, limit: 5 });
 
     const hasMore = data?.hasNextPage ?? false;
-
 
     useEffect(() => {
         if (data && data.posts) {
@@ -39,7 +37,7 @@ const Home = () => {
         }
     };
 
-    const {loaderRef} = useInfiniteScroll(loadMorePosts, hasMore, isFetching);
+    const { loaderRef } = useInfiniteScroll(loadMorePosts, hasMore, isFetching);
 
     const refreshPosts = async () => {
         setPage(1);
@@ -64,7 +62,7 @@ const Home = () => {
                 <CreateInput userProfileImage="https://via.placeholder.com/150" onPostCreated={refreshPosts}/>
 
                 {/* Loading Skeletons Initial Posts */}
-                {isLoading && Array.from({length: 3}).map((_, index) => <TweetCardSkeleton key={index}/>)}
+                {isLoading && Array.from({ length: 3 }).map((_, index) => <TweetCardSkeleton key={index}/>)}
 
                 {accumulatedPosts.length > 0 ? (
                     accumulatedPosts.map((post: IPost) => (
@@ -73,7 +71,7 @@ const Home = () => {
                             post={{
                                 ...post,
                                 content: post.content || '',
-                                owner: {...post.owner, _id: post.owner._id || ''},
+                                owner: { ...post.owner, _id: post.owner._id || '' },
                             }}
                         />
                     ))

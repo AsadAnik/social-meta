@@ -93,7 +93,6 @@ class PostController {
     const currentLoggedInUserId = String((req as any).user._id);
     const post: any = {
       content: req.body.content,
-      // image: req.file?.originalname,
       ownerId: currentLoggedInUserId,
       user: new Types.ObjectId(currentLoggedInUserId),
     };

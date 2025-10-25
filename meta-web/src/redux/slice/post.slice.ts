@@ -18,12 +18,12 @@ interface LikeResponse {
 }
 
 // Custom Base Query using Axios
-const customBaseQuery = async ({url, method, data}: any) => {
+const customBaseQuery = async ({ url, method, data }: any) => {
     try {
-        const result = await axiosInstance({url, method, data});
-        return {data: result.data};
+        const result = await axiosInstance({ url, method, data });
+        return { data: result.data };
     } catch (error) {
-        return {error};
+        return { error };
     }
 };
 
@@ -38,7 +38,7 @@ export const postsApi = createApi({
             posts: IPost[];
             hasNextPage: boolean;
         }, { page: number; limit: number }>({
-            query: ({page, limit}) => ({
+            query: ({ page, limit }) => ({
                 url: `/posts?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
@@ -51,7 +51,7 @@ export const postsApi = createApi({
                 url: `/posts/${postId}`,
                 method: "GET",
             }),
-            providesTags: (result, error, id) => [{type: "Post", id}],
+            providesTags: (result, error, id) => [{ type: "Post", id }],
         }),
 
         // region Current User
@@ -74,7 +74,7 @@ export const postsApi = createApi({
 
         // region Upload Profile Pic
         uploadProfilePhoto: builder.mutation({
-            query: ({userId, formData}: { userId: string; formData: FormData }) => ({
+            query: ({ userId, formData }: { userId: string; formData: FormData }) => ({
                 url: `/users/update-photo`,
                 method: 'PATCH',
                 data: formData,
@@ -83,7 +83,7 @@ export const postsApi = createApi({
 
         // region Upload Cover Pic
         uploadCoverPhoto: builder.mutation({
-            query: ({userId, formData}: { userId: string; formData: FormData }) => ({
+            query: ({ userId, formData }: { userId: string; formData: FormData }) => ({
                 url: `/users/update-cover`,
                 method: 'PATCH',
                 data: formData,
@@ -97,7 +97,7 @@ export const postsApi = createApi({
                 method: "POST",
                 data: postData,
             }),
-            async onQueryStarted(postData, {dispatch, queryFulfilled}) {
+            async onQueryStarted(postData, { dispatch, queryFulfilled }) {
                 // Optimistic update: Add a temporary post to the cache
                 const tempPost: Partial<IPost> = {
                     _id: Date.now().toString(),
@@ -118,16 +118,16 @@ export const postsApi = createApi({
                 };
 
                 const patchResult = dispatch(
-                    postsApi.util.updateQueryData("fetchPosts", {page: 1, limit: 5}, (draft) => {
+                    postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
                         draft.posts.unshift(tempPost as IPost);
                     })
                 );
 
                 try {
-                    const {data: newPost} = await queryFulfilled;
+                    const { data: newPost } = await queryFulfilled;
                     // Replace temp post with actual post
                     dispatch(
-                        postsApi.util.updateQueryData("fetchPosts", {page: 1, limit: 5}, (draft) => {
+                        postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
                             const index = draft.posts.findIndex((p) => p._id === tempPost._id);
                             if (index !== -1) {
                                 draft.posts[index] = newPost;
@@ -143,12 +143,12 @@ export const postsApi = createApi({
 
         // region Update Post
         updatePost: builder.mutation<IPost, { postId: string; postData: FormData }>({
-            query: ({postId, postData}) => ({
+            query: ({ postId, postData }) => ({
                 url: `/posts/${postId}`,
                 method: "PUT",
                 data: postData,
             }),
-            invalidatesTags: (result, error, {postId}) => [{type: "Post", id: postId}],
+            invalidatesTags: (result, error, { postId }) => [{ type: "Post", id: postId }],
         }),
 
         // region Delete Post
@@ -157,10 +157,10 @@ export const postsApi = createApi({
                 url: `/posts/${postId}`,
                 method: "DELETE",
             }),
-            async onQueryStarted(postId, {dispatch, queryFulfilled}) {
+            async onQueryStarted(postId, { dispatch, queryFulfilled }) {
                 // Optimistic delete
                 const patchResult = dispatch(
-                    postsApi.util.updateQueryData("fetchPosts", {page: 1, limit: 5}, (draft) => {
+                    postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
                         draft.posts = draft.posts.filter((post) => post._id !== postId);
                     })
                 );
@@ -170,20 +170,20 @@ export const postsApi = createApi({
                     patchResult.undo();
                 }
             },
-            invalidatesTags: (result, error, postId) => [{type: "Post", id: postId}],
+            invalidatesTags: (result, error, postId) => [{ type: "Post", id: postId }],
         }),
 
         // region Toggle Like
         toggleLike: builder.mutation<LikeResponse, { postId: string }>({
-            query: ({postId}) => ({
+            query: ({ postId }) => ({
                 url: `/likes/toggle`,
                 method: "POST",
-                data: {postId},
+                data: { postId },
             }),
-            async onQueryStarted({postId}, {dispatch, queryFulfilled}) {
+            async onQueryStarted({ postId }, { dispatch, queryFulfilled }) {
                 // Optimistic update for like toggle
                 const patchResult = dispatch(
-                    postsApi.util.updateQueryData("fetchPosts", {page: 1, limit: 5}, (draft) => {
+                    postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
                         const post = draft.posts.find((p) => p._id === postId);
                         if (post) {
                             const wasLiked = post.likedByCurrentUser || false;
@@ -194,12 +194,12 @@ export const postsApi = createApi({
                 );
 
                 try {
-                    const {data} = await queryFulfilled;
+                    const { data } = await queryFulfilled;
                     if (!data.success) throw new Error("Failed to toggle like");
 
                     // Emit notification if liked
                     if (data.likeStatus) {
-                        socket.emit("notification", {postId, type: "like"});
+                        socket.emit("notification", { postId, type: "like" });
                     }
                 } catch {
                     patchResult.undo();
@@ -256,7 +256,7 @@ const postSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addMatcher(postsApi.endpoints.fetchPosts.matchFulfilled, (state, action) => {
-                const {posts, hasNextPage} = action.payload;
+                const { posts, hasNextPage } = action.payload;
                 if (state.posts.length === 0) {
                     state.posts = posts;
                 } else {
@@ -277,5 +277,5 @@ const postSlice = createSlice({
     },
 });
 
-export const {setPosts, addPosts, setFetching} = postSlice.actions;
+export const { setPosts, addPosts, setFetching } = postSlice.actions;
 export default postSlice.reducer;

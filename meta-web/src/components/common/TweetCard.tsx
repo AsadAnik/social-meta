@@ -28,13 +28,13 @@ interface TweetCardProps {
 }
 
 // region CARD COMPONENT
-export default function TweetCard({post}: TweetCardProps) {
-    const [isEditOpen, setIsEditOpen] = useState(false);
+const TweetCard = ({ post }: TweetCardProps) => {
+    const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
-    const [likes, setLikes] = useState(post.likes_count);
-    const [dislikes, setDislikes] = useState(post.dislikes_count);
-    const [comments, setComments] = useState<any[]>([]);
+    const [likes, setLikes] = useState<number>(post.likes_count);
+    const [_dislikes, setDislikes] = useState<number>(post.dislikes_count);
+    const [commentsCount, setComments] = useState<number>(post.comments_count);
 
     const router = useRouter(); // ✅ Initialize router
 
@@ -71,6 +71,10 @@ export default function TweetCard({post}: TweetCardProps) {
         handleClose();
     };
 
+    /**
+     * HANDLE LIKE
+     * This will handle to generate likes
+     */
     const handleLike = async () => {
         try {
             const isAlreadyLiked = likes > post.likes_count;
@@ -184,7 +188,7 @@ export default function TweetCard({post}: TweetCardProps) {
             </CardActions>
 
             {/* COMMENT SECTION */}
-            <CommentSection postId={post._id} initialComments={comments}/>
+            <CommentSection postId={post._id} commentsCount={commentsCount} />
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (
@@ -198,3 +202,5 @@ export default function TweetCard({post}: TweetCardProps) {
         </Card>
     )
 }
+
+export default TweetCard;
