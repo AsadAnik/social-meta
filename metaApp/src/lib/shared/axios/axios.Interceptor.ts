@@ -3,6 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { store } from '../../../redux/store';
 import { setCredentials, clearCredentials } from '../../../redux/slice/auth.slice';
 import Toast from 'react-native-toast-message';
+import { Platform } from 'react-native';
+import { debugNetworkRequest, debugNetworkResponse, debugNetworkError } from '../../utils/debugUtils';
+import { API_URL } from '../../../config/environment';
+import { checkNetworkConnectivity, showNetworkError } from '../../utils/networkUtils';
 
 declare global {
   var navigationRef: {
@@ -12,30 +16,30 @@ declare global {
   };
 }
 
-interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
-  _retry?: boolean;
-}
+let isRefreshing: boolean = false;
 
-const API_URL = process.env.REACT_PUBLIC_API_URL ?? 'https://social-meta.onrender.com/api/v1';
-
-let isRefreshing = false;
-let refreshPromise: Promise<string | null> | null = null;
-
+/**
+ * Wait for refresh
+ * @returns The access token
+ */
 const waitForRefresh = () =>
-  new Promise<string | null>((resolve, reject) => {
+  new Promise<string | null>((resolve) => {
     const interval = setInterval(() => {
       if (!isRefreshing) {
         clearInterval(interval);
         resolve(AsyncStorage.getItem('accessToken'));
       }
     }, 200);
-  });
+});
 
-
-// Create Axios instance
+/**
+ * Create Axios instance
+ * @returns The Axios instance
+ */
 const axiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+  timeout: 30000, // 30 seconds timeout
 });
 
 
@@ -43,13 +47,42 @@ const axiosInstance = axios.create({
 // region Request Interceptor
 axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    const isFormData = config.data instanceof FormData;
+    const contentType = config.headers?.['Content-Type'] || config.headers?.['content-type'];
+
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android' && isFormData) {
+      debugNetworkRequest(config);
+    }
+
+    console.log('[REQUEST] - ', config.method?.toUpperCase(), config.url, isFormData ? '[FormData]' : config.data);
+    console.log('[REQUEST-CONTENT-TYPE] - ', contentType);
+
     try {
-      const token = store.getState().auth.accessToken;
+      // Check network connectivity before making request
+      const isConnected = await checkNetworkConnectivity();
+      if (!isConnected) {
+        showNetworkError();
+        return Promise.reject(new Error('No internet connection'));
+      }
+
+      // Fix the linter error by properly typing the store state
+      const state = store.getState() as any;
+      const token = state.auth?.accessToken;
       const accessToken = token ?? await AsyncStorage.getItem('accessToken');
 
       if (accessToken) {
         if (config.headers) {
           config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      }
+
+      // Handle FormData specifically for Android
+      if (isFormData && Platform.OS === 'android') {
+        // Remove Content-Type header to let the browser set it with boundary
+        if (config.headers) {
+          delete config.headers['Content-Type'];
+          delete config.headers['content-type'];
         }
       }
     } catch (error) {
@@ -62,14 +95,62 @@ axiosInstance.interceptors.request.use(
 );
 
 
-
 // Handle Refresh Token Mechanism
 // region Response Interceptor
-
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android') {
+      debugNetworkResponse(response);
+    }
+
+    console.log('[RESPONSE] - ', response.config.url, response.status, response.data);
+    console.log('[RESPONSE STATUS] - ', response.status);
+    console.log('[RESPONSE DATA] - ', response.data);
+    console.log('[RESPONSE HEADERS] - ', response.headers);
+
+    return response;
+  },
   async (error) => {
+    // Debug logging for Android FormData issues
+    if (Platform.OS === 'android') {
+      debugNetworkError(error);
+    }
+
     const originalRequest = error.config;
+
+    // Handle network connectivity errors
+    if (error.message === 'Network Error' || error.code === 'NETWORK_ERROR' || !error.response) {
+      const isConnected = await checkNetworkConnectivity();
+      if (!isConnected) {
+        showNetworkError();
+        return Promise.reject(new Error('No internet connection. Please check your network settings.'));
+      }
+    }
+
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      Toast.show({
+        type: 'error',
+        text1: 'Request Timeout',
+        text2: 'The request took too long. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+      return Promise.reject(error);
+    }
+
+    // Handle server errors (5xx)
+    if (error.response?.status >= 500) {
+      Toast.show({
+        type: 'error',
+        text1: 'Server Error',
+        text2: 'Something went wrong on our end. Please try again later.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -108,10 +189,11 @@ axiosInstance.interceptors.response.use(
       try {
         const storedRefreshToken = await AsyncStorage.getItem('refreshToken');
 
-        if (!storedRefreshToken) throw new Error('No refresh token found');
+        if (!storedRefreshToken) {
+          throw new Error('No refresh token found');
+        }
 
-        const refreshResponse = await axiosInstance.post(
-          `${API_URL}/auth/refresh_token`,
+        const refreshResponse = await axiosInstance.post(`${API_URL}/auth/refresh_token`,
           { refreshToken: storedRefreshToken },
           { headers: { 'Content-Type': 'application/json' } }
         );

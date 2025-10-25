@@ -1,18 +1,13 @@
 import { useEffect, useRef, useCallback, type RefObject } from "react";
 
-export function useInfiniteScroll(
-  callback: () => void,
-  hasMore: boolean,
-  isLoading: boolean
-): { loaderRef: RefObject<HTMLDivElement> } {
+export function useInfiniteScroll(callback: () => void, hasMore: boolean, isLoading: boolean): { loaderRef: RefObject<HTMLDivElement> } {
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  const handleIntersect = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
+  const handleIntersect = useCallback((entries: IntersectionObserverEntry[]) => {
       if (entries[0].isIntersecting && hasMore && !isLoading) {
         callback();
       }
-    },
+    }, 
     [callback, hasMore, isLoading]
   );
 

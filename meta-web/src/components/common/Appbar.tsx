@@ -17,11 +17,11 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Searchbar from '../widgets/Searchbar';
-import { Container, Fab, Fade } from '@mui/material';
+import { Fab, Fade } from '@mui/material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { ModeSwitch } from '@/components/widgets';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useLogoutMutation } from '@/redux/slice/auth.slice';
 import { clearCredentials } from '@/redux/slice/auth.slice';
 import { toast } from 'react-hot-toast';
@@ -30,15 +30,11 @@ import { RootState } from '@/redux/store';
 
 // region AppBar Component
 export default function PrimarySearchAppBar(props: any) {
-
-    const [logout, { isLoading }] = useLogoutMutation();
+    const [logout, {isLoading}] = useLogoutMutation();
     const dispatch = useDispatch();
     const authUser = useSelector((state: RootState) => state.auth.user); // Get user from Redux
-    console.log(authUser?.id);
+    // console.log(authUser?.id);
     const userId = authUser?.id;
-      
-
-    
 
     const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -104,7 +100,7 @@ export default function PrimarySearchAppBar(props: any) {
             }}>
                 <IconButton size="large" color="inherit">
                     <Badge badgeContent={0} color="error">
-                        <AccountBoxIcon />
+                        <AccountBoxIcon/>
                     </Badge>
                 </IconButton>
                 <Typography>
@@ -118,7 +114,7 @@ export default function PrimarySearchAppBar(props: any) {
             }}>
                 <IconButton size="large" color="inherit">
                     <Badge badgeContent={0} color="error">
-                        <SettingsIcon />
+                        <SettingsIcon/>
                     </Badge>
                 </IconButton>
                 <Typography>
@@ -132,7 +128,7 @@ export default function PrimarySearchAppBar(props: any) {
             }}>
                 <IconButton size="large" color="inherit">
                     <Badge badgeContent={0} color="error">
-                        <LogoutIcon />
+                        <LogoutIcon/>
                     </Badge>
                 </IconButton>
                 <Typography>
@@ -163,7 +159,7 @@ export default function PrimarySearchAppBar(props: any) {
             <MenuItem>
                 <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                     <Badge badgeContent={4} color="error">
-                        <MailIcon />
+                        <MailIcon/>
                     </Badge>
                 </IconButton>
                 <p>Messages</p>
@@ -175,7 +171,7 @@ export default function PrimarySearchAppBar(props: any) {
                     color="inherit"
                 >
                     <Badge badgeContent={17} color="error">
-                        <NotificationsIcon />
+                        <NotificationsIcon/>
                     </Badge>
                 </IconButton>
                 <p>Notifications</p>
@@ -207,7 +203,7 @@ export default function PrimarySearchAppBar(props: any) {
 
     // region ScrollTop Component
     function ScrollTop(props: Props) {
-        const { children, window } = props;
+        const {children, window} = props;
         // Note that you normally won't need to set the window ref as useScrollTrigger
         // will default to window.
         // This is only being set here because the demo is in an iframe.
@@ -234,7 +230,7 @@ export default function PrimarySearchAppBar(props: any) {
                 <Box
                     onClick={handleClick}
                     role="presentation"
-                    sx={{ position: 'fixed', bottom: 16, right: 16 }}
+                    sx={{position: 'fixed', bottom: 16, right: 16}}
                 >
                     {children}
                 </Box>
@@ -244,7 +240,7 @@ export default function PrimarySearchAppBar(props: any) {
 
     // region AppBar
     return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{flexGrow: 1}}>
             <AppBar position="fixed" className='appbar'>
                 <Toolbar>
                     {/* Home Icon to Home Page */}
@@ -254,7 +250,7 @@ export default function PrimarySearchAppBar(props: any) {
                         onClick={() => router.push('/')}
                     >
                         <Badge color="error">
-                            <PublicIcon />
+                            <PublicIcon/>
                         </Badge>
                     </IconButton>
 
@@ -262,20 +258,20 @@ export default function PrimarySearchAppBar(props: any) {
                         variant="h6"
                         noWrap
                         component="div"
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
+                        sx={{display: {xs: 'none', sm: 'block'}}}
                     >
                         MUI
                     </Typography>
 
                     {/* SEARCH-BAR COMPONENT */}
-                    <Searchbar />
+                    <Searchbar/>
 
                     {/* MIDDLE GAP COMPONENT */}
-                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{flexGrow: 1}}/>
 
                     {/* ICONS NAVIGATION COMPONENTS */}
                     {/* Desktop View Here */}
-                    <Box sx={{ display: { xs: 'none', md: 'flex', lg: 'flex' } }}>
+                    <Box sx={{display: {xs: 'none', md: 'flex', lg: 'flex'}}}>
                         {/* Mail Icon */}
                         <IconButton
                             size="large"
@@ -284,7 +280,7 @@ export default function PrimarySearchAppBar(props: any) {
                             onClick={() => router.push('/messenger')}
                         >
                             <Badge badgeContent={4} color="error">
-                                <MailIcon />
+                                <MailIcon/>
                             </Badge>
                         </IconButton>
 
@@ -296,7 +292,7 @@ export default function PrimarySearchAppBar(props: any) {
                             onClick={() => router.push('/notifications')}
                         >
                             <Badge badgeContent={17} color="error">
-                                <NotificationsIcon />
+                                <NotificationsIcon/>
                             </Badge>
                         </IconButton>
 
@@ -310,15 +306,15 @@ export default function PrimarySearchAppBar(props: any) {
                             onClick={handleProfileMenuOpen}
                             color="inherit"
                         >
-                            <AccountCircle />
+                            <AccountCircle/>
                         </IconButton>
 
                         {/* Mode Theme Switch */}
-                        <ModeSwitch />
+                        <ModeSwitch/>
                     </Box>
 
                     {/* Mobile View Here */}
-                    <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+                    <Box sx={{display: {xs: 'flex', md: 'none'}}}>
                         <IconButton
                             size="large"
                             aria-label="show more"
@@ -327,25 +323,23 @@ export default function PrimarySearchAppBar(props: any) {
                             onClick={handleMobileMenuOpen}
                             color="inherit"
                         >
-                            <MoreIcon />
+                            <MoreIcon/>
                         </IconButton>
                     </Box>
                 </Toolbar>
             </AppBar>
 
-            <Toolbar id="back-to-top-anchor" />
+            <Toolbar id="back-to-top-anchor"/>
 
             {/* CONTAINER COMPONENT */}
-            <Container>
-                <Box sx={{ my: 2 }}>
-                    {props.children}
-                </Box>
-            </Container>
+            <Box sx={{my: 2}}>
+                {props.children}
+            </Box>
 
             {/* SCROLL TO TOP COMPONENT */}
             <ScrollTop {...props}>
                 <Fab size="small" aria-label="scroll back to top">
-                    <KeyboardArrowUpIcon />
+                    <KeyboardArrowUpIcon/>
                 </Fab>
             </ScrollTop>
 

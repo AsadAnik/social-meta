@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState } from "react"
-import { Box, Typography, Button, IconButton } from "@mui/material"
-import { ChevronDown } from "lucide-react"
-import Image from "next/image"
-import { createTheme, ThemeProvider } from "@mui/material/styles"
+import React, { useState } from "react";
+import { Box, Typography, Button, IconButton } from "@mui/material";
+import { ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 const darkTheme = createTheme({
     palette: {
@@ -66,9 +66,11 @@ const footerLinks = [
     "Meta Verified",
 ]
 
+// region SIDEBAR COMPONENT
 export default function InstagramSuggestions() {
     const [showAllFooterLinks, setShowAllFooterLinks] = useState(false)
 
+    // region Main UI
     return (
         <ThemeProvider theme={darkTheme}>
             <Box sx={{ backgroundColor: "background.default", color: "text.primary", padding: "36px" , }}>
@@ -135,7 +137,7 @@ export default function InstagramSuggestions() {
 
                 {/* Copyright */}
                 <Typography sx={{ fontSize: "12px", color: "text.secondary", marginTop: "8px", textAlign: "center" }}>
-                    © 2025 Instagram from Meta
+                    © 2025 social-meta from asadanik
                 </Typography>
             </Box>
         </ThemeProvider>

@@ -1,28 +1,24 @@
 import React, { useState, useRef } from 'react';
 import {
   ScrollView,
-  FlatList,
   View,
   Text,
   StyleSheet,
   RefreshControl,
-  useWindowDimensions,
   Modal,
   TouchableOpacity,
   Image,
   Alert,
   Animated,
-  ActionSheetIOS,
-  Platform,
 } from 'react-native';
 import ProfileHeaderUI from '../../components/widgets/ProfileHeaderUI.tsx';
 import PostCard from '../../components/widgets/PostCard.tsx';
 import FollowersTab from '../../components/widgets/FollowersTab.tsx';
 import FollowingTab from '../../components/widgets/FollowingTab.tsx';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { launchImageLibrary, launchCamera, ImagePickerResponse, MediaType } from 'react-native-image-picker';
+import { ensureMediaPermission } from '../../lib/utils/permissionUtils';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -84,10 +80,35 @@ const ImagePickerModal = ({ visible, onClose, onImageSelected, title }: any) => 
     }
   }, [visible, slideAnim]);
 
-  const openCamera = () => {
+  const openCamera = async () => {
+    try {
+      // Check camera permission first
+      const hasPermission = await ensureMediaPermission(
+        'camera',
+        () => {
+          // Permission granted - proceed with camera
+          proceedWithCamera();
+        },
+        () => {
+          // Permission denied
+          console.log('Camera permission denied');
+        }
+      );
+
+      // If permission is already granted, proceed immediately
+      if (hasPermission) {
+        proceedWithCamera();
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      Alert.alert('Error', 'Failed to access camera. Please try again.');
+    }
+  };
+
+  const proceedWithCamera = () => {
     const options = {
       mediaType: 'photo' as MediaType,
-      quality: 0.8,
+      quality: 0.8 as const,
       maxWidth: 1000,
       maxHeight: 1000,
     };
@@ -100,10 +121,35 @@ const ImagePickerModal = ({ visible, onClose, onImageSelected, title }: any) => 
     });
   };
 
-  const openGallery = () => {
+  const openGallery = async () => {
+    try {
+      // Check photo library permission first
+      const hasPermission = await ensureMediaPermission(
+        'photo',
+        () => {
+          // Permission granted - proceed with gallery
+          proceedWithGallery();
+        },
+        () => {
+          // Permission denied
+          console.log('Photo library permission denied');
+        }
+      );
+
+      // If permission is already granted, proceed immediately
+      if (hasPermission) {
+        proceedWithGallery();
+      }
+    } catch (error) {
+      console.error('Error accessing photo library:', error);
+      Alert.alert('Error', 'Failed to access photo library. Please try again.');
+    }
+  };
+
+  const proceedWithGallery = () => {
     const options = {
       mediaType: 'photo' as MediaType,
-      quality: 0.8,
+      quality: 0.8 as const,
       maxWidth: 1000,
       maxHeight: 1000,
     };
@@ -133,7 +179,7 @@ const ImagePickerModal = ({ visible, onClose, onImageSelected, title }: any) => 
         <Animated.View
           style={[
             styles.imagePickerContainer,
-            { transform: [{ translateY: slideAnim }] }
+            { transform: [{ translateY: slideAnim }] },
           ]}
         >
           <View style={styles.imagePickerHeader}>
@@ -218,7 +264,7 @@ const EnhancedProfileHeader = ({
 );
 
 // Profile Menu Component
-const ProfileMenu = ({ visible, onClose, onLogout, navigation }: any) => {
+const ProfileMenu = ({ visible, onClose, onLogout, navigation: _navigation }: any) => {
   const slideAnim = useRef(new Animated.Value(-300)).current;
 
   React.useEffect(() => {
@@ -264,7 +310,7 @@ const ProfileMenu = ({ visible, onClose, onLogout, navigation }: any) => {
         <Animated.View
           style={[
             styles.menuContainer,
-            { transform: [{ translateX: slideAnim }] }
+            { transform: [{ translateX: slideAnim }] },
           ]}
         >
           <View style={styles.menuHeader}>

@@ -1,10 +1,10 @@
-import { InputField, InputWrapper } from "../../../styles/AddPostStyles";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Entypo from "react-native-vector-icons/Entypo";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { IconButton } from "../../widgets/Button";
-import React from "react";
+import { InputField, InputWrapper } from '../../../styles/AddPostStyles';
+import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { IconButton } from '../../widgets/Button';
+import React from 'react';
 
 type PostPlaygroundProps = {
   selectedMedia: any;
@@ -16,6 +16,7 @@ type PostPlaygroundProps = {
   placeholerText?: string;
 };
 
+// region Main Component
 const PostPlayground: React.FC<PostPlaygroundProps> = ({ selectedMedia, setSelectedMedia, handleSubmitPost, isSubmitting, textContent, onChangeTextContent, placeholerText = "What's on your mind?" }) => {
   return (
     <InputWrapper>
@@ -34,6 +35,11 @@ const PostPlayground: React.FC<PostPlaygroundProps> = ({ selectedMedia, setSelec
         <View style={styles.mediaPreviewContainer}>
           {selectedMedia.type.includes('image') ? (
             <View style={styles.imagePreview}>
+              <Image
+                source={{ uri: selectedMedia.uri }}
+                style={styles.mediaImage}
+                resizeMode="cover"
+              />
               <TouchableOpacity
                 style={styles.removeMediaButton}
                 onPress={() => setSelectedMedia(null)}
@@ -112,6 +118,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1DA1F2',
     borderRadius: 12,
     padding: 4,
+  },
+  mediaImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
   },
 });
 

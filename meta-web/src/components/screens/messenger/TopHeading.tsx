@@ -1,6 +1,6 @@
 import { useColorScheme } from '@mui/material/styles';
 import { Typography, Avatar, Box } from '@mui/material';
-import { ModeSwitch } from '../widgets';
+import { ModeSwitch } from '../../widgets';
 
 const TopHeading = () => {
   const { mode } = useColorScheme();

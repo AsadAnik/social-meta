@@ -17,10 +17,10 @@ class CommentService {
     /**
      * FETCH COMMENTS SERVICE
      * Aggretation for comments on a post with user info
-     * @param postId 
-     * @param page 
-     * @param limit 
-     * @returns 
+     * @param postId
+     * @param page
+     * @param limit
+     * @returns
      */
     // region Fetch Comments
     public async fetchComments(postId: string, page: number = 1, limit: number = 10): Promise<any> {
@@ -70,7 +70,7 @@ class CommentService {
                 },
             ]);
 
-            return { success: true, comments };
+            return { success: true, ...comments };
 
         } catch (error) {
             console.error(`Error in fetchComments service: ${error}`);
@@ -80,9 +80,9 @@ class CommentService {
 
     /**
      * FETCH COMMENTS SERVICE
-     * @param postId 
-     * @param page 
-     * @param limit 
+     * @param postId
+     * @param page
+     * @param limit
      */
     // region Fetch Comments Old
     public async fetchCommentsOld(postId: string, page: number = 1, limit: number = 10): Promise<any> {
@@ -119,11 +119,11 @@ class CommentService {
 
     /**
      * CREATE COMMENT SERVICE
-     * @param userId 
-     * @param postId 
-     * @param comment 
+     * @param userId
+     * @param postId
+     * @param comment
      * @param io
-     * @returns 
+     * @returns
      */
     // region Create Comment
     public async createComment(userId: string, postId: string, comment: string, io: any): Promise<any> {
@@ -154,7 +154,7 @@ class CommentService {
                     postId,
                     message: 'Someone commented on your post.',
                     comment: newComment,
-                }); 
+                });
             }
 
             return { success: true, message: "Comment created.", comment: newComment };
@@ -167,7 +167,7 @@ class CommentService {
 
     /**
      * UPDATE COMMENT SERVICE
-     * @param commentId 
+     * @param commentId
      */
     // region Update Comment
     public async updateComment(commentId: string, newComment: string): Promise<any> {
@@ -189,7 +189,7 @@ class CommentService {
 
     /**
      * DELETE COMMENT SERVICE
-     * @param commentId 
+     * @param commentId
      */
     // region Delete Comment
     public async deleteComment(commentId: string): Promise<any> {

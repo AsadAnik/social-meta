@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Animated
+  Animated,
 } from 'react-native';
 import { PostCard } from '../../components/widgets';
 import { InstaStoryUI } from '../../components/widgets';
@@ -21,13 +21,14 @@ import {
   useGetAllPostsQuery,
   useCreatePostMutation,
   useDeletePostMutation,
-  useUpdatePostMutation
+  useUpdatePostMutation,
 } from '../../redux/slice/post.slice';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button } from '../../components/widgets/Button';
 
 const LIMIT = 5;
 
+// region Main Component
 const HomeTabScreen = ({ navigation }: any) => {
     const [page, setPage] = useState(1);
     const [posts, setPosts] = useState<any[]>([]);
@@ -45,7 +46,7 @@ const HomeTabScreen = ({ navigation }: any) => {
     const fabAnimation = scrollY.interpolate({
       inputRange: [0, 100],
       outputRange: [0, 100],
-      extrapolate: 'clamp'
+      extrapolate: 'clamp',
     });
 
     // API Hooks
@@ -91,12 +92,12 @@ const HomeTabScreen = ({ navigation }: any) => {
             userImg: owner.profilePhoto ? { uri: owner.profilePhoto } : require('../../assets/images/avatar-male.png'),
             postTime: post.createdAt ? new Date(post.createdAt).toLocaleString() : 'Unknown date',
             post: post.content || '',
-            postImg: null,
+            image: post.image,
             liked: false,
             likes: post.likes_count || 0,
             comments: post.comments_count || 0,
             // Add raw data for editing
-            rawData: post
+            rawData: post,
         };
     };
 
@@ -146,7 +147,7 @@ const HomeTabScreen = ({ navigation }: any) => {
             setIsSubmitting(true);
             await updatePost({
                 id: currentPost._id,
-                content: postContent
+                content: postContent,
             }).unwrap();
             setPostContent('');
             setEditModalVisible(false);
@@ -181,8 +182,8 @@ const HomeTabScreen = ({ navigation }: any) => {
                             console.error('Failed to delete post:', error);
                             Alert.alert('Error', 'Failed to delete post. Please try again.');
                         }
-                    }
-                }
+                    },
+                },
             ]
         );
     };
@@ -218,6 +219,7 @@ const HomeTabScreen = ({ navigation }: any) => {
         navigation.navigate('Post');
     };
 
+    // region UI
     return (
         <Container>
             <KeyboardAvoidingView
@@ -251,48 +253,6 @@ const HomeTabScreen = ({ navigation }: any) => {
                         </View>
                     )}
                 </ScrollView>
-
-                {/* Create Post Modal */}
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={createModalVisible}
-                    onRequestClose={() => setCreateModalVisible(false)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalHeader}>
-                                <Text style={styles.modalTitle}>Create Post</Text>
-                                <TouchableOpacity onPress={() => setCreateModalVisible(false)}>
-                                    <Icon name="close" size={24} color="#333" />
-                                </TouchableOpacity>
-                            </View>
-
-                            <TextInput
-                                style={styles.postInput}
-                                placeholder="What's on your mind?"
-                                multiline
-                                value={postContent}
-                                onChangeText={setPostContent}
-                                autoFocus
-                            />
-
-                            <View style={styles.modalFooter}>
-                                <TouchableOpacity
-                                    style={[styles.postButton, !postContent.trim() && styles.disabledButton]}
-                                    onPress={handleCreatePost}
-                                    disabled={!postContent.trim() || isSubmitting}
-                                >
-                                    {isSubmitting ? (
-                                        <ActivityIndicator size="small" color="#fff" />
-                                    ) : (
-                                        <Text style={styles.postButtonText}>Post</Text>
-                                    )}
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
 
                 {/* Edit Post Modal */}
                 <Modal
@@ -372,6 +332,7 @@ const HomeTabScreen = ({ navigation }: any) => {
     );
 };
 
+// region Style Sheet
 const styles = StyleSheet.create({
     noPostsText: {
         textAlign: 'center',

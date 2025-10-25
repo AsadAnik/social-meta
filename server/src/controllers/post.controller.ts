@@ -52,8 +52,9 @@ class PostController {
 
       res.status(200).json({
         success: true,
-        posts,
+        ...posts,
       });
+
     } catch (error) {
       console.error(`Error in readAllPosts controller: ${error}`);
       next(error);
@@ -71,7 +72,11 @@ class PostController {
     try {
       const posts = await this.postService.specificUserPosts(userId as string);
       if (!posts) res.status(400).json({ success: false, posts });
-      res.status(200).send(posts);
+
+      res.status(200).send({
+        success: true,
+        ...posts
+      });
 
     } catch (error) {
       console.error(`Error in readPost controller: ${error}`);
@@ -88,7 +93,6 @@ class PostController {
     const currentLoggedInUserId = String((req as any).user._id);
     const post: any = {
       content: req.body.content,
-      // image: req.file?.originalname,
       ownerId: currentLoggedInUserId,
       user: new Types.ObjectId(currentLoggedInUserId),
     };

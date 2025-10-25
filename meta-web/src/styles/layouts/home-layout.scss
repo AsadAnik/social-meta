@@ -5,6 +5,7 @@
   width: 100%; // Central content feed width
   margin: 0 auto; // Center horizontally
   padding: 16px; // Padding around the tweets area
+  overflowX: hidden; // Hide horizontal scrollbars
   // background-color: #f5f8fa; // Light background
 
   display: flex;

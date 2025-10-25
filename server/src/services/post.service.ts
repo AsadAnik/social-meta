@@ -1,7 +1,6 @@
 import { Post } from "../models";
 import { BlobStorageUtils } from '../lib/shared';
 
-
 class PostService {
   private readonly postModelRepository: typeof Post;
 
@@ -11,10 +10,10 @@ class PostService {
 
   /**
    * UPLOAD IMAGE FOR POST SERVICE
-   * This is for post service upload and internal function.
-   * @param file 
-   * @param dirName 
-   * @returns 
+   * This is for post-service upload and internal function.
+   * @param file
+   * @param dirName
+   * @returns
    */
   private async uploadImage<T>(file: any, dirName: string = "post_upload"): Promise<T> {
     try {
@@ -58,8 +57,8 @@ class PostService {
    * This is the optimized way of fetching all posts
    * We used aggregate which is better for large set of data fetching
    * Usefull for pagination, searching, filtering, and sorting and also relationships
-   * @param page 
-   * @param limit 
+   * @param page
+   * @param limit
    */
   // region Get All Posts
   public async fetchAllPosts(page: number = 1, limit: number = 5) {
@@ -120,7 +119,6 @@ class PostService {
       const hasPreviousPage = page > 1;
 
       return {
-        success: true,
         posts: result.posts,
         total,
         totalPages,
@@ -167,7 +165,6 @@ class PostService {
       const hasPreviousPage = page > 1;
 
       return {
-        success: true,
         posts: filteredPosts,
         total,
         totalPages,
@@ -247,7 +244,6 @@ class PostService {
       const hasPreviousPage = page > 1;
 
       return {
-        success: true,
         posts: result.posts,
         total,
         totalPages,
@@ -302,8 +298,6 @@ class PostService {
       } else {
         delete postData.image;
       }
-
-      console.log('POST DATA - ', postData);
 
       const updatedPost = await this.postModelRepository.findByIdAndUpdate(postId, postData, { new: true });
       if (!updatedPost) throw new Error("Post not found!");

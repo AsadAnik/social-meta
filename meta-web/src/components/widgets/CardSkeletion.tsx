@@ -1,6 +1,5 @@
 import type React from "react"
 import Skeleton from "@/components/widgets/Skeletion"
-// import styles from "@/styles/components/skeleton.module.scss"
 
 const TweetCardSkeleton: React.FC = () => {
   return (
@@ -10,30 +9,29 @@ const TweetCardSkeleton: React.FC = () => {
         <div className='cardHeader'>
           <Skeleton variant="circle" width={40} height={40} />
           <div className='headerContent'>
-            <Skeleton width={150} height={20} />
-            <Skeleton width={100} height={16} />
+            <Skeleton width={180} height={20} />
+            <Skeleton width={120} height={16} />
           </div>
         </div>
 
         {/* Media */}
-        <Skeleton height={194} />
+        <Skeleton height={200} />
 
         {/* Content */}
         <div className='cardContent'>
-          <Skeleton width={200} height={24} />
-          <Skeleton height={60} />
+          <Skeleton width={250} height={28} />
+          <Skeleton width="100%" height={80} />
         </div>
 
         {/* Actions */}
         <div className='cardActions'>
-          <Skeleton width={24} height={24} />
-          <Skeleton width={50} height={20} />
-          <Skeleton width={24} height={24} />
-          <Skeleton width={50} height={20} />
+          <Skeleton variant="circle" width={40} height={40} />
+          <Skeleton width={60} height={20} />
+          <Skeleton variant="circle" width={40} height={40} />
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default TweetCardSkeleton

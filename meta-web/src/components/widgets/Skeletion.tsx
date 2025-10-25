@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from "react";
 
 type SkeletonProps = {
   width?: string | number
@@ -7,10 +7,8 @@ type SkeletonProps = {
 }
 
 const Skeleton: React.FC<SkeletonProps> = ({ width = "100%", height = "100%", variant = "rect" }) => {
-  const style = { width, height }
-
-  return <span className={`skeleton} ${variant === "circle" ? 'circle' : ""}`} style={style}></span>
+  const style = { width, height };
+  return <span className={`skeleton ${variant === "circle" ? 'circle' : ""}`} style={style}></span>
 }
 
-export default Skeleton
-
+export default Skeleton;

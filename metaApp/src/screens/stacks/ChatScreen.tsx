@@ -7,7 +7,7 @@ import {
   Text,
   Button,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import {
   Container,
@@ -35,6 +35,7 @@ type Message = {
   messageText: string;
 };
 
+// region Messages Demo
 const Messages: Message[] = [
   {
     id: '1',
@@ -82,6 +83,7 @@ type MessagesScreenProps = {
   navigation: any; // Replace `any` with the correct type if you're using a type-safe navigation library like React Navigation
 };
 
+// region Main Component
 const ChatTabScreen: React.FC<MessagesScreenProps> = ({ navigation }) => {
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -95,6 +97,7 @@ const ChatTabScreen: React.FC<MessagesScreenProps> = ({ navigation }) => {
     console.log('handleSheetChanges', index);
   }, []);
 
+  // region UI
   return (
     <>
       <Container>
@@ -107,7 +110,8 @@ const ChatTabScreen: React.FC<MessagesScreenProps> = ({ navigation }) => {
               onPress={() =>
                 navigation.navigate('Messages', { userName: item.userName })
               }
-              onLongPress={handlePresentModalPress}>
+              onLongPress={handlePresentModalPress}
+            >
               <UserInfo>
                 <UserImgWrapper>
                   <UserImg source={item.userImg} />
@@ -193,6 +197,7 @@ const ChatTabScreen: React.FC<MessagesScreenProps> = ({ navigation }) => {
   );
 };
 
+// region Style Sheet
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#D1D1D1',
     width: '100%',
-  }
+  },
 });
 
 export default ChatTabScreen;
