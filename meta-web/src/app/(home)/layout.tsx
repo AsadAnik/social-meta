@@ -1,10 +1,10 @@
 "use client";
+import React, { useState } from "react";
 import { AppBarComponent } from "@/components/common";
 import Sidebar from "@/components/common/Sidebar";
 import ActiveFriends from "@/components/common/ActiveSidebar";
 import { Box, useMediaQuery, Drawer, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
 
 // region LAYOUT COMPONENT
 const HomeLayout = (props: { children: React.ReactNode }) => {
