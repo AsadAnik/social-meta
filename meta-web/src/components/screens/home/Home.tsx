@@ -37,7 +37,7 @@ const Home = () => {
         }
     };
 
-    const { loaderRef } = useInfiniteScroll(loadMorePosts, hasMore, isFetching);
+    const { loaderRef } = useInfiniteScroll({ isLoading: isFetching, hasNextPage: hasMore, onLoadMore: loadMorePosts });
 
     const refreshPosts = async () => {
         setPage(1);

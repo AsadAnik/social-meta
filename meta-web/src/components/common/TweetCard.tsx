@@ -15,12 +15,11 @@ import {
 import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { useRouter } from 'next/navigation';
 import EditPostDialog from './EditModel';
 import { useDeletePostMutation, useToggleLikeMutation } from '@/redux/slice/post.slice';
-// import { useAddCommentMutation } from '@/redux/slice/comment.slice';
-import CommentSection from '../CommentSection';
-// import { socket } from '@/lib/socket';
+import CommentModal from '../CommentModal';
 import { IPost } from '@/shared/types';
 
 interface TweetCardProps {
@@ -30,11 +29,11 @@ interface TweetCardProps {
 // region CARD COMPONENT
 const TweetCard = ({ post }: TweetCardProps) => {
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const [likes, setLikes] = useState<number>(post.likes_count);
-    const [_dislikes, setDislikes] = useState<number>(post.dislikes_count);
-    const [commentsCount, setComments] = useState<number>(post.comments_count);
+    const [commentsCount, setCommentsCount] = useState<number>(post.comments_count);
 
     const router = useRouter(); // ✅ Initialize router
 
@@ -47,8 +46,7 @@ const TweetCard = ({ post }: TweetCardProps) => {
 
     useEffect(() => {
         setLikes(post.likes_count);
-        setDislikes(post.dislikes_count);
-        setComments([]); // Initialize comments as an empty array
+        setCommentsCount(post.comments_count);
     }, [post]);
 
     const handleEdit = () => {
@@ -80,27 +78,7 @@ const TweetCard = ({ post }: TweetCardProps) => {
             const isAlreadyLiked = likes > post.likes_count;
             setLikes((prev) => (isAlreadyLiked ? prev - 1 : prev + 1));
 
-            await likePost({postId: post._id}).unwrap();
-
-            if (!isAlreadyLiked) {
-                console.log("📢 Emitting like notification...", {
-                    recipientId: post.owner._id,
-                    senderId: "CURRENT_USER_ID",  // Replace with actual logged-in user ID
-                    postId: post._id,
-                    type: "like",
-                    message: `Someone liked your post.`,
-                });
-
-                // THIS HAVE TO SEND REQUEST FOR EMIT NOTIFICATION
-                // TESTING IS REQUIRED
-                // socket.emit("notification", {
-                //   recipientId: post.owner._id,
-                //   senderId: "CURRENT_USER_ID",
-                //   postId: post._id,
-                //   type: "like",
-                //   message: `Someone liked your post.`,
-                // });
-            }
+            await likePost({ postId: post._id }).unwrap();
 
         } catch (err) {
             console.error("Error liking post:", err);
@@ -109,10 +87,7 @@ const TweetCard = ({ post }: TweetCardProps) => {
     };
 
     // Create a new post object for editing
-    const editPost = {
-        ...post,
-        content: post.content,
-    };
+    const { comments, ...editPost } = post;
 
     // region Main UI
     return (
@@ -134,7 +109,7 @@ const TweetCard = ({ post }: TweetCardProps) => {
                 avatar={
                     <Avatar
                         src={post?.owner?.profilePhoto || ''}
-                        sx={{bgcolor: red[500]}}
+                        sx={{ bgcolor: red[500] }}
                     >
                         {post?.owner?.firstname[0] || ''}
                     </Avatar>
@@ -185,10 +160,21 @@ const TweetCard = ({ post }: TweetCardProps) => {
                 <IconButton onClick={handleLike}><FavoriteIcon
                     color={likes > post.likes_count ? "primary" : "inherit"}/></IconButton>
                 <Typography>{likes} Likes</Typography>
+
+                <IconButton onClick={() => setIsCommentModalOpen(true)}>
+                    <ChatBubbleOutlineIcon/>
+                </IconButton>
+                <Typography>{commentsCount} Comments</Typography>
             </CardActions>
 
-            {/* COMMENT SECTION */}
-            <CommentSection postId={post._id} commentsCount={commentsCount} />
+            {/* COMMENT MODAL */}
+            {isCommentModalOpen && (
+                <CommentModal
+                    postId={post._id}
+                    open={isCommentModalOpen}
+                    onClose={() => setIsCommentModalOpen(false)}
+                />
+            )}
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (
