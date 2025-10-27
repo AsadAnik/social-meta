@@ -168,8 +168,13 @@ const TweetCard = ({ post }: TweetCardProps) => {
             </CardActions>
 
             {/* COMMENT MODAL */}
-            {isCommentModalOpen && <CommentModal open={isCommentModalOpen} onClose={() => setIsCommentModalOpen(false)}
-                                                 postId={post._id}/>}
+            {isCommentModalOpen && (
+                <CommentModal
+                    postId={post._id}
+                    open={isCommentModalOpen}
+                    onClose={() => setIsCommentModalOpen(false)}
+                />
+            )}
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (

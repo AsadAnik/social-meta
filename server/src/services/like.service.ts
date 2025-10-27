@@ -14,7 +14,6 @@ class LikeService {
         this.notificationService = new NotificationService();
     }
 
-
     /**
      * TOGGLE LIKE SERVICE
      * Aggregates the like data with user info from the database.
@@ -22,8 +21,8 @@ class LikeService {
      * with $project we can select the fields we want to return.
      * with $unwind we can unwind the array.
      * with $match  we can filter the data.
-     * @param postId 
-     * @returns 
+     * @param postId
+     * @returns
      */
     // region Get Post Likes
     public async getPostLikes(postId: string, page: number = 1, limit: number = 10): Promise<any[]> {
@@ -86,7 +85,7 @@ class LikeService {
      * LIKE POST SERVICE
      * Not using this becuase of scalability issue on large data set.
      * We are using the getPostLikes() service instead.
-     * @param postId 
+     * @param postId
      * @returns {Promise<[]>}
      */
     // region Get Post Likes Old
@@ -114,12 +113,16 @@ class LikeService {
 
     /**
      * TOGGLE LIKE SERVICE
-     * @param userId 
-     * @param postId 
+     * @param userId
+     * @param postId
      * @returns {Promise<{ success: boolean, message: string, likeStatus: boolean }>}
      */
-    // region Toggle Like/Dislike 
-    public async toggleLike(userId: string, postId: string, io: any): Promise<{ success: boolean, message: string, likeStatus: boolean }> {
+    // region Toggle Like/Dislike
+    public async toggleLike(userId: string, postId: string, io: any): Promise<{
+        success: boolean,
+        message: string,
+        likeStatus: boolean
+    }> {
         try {
             const existingLike = await this.likeModelRepository.findOne({ userId, postId });
             if (existingLike !== null && existingLike) {
@@ -166,12 +169,16 @@ class LikeService {
 
     /**
      * LIKE POST SERVICE (Private)
-     * @param userId 
-     * @param postId 
-     * @returns 
+     * @param userId
+     * @param postId
+     * @returns
      */
     // region Like Post
-    private async likePost(userId: string, postId: string): Promise<{ success: boolean, message: string, likeStatus: boolean }> {
+    private async likePost(userId: string, postId: string): Promise<{
+        success: boolean,
+        message: string,
+        likeStatus: boolean
+    }> {
         try {
             const newLike = new this.likeModelRepository({ userId, postId });
             await newLike.save();
@@ -189,15 +196,19 @@ class LikeService {
 
     /**
      * DISLIKE POST SERVICE (Private)
-     * @param userId 
-     * @param postId 
-     * @returns 
+     * @param userId
+     * @param postId
+     * @returns
      */
     // region Dislike Post
-    private async dislikePost(userId: string, postId: string): Promise<{ success: boolean, message: string, likeStatus: boolean }> {
+    private async dislikePost(userId: string, postId: string): Promise<{
+        success: boolean,
+        message: string,
+        likeStatus: boolean
+    }> {
         try {
             await this.likeModelRepository.deleteOne({ userId, postId });
-            await this.postModelRepository.findByIdAndUpdate(postId, {
+            await this.postModelRepository.updateOne({ _id: postId, likes_count: { $gt: 0 } }, {
                 $inc: { likes_count: -1 }
             });
 

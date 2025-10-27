@@ -28,7 +28,7 @@ interface CommentModalProps {
 }
 
 // region COMMENT MODAL
-const CommentModal: React.FC<CommentModalProps> = ({ open, onClose, postId }) => {
+const CommentModal: React.FC<CommentModalProps> = ({ postId, open, onClose }) => {
     const [newComment, setNewComment] = useState('');
     const [page, setPage] = useState(1);
     const [comments, setComments] = useState<IComment[]>([]);
@@ -105,7 +105,12 @@ const CommentModal: React.FC<CommentModalProps> = ({ open, onClose, postId }) =>
             </DialogTitle>
 
             <DialogContent dividers sx={{ height: '400px' }}>
-                {isLoading && <CircularProgress/>}
+                {isLoading && (
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '8rem' }}>
+                        <CircularProgress />
+                    </div>
+                )}
+
                 {error && <Typography color="error">Failed to load comments.</Typography>}
                 {comments.length > 0 && (
                     <List>
