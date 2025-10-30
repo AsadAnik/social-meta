@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TweetCard } from '@/components/common';
 import CreateInput from '@/components/common/CreateInput';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
@@ -37,7 +37,7 @@ const Home = () => {
         }
     };
 
-    const { loaderRef } = useInfiniteScroll({ isLoading: isFetching, hasNextPage: hasMore, onLoadMore: loadMorePosts });
+    const { loaderRef } = useInfiniteScroll({ isLoading: isFetching, hasNextPage: hasMore, onLoadMore: loadMorePosts }) as { loaderRef: React.RefObject<HTMLDivElement> };
 
     const refreshPosts = async () => {
         setPage(1);

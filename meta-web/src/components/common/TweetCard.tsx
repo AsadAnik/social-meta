@@ -26,39 +26,51 @@ interface TweetCardProps {
     post: IPost;
 }
 
+type likeType = {
+    liked: boolean;
+    likes_count: number;
+};
+
 // region CARD COMPONENT
 const TweetCard = ({ post }: TweetCardProps) => {
     const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
     const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const [likes, setLikes] = useState<number>(post.likes_count);
-    const [commentsCount, setCommentsCount] = useState<number>(post.comments_count);
+    const [likeObj, setLikeObj] = useState<likeType>({
+        liked: post.likedByCurrentUser || false,
+        likes_count: post.likes_count || 0,
+    });
 
     const router = useRouter(); // ✅ Initialize router
 
     // Use the deletePost mutation from RTK Query
     const [deletePost] = useDeletePostMutation();
-    const [likePost] = useToggleLikeMutation();
+    const [likePost, { isLoading: isLiking }] = useToggleLikeMutation();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
     const handleClose = () => setAnchorEl(null);
 
+    // Sync local state with prop changes to ensure UI is always up-to-date
     useEffect(() => {
-        setLikes(post.likes_count);
-        setCommentsCount(post.comments_count);
-    }, [post]);
+        setLikeObj({
+            liked: post.likedByCurrentUser || false,
+            likes_count: post.likes_count || 0,
+        });
+    }, [post.likedByCurrentUser, post.likes_count]);
 
+    // region Edit Post
     const handleEdit = () => {
         setIsEditOpen(true);
         handleClose();
     };
 
+    // region Click Title
     const handleTitleClick = () => {
         console.log("Title clicked!");
         router.push(`/post/${post._id}`);
     };
 
+    // region Delete Like
     const handleDelete = async () => {
         try {
             await deletePost(post._id).unwrap();
@@ -73,16 +85,25 @@ const TweetCard = ({ post }: TweetCardProps) => {
      * HANDLE LIKE
      * This will handle to generate likes
      */
+    // region Handle Like
     const handleLike = async () => {
+        if (isLiking) return; // Prevent multiple clicks while loading
+
+        const originalState = { ...likeObj }; // Store original state for potential revert
+
+        // Optimistic UI update
+        setLikeObj((prevState: likeType) => ({
+            liked: !prevState.liked,
+            likes_count: prevState.liked ? prevState.likes_count - 1 : prevState.likes_count + 1,
+        }));
+
         try {
-            const isAlreadyLiked = likes > post.likes_count;
-            setLikes((prev) => (isAlreadyLiked ? prev - 1 : prev + 1));
-
             await likePost({ postId: post._id }).unwrap();
-
+            // On success, RTK Query will refetch and the useEffect will sync the state.
         } catch (err) {
             console.error("Error liking post:", err);
-            setLikes(post.likes_count);
+            // On error, revert to the original state.
+            setLikeObj(originalState);
         }
     };
 
@@ -124,7 +145,7 @@ const TweetCard = ({ post }: TweetCardProps) => {
             />
 
             {/* Options Menu */}
-            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
                 <MenuItem onClick={handleEdit}>Edit</MenuItem>
                 <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
@@ -157,14 +178,21 @@ const TweetCard = ({ post }: TweetCardProps) => {
 
             {/* ACTIONS */}
             <CardActions>
-                <IconButton onClick={handleLike}><FavoriteIcon
-                    color={likes > post.likes_count ? "primary" : "inherit"}/></IconButton>
-                <Typography>{likes} Likes</Typography>
+                {/* LIKE BUTTON & COUNTS TEXT */}
+                <IconButton
+                    onClick={handleLike}
+                    disabled={isLiking}
+                    color={likeObj.liked ? 'primary' : 'default'}
+                >
+                    <FavoriteIcon/>
+                </IconButton>
+                <Typography>{likeObj.likes_count} Likes</Typography>
 
+                {/* COMMENT BUTTON & COUNTS TEXT */}
                 <IconButton onClick={() => setIsCommentModalOpen(true)}>
                     <ChatBubbleOutlineIcon/>
                 </IconButton>
-                <Typography>{commentsCount} Comments</Typography>
+                <Typography>{post.comments_count} Comments</Typography>
             </CardActions>
 
             {/* COMMENT MODAL */}
