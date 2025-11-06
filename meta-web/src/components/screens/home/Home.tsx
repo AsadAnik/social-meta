@@ -59,10 +59,10 @@ const Home = () => {
     return (
         <>
             <div className="tweets-area">
-                <CreateInput userProfileImage="https://via.placeholder.com/150" onPostCreated={refreshPosts}/>
+                <CreateInput userProfileImage="https://via.placeholder.com/150" onPostCreated={refreshPosts} />
 
                 {/* Loading Skeletons Initial Posts */}
-                {isLoading && Array.from({ length: 3 }).map((_, index) => <TweetCardSkeleton key={index}/>)}
+                {isLoading && Array.from({ length: 3 }).map((_, index) => <TweetCardSkeleton key={index} />)}
 
                 {accumulatedPosts.length > 0 ? (
                     accumulatedPosts.map((post: IPost) => (

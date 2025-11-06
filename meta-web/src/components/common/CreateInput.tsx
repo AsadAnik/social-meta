@@ -1,7 +1,6 @@
-import * as React from "react";
-import {useState} from "react";
-import {InputBase, Avatar, Card} from "@mui/material";
-import {useTheme} from "@mui/material/styles";
+import React, { useState } from "react";
+import { Avatar, Card, InputBase } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import CreatePostDialog from "./PostModal";
 
 interface CreateInputProps {
@@ -10,7 +9,7 @@ interface CreateInputProps {
 }
 
 // region INPUT COMPONENT
-const CreateInput: React.FC<CreateInputProps> = ({userProfileImage, onPostCreated}) => {
+const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreated }) => {
     const [open, setOpen] = useState(false);
     const theme = useTheme();
 
@@ -25,7 +24,7 @@ const CreateInput: React.FC<CreateInputProps> = ({userProfileImage, onPostCreate
                     p: 2,
                     display: "flex",
                     alignItems: "center",
-                    width: "100%",
+                    width: "fit-content",
                     maxWidth: 650,
                     minWidth: 600,
                     borderRadius: "16px",
@@ -40,7 +39,7 @@ const CreateInput: React.FC<CreateInputProps> = ({userProfileImage, onPostCreate
                 <Avatar
                     alt="User Profile"
                     src={userProfileImage}
-                    sx={{width: 48, height: 48, mr: 2}}
+                    sx={{ width: 48, height: 48, mr: 2 }}
                 />
                 <InputBase
                     sx={{
@@ -60,12 +59,13 @@ const CreateInput: React.FC<CreateInputProps> = ({userProfileImage, onPostCreate
                         },
                     }}
                     placeholder="What's on your mind?"
-                    inputProps={{"aria-label": "What's on your mind?"}}
+                    inputProps={{ "aria-label": "What's on your mind?" }}
                     onClick={handlePaperClick}
                     readOnly
                 />
             </Card>
 
+            {/* ==== CREATE POST DIALOG CONTENT ==== */}
             <CreatePostDialog
                 avatarSrc={userProfileImage}
                 open={open}
