@@ -1,5 +1,5 @@
-import NetInfo from '@react-native-community/netinfo';
-import Toast from 'react-native-toast-message';
+import NetInfo from "@react-native-community/netinfo";
+import Toast from "react-native-toast-message";
 
 let isNetworkErrorShown: boolean = false;
 
@@ -12,7 +12,7 @@ export const checkNetworkConnectivity = async (): Promise<boolean> => {
     const state = await NetInfo.fetch();
     return state.isConnected === true && state.isInternetReachable === true;
   } catch (error) {
-    console.error('Error checking network connectivity:', error);
+    console.error("Error checking network connectivity:", error);
     return false;
   }
 };
@@ -24,13 +24,13 @@ export const showNetworkError = () => {
   if (!isNetworkErrorShown) {
     isNetworkErrorShown = true;
     Toast.show({
-      type: 'error',
-      text1: 'No Internet Connection',
-      text2: 'Please check your network connection and try again.',
-      position: 'top',
+      type: "error",
+      text1: "No Internet Connection",
+      text2: "Please check your network connection and try again.",
+      position: "top",
       visibilityTime: 4000,
     });
-    
+
     // Reset flag after 5 seconds to allow showing again
     setTimeout(() => {
       isNetworkErrorShown = false;
@@ -43,10 +43,10 @@ export const showNetworkError = () => {
  */
 export const showNetworkRestored = () => {
   Toast.show({
-    type: 'success',
-    text1: 'Connection Restored',
-    text2: 'You are back online!',
-    position: 'top',
+    type: "success",
+    text1: "Connection Restored",
+    text2: "You are back online!",
+    position: "top",
     visibilityTime: 3000,
   });
 };
@@ -56,10 +56,11 @@ export const showNetworkRestored = () => {
  */
 export const initializeNetworkListener = () => {
   let wasOffline = false;
-  
+
   NetInfo.addEventListener(state => {
-    const isOnline = state.isConnected === true && state.isInternetReachable === true;
-    
+    const isOnline =
+      state.isConnected === true && state.isInternetReachable === true;
+
     if (!isOnline && !wasOffline) {
       wasOffline = true;
       showNetworkError();
@@ -84,7 +85,7 @@ export const getCurrentNetworkState = async () => {
  */
 export const isOnWifi = async (): Promise<boolean> => {
   const state = await NetInfo.fetch();
-  return state.type === 'wifi';
+  return state.type === "wifi";
 };
 
 /**
@@ -93,7 +94,7 @@ export const isOnWifi = async (): Promise<boolean> => {
  */
 export const isOnCellular = async (): Promise<boolean> => {
   const state = await NetInfo.fetch();
-  return state.type === 'cellular';
+  return state.type === "cellular";
 };
 
 /**
@@ -101,21 +102,21 @@ export const isOnCellular = async (): Promise<boolean> => {
  */
 export const showNetworkTypeInfo = async () => {
   const state = await NetInfo.fetch();
-  let networkType = 'Unknown';
-  
-  if (state.type === 'wifi') {
-    networkType = 'WiFi';
-  } else if (state.type === 'cellular') {
-    networkType = 'Cellular Data';
-  } else if (state.type === 'none') {
-    networkType = 'No Connection';
+  let networkType = "Unknown";
+
+  if (state.type === "wifi") {
+    networkType = "WiFi";
+  } else if (state.type === "cellular") {
+    networkType = "Cellular Data";
+  } else if (state.type === "none") {
+    networkType = "No Connection";
   }
-  
+
   Toast.show({
-    type: 'info',
-    text1: 'Network Status',
+    type: "info",
+    text1: "Network Status",
     text2: `Connected via ${networkType}`,
-    position: 'top',
+    position: "top",
     visibilityTime: 3000,
   });
-}; 
+};

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/**
+ * The Global Middleware Function for Application
+ * @param req
+ */
 export function middleware(req: NextRequest) {
-    const accessToken = req.headers.get("authorization")?.split(" ")[1]; 
+    const accessToken = req.headers.get("authorization")?.split(" ")[1];
 
-    const publicPaths = ["/login", "/register"]; 
+    const publicPaths = ["/login", "/register"];
     const protectedPaths = ["/dashboard", "/profile", "/settings"];
 
     const { pathname } = req.nextUrl;
@@ -18,10 +22,10 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    return NextResponse.next(); 
+    return NextResponse.next();
 }
 
 // 🌍 Apply middleware to specific paths
 export const config = {
-    matcher: ["/login", "/register", "/dashboard", "/profile", "/settings"], 
+    matcher: ["/login", "/register", "/dashboard", "/profile", "/settings"],
 };
