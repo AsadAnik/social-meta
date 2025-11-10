@@ -1,13 +1,14 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models";
 import { BlobStorageUtils } from "../lib/shared";
+import { IUser } from '../lib/type';
 
 class UserController {
     /**
      * ---- Show All Users ----
-     * @param {Request} req 
-     * @param {Response} res 
-     * @param {NextFunction} next 
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
      */
     public async showUsers(_req: Request, res: Response | any, next: NextFunction) {
         try {
@@ -50,9 +51,7 @@ class UserController {
             );
 
             if (!updatedUser)
-                return res
-                    .status(404)
-                    .json({ isUpdate: false, message: "User not found" });
+                return res.status(404).json({ isUpdate: false, message: "User not found" });
 
             res.status(200).json({
                 isUpdate: true,
@@ -78,10 +77,7 @@ class UserController {
         try {
             const user = await User.findById(userId);
 
-            if (!user)
-                return res
-                    .status(404)
-                    .json({ isUserFound: false, message: "User not found!" });
+            if (!user) return res.status(404).json({ isUserFound: false, message: "User not found!" });
 
             res.status(200).json({
                 isUserFound: true,
@@ -113,17 +109,32 @@ class UserController {
      * @param {Request} req
      * @param {Response} res
      */
-    public profileAuth(req: Request, res: Response) {
+    public profileAuth = (req: Request, res: Response): void => {
+        const { _id, email, firstname, lastname, title, profilePhoto, themeMode, colorMode } = (req as any).user as IUser;
+
+        console.log('user here - ', {
+            _id,
+            email,
+            firstname,
+            lastname,
+            title,
+            profilePhoto,
+            themeMode,
+            colorMode,
+        });
+
         res.status(200).json({
             isAuth: true,
-            id: (req as any).user._id,
-            email: (req as any).user.email,
-            firstname: (req as any).user.firstname,
-            lastname: (req as any).user.lastname,
-            title: (req as any).user.title,
-            profilePhoto: (req as any).user.profilePhoto,
-            themeMode: (req as any).user.themeMode,
-            colorMode: (req as any).user.colorMode,
+            user: {
+                _id,
+                email,
+                firstname,
+                lastname,
+                title,
+                profilePhoto,
+                themeMode,
+                colorMode,
+            }
         });
     }
 
@@ -136,17 +147,13 @@ class UserController {
         try {
             const userId = (req as any).user?._id;
             if (!userId) {
-                return res
-                    .status(400)
-                    .json({ success: false, message: "User ID is required" });
+                return res.status(400).json({ success: false, message: "User ID is required" });
             }
 
             // Ensure a file is attached
             const file = req.file; // Your file should be available in `req.file`
             if (!file) {
-                return res
-                    .status(400)
-                    .json({ success: false, message: "No file uploaded" });
+                return res.status(400).json({ success: false, message: "No file uploaded" });
             }
 
             // Upload file to Cloudinary
@@ -233,4 +240,5 @@ class UserController {
         }
     }
 }
+
 export default UserController;
