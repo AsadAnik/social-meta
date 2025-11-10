@@ -89,7 +89,7 @@ class PostController {
    * @param req
    * @param res
    */
-  public createPost = async (req: Request, res: Response) => {
+  public createPost = async (req: Request, res: Response): Promise<void> => {
     const currentLoggedInUserId = String((req as any).user._id);
     const post: any = {
       content: req.body.content,
