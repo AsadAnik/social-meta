@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import { Avatar, Card, InputBase } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import CreatePostDialog from "./PostModal";
+import PostFormModal from "@/components/common/TweetModal/PostFormModal"; // Corrected import path
+import { useSelector } from 'react-redux';
+import { RootState } from "@/redux/store"; // Import RootState for selector typing
 
 interface CreateInputProps {
-    userProfileImage: string;
     onPostCreated: () => void;
 }
 
 // region INPUT COMPONENT
-const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreated }) => {
+const CreateInput: React.FC<CreateInputProps> = ({ onPostCreated }) => {
     const [open, setOpen] = useState(false);
     const theme = useTheme();
+    // Correctly select the user object from the Redux state
+    const { data: currentUser } = useSelector((state: RootState) => state.user);
 
     const handlePaperClick = () => setOpen(true);
 
@@ -38,7 +41,7 @@ const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreat
             >
                 <Avatar
                     alt="User Profile"
-                    src={userProfileImage}
+                    src={currentUser?.profilePhoto || ''} // Use user data from selector
                     sx={{ width: 48, height: 48, mr: 2 }}
                 />
                 <InputBase
@@ -58,7 +61,7 @@ const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreat
                                 : theme.palette.grey[200],
                         },
                     }}
-                    placeholder="What's on your mind?"
+                    placeholder={`What's on your mind, ${currentUser?.firstname || ''}?`}
                     inputProps={{ "aria-label": "What's on your mind?" }}
                     onClick={handlePaperClick}
                     readOnly
@@ -66,12 +69,16 @@ const CreateInput: React.FC<CreateInputProps> = ({ userProfileImage, onPostCreat
             </Card>
 
             {/* ==== CREATE POST DIALOG CONTENT ==== */}
-            <CreatePostDialog
-                avatarSrc={userProfileImage}
-                open={open}
-                setOpen={setOpen}
-                onPostCreated={onPostCreated}
-            />
+            {/* Pass the user object to the modal */}
+            {open && currentUser && (
+                <PostFormModal
+                    mode="create"
+                    open={open}
+                    setOpen={setOpen}
+                    onPostUpdated={onPostCreated}
+                    currentUser={currentUser}
+                />
+            )}
         </>
     );
 };

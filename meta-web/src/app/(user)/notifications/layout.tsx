@@ -1,6 +1,6 @@
 import { AppBarComponent } from '@/components/common';
 import { Box } from '@mui/material';
-import ActiveFriends from '@/components/common/ActiveSidebar';
+import ActiveFriends from '@/components/common/Sidebar/ActiveSidebar';
 
 const NotificationLayout = (props: { children: React.ReactNode }) => {
     return (

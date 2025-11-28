@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { TweetCard } from '@/components/common';
-import CreateInput from '@/components/common/CreateInput';
+import CreateInput from '@/components/common/TweetCard/CreateInput';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import TweetCardSkeleton from '@/components/widgets/CardSkeletion';
 import { NotFound } from '@/components/widgets';
@@ -59,7 +59,7 @@ const Home = () => {
     return (
         <>
             <div className="tweets-area">
-                <CreateInput userProfileImage="https://via.placeholder.com/150" onPostCreated={refreshPosts} />
+                <CreateInput onPostCreated={refreshPosts} />
 
                 {/* Loading Skeletons Initial Posts */}
                 {isLoading && Array.from({ length: 3 }).map((_, index) => <TweetCardSkeleton key={index} />)}

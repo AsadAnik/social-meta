@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import {
     Avatar,
@@ -17,9 +17,9 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { useRouter } from 'next/navigation';
-import EditPostDialog from './EditModel';
+import PostFormModal from '../TweetModal/PostFormModal';
 import { useDeletePostMutation, useToggleLikeMutation } from '@/redux/slice/post.slice';
-import CommentModal from '../CommentModal';
+import CommentModal from '../../CommentModal';
 import { IPost } from '@/shared/types';
 
 interface TweetCardProps {
@@ -206,8 +206,9 @@ const TweetCard = ({ post }: TweetCardProps) => {
 
             {/* EDIT POST DIALOG */}
             {isEditOpen && (
-                <EditPostDialog
+                <PostFormModal
                     open={isEditOpen}
+                    mode="edit"
                     setOpen={setIsEditOpen}
                     post={editPost}
                     onPostUpdated={() => console.log("Post updated! Refresh UI here")}
