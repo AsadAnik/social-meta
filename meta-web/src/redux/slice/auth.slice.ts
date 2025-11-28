@@ -1,11 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createApi } from "@reduxjs/toolkit/query/react";
+import { createSlice } from "@reduxjs/toolkit";
 import toaster from "react-hot-toast";
 import axiosInstance from "@/lib/axios.interceptor";
-
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
 
 // region Axios instance with default configuration
 const customBaseQuery = async ({ url, method, data }: any) => {
@@ -117,8 +113,6 @@ const authSlice = createSlice({
   reducers: {
     // region Set Credentials
     setCredentials: (state, action) => {
-      console.log('action', action);
-
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.user = action.payload.user;

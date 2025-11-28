@@ -42,7 +42,11 @@ export const postsApi = createApi({
                 url: `/posts?page=${page}&limit=${limit}`,
                 method: "GET",
             }),
-            providesTags: ["Post"],
+            // Provide a list of tags for the fetched posts
+            providesTags: (result) =>
+                result
+                    ? [...result.posts.map(({ _id }) => ({ type: 'Post' as const, id: _id })), { type: 'Post', id: 'LIST' }]
+                    : [{ type: 'Post', id: 'LIST' }],
         }),
 
         // region Fetch Post
@@ -97,48 +101,8 @@ export const postsApi = createApi({
                 method: "POST",
                 data: postData,
             }),
-            async onQueryStarted(postData, { dispatch, queryFulfilled }) {
-                // Optimistic update: Add a temporary post to the cache
-                const tempPost: Partial<IPost> = {
-                    _id: Date.now().toString(),
-                    content: postData.get("content") as string || "",
-                    body: "",
-                    createdAt: new Date().toISOString(),
-                    likes_count: 0,
-                    dislikes_count: 0,
-                    comments_count: 0,
-                    image: "",
-                    owner: {
-                        _id: "temp",
-                        firstname: "Current", // TODO: Replace with actual current user data
-                        lastname: "User",
-                        profilePhoto: "https://via.placeholder.com/150",
-                        title: "User",
-                    },
-                };
-
-                const patchResult = dispatch(
-                    postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
-                        draft.posts.unshift(tempPost as IPost);
-                    })
-                );
-
-                try {
-                    const { data: newPost } = await queryFulfilled;
-                    // Replace temp post with actual post
-                    dispatch(
-                        postsApi.util.updateQueryData("fetchPosts", { page: 1, limit: 5 }, (draft) => {
-                            const index = draft.posts.findIndex((p) => p._id === tempPost._id);
-                            if (index !== -1) {
-                                draft.posts[index] = newPost;
-                            }
-                        })
-                    );
-                } catch {
-                    patchResult.undo();
-                }
-            },
-            invalidatesTags: ["Post"],
+            // When a post is created, invalidate the 'LIST' tag to refetch the posts list.
+            invalidatesTags: [{ type: 'Post', id: 'LIST' }],
         }),
 
         // region Update Post
@@ -148,7 +112,8 @@ export const postsApi = createApi({
                 method: "PUT",
                 data: postData,
             }),
-            invalidatesTags: (result, error, { postId }) => [{ type: "Post", id: postId }],
+            // When a post is updated, invalidate its specific tag and the list tag.
+            invalidatesTags: (result, error, { postId }) => [{ type: 'Post', id: postId }, { type: 'Post', id: 'LIST' }],
         }),
 
         // region Delete Post

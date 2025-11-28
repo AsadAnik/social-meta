@@ -41,7 +41,7 @@ const customBaseQuery = async ({ url, method, body }: { url: string; method: str
     }
 };
 
-// region COMMENT API SLICE
+// region COMMENT API
 export const commentsApi = createApi({
     reducerPath: 'commentsApi',
     baseQuery: customBaseQuery,
@@ -58,7 +58,7 @@ export const commentsApi = createApi({
                 method: 'GET',
                 body: undefined,
             }),
-            transformResponse: (response: { data: IComment[], total: number }, meta, arg) => ({
+            transformResponse: (response: { data: IComment[], total: number }, _meta, arg) => ({
                 comments: response.data,
                 hasNextPage: arg.page * arg.limit < response.total,
             }),
@@ -95,6 +95,7 @@ export const commentsApi = createApi({
 
 export const { useFetchCommentsQuery, useLazyFetchCommentsQuery, useAddCommentMutation } = commentsApi;
 
+// region COMMENT SLICE
 const commentSlice = createSlice({
     name: 'comments',
     initialState,

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { AppBarComponent } from "@/components/common";
-import Sidebar from "@/components/common/Sidebar";
-import ActiveFriends from "@/components/common/ActiveSidebar";
+import Sidebar from "@/components/common/Sidebar/Sidebar";
+import ActiveFriends from "@/components/common/Sidebar/ActiveSidebar";
 import { Box, useMediaQuery, Drawer, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 
@@ -79,7 +79,7 @@ const HomeLayout = (props: { children: React.ReactNode }) => {
                 ) : (
                     <Box
                         sx={{
-                            width: isUltraWide ? 350 : 400,
+                            width: isUltraWide ? 400 : 350,
                             p: 1,
                             flexShrink: 0,
                             height: "100%",
@@ -113,7 +113,7 @@ const HomeLayout = (props: { children: React.ReactNode }) => {
                 ) : (
                     <Box
                         sx={{
-                            width: isUltraWide ? 400 : 450,
+                            width: isUltraWide ? 450 : 400,
                             // p: 2,
                             flexShrink: 1,
                             height: "100%",
