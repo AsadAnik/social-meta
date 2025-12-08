@@ -3,17 +3,16 @@ import { User } from '../models';
 class UserService {
     private readonly userModelRepository: typeof User;
 
-    constructor(userModelRepository: typeof User = User) {
-        this.userModelRepository = userModelRepository;
+    constructor(userModel_repository: typeof User = User) {
+        this.userModelRepository = userModel_repository;
     }
-
 
     /**
      * UPDATE USER INFORMATIONS
      * Find user by Id and then update informations
-     * @param userId 
-     * @param userInfo 
-     * @returns 
+     * @param userId
+     * @param userInfo
+     * @returns
      */
     // region Update User-Info
     public async updateUserInfo(userId: string, userInfo: any) {
@@ -40,6 +39,23 @@ class UserService {
 
         } catch (error) {
             console.error(`Error occcured while register user: ${error}`);
+            throw error;
+        }
+    }
+
+    /**
+     * GET FOLLOW SUGGESTED USERS
+     * Get follow suggested users
+     * @returns
+     */
+    // region Get Follow Suggested
+    public async getFollowSuggestedUsers(): Promise<unknown> {
+        try {
+            const followSuggestedUsers = await this.userModelRepository.find({}).select('_id firstname lastname email title profilePhoto');
+            return followSuggestedUsers;
+
+        } catch (error) {
+            console.error(`Error occured while get follow suggested users: ${error}`);
             throw error;
         }
     }
