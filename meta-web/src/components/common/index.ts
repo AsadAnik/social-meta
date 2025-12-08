@@ -1,2 +1,2 @@
-export { default as AppBarComponent } from './Appbar';
-export { default as TweetCard } from './TweetCard';
+export { default as AppBarComponent } from './Appbar/Appbar';
+export { default as TweetCard } from './TweetCard/TweetCard';

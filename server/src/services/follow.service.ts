@@ -36,21 +36,21 @@ class FollowService {
             await this.followerFollowingModelRepository.create({ followerId, followingId, status: 'pending' });
 
             // Send Notification and Save to DB for Notification Data save..
-            const notification = await this.notificationService.createNotification({
-                recipientId: followingId,
-                senderId: followerId,
-                type: "follow_request",
-                message: "You got a recent follower!"
-            } as INotification);
+            // const notification = await this.notificationService.createNotification({
+            //     recipientId: followingId,
+            //     senderId: followerId,
+            //     type: "follow_request",
+            //     message: "You got a recent follower!"
+            // } as INotification);
 
             // region Socket IO-TO 
-            io.to(followerId.toString()).emit('notification', {
-                message: notification.message,
-                senderId: followerId,
-                followingId,
-                type: notification.type,
-                createdAt: notification.createdAt,
-            });
+            // io.to(followerId.toString()).emit('notification', {
+            //     message: notification.message,
+            //     senderId: followerId,
+            //     followingId,
+            //     type: notification.type,
+            //     createdAt: notification.createdAt,
+            // });
 
             return { success: true, message: 'Follow request sent' };
 
@@ -88,22 +88,22 @@ class FollowService {
             await this.userService.updateUserInfo(followerId, { $inc: { followings_count: 1 } });
             await this.userService.updateUserInfo(followingId, { $inc: { followers_count: 1 } });
 
-            // Send notificaiton to follower..
-            const notification = await this.notificationService.createNotification({
-                recipientId: followerId,
-                senderId: followingId,
-                type: "follow_accept",
-                message: "Your follow request was accepted!",
-            } as INotification);
+            // Send notificaiton to follower.
+            // const notification = await this.notificationService.createNotification({
+            //     recipientId: followerId,
+            //     senderId: followingId,
+            //     type: "follow_accept",
+            //     message: "Your follow request was accepted!",
+            // } as INotification);
 
             // region Socket IO-TO
-            io.to(followingId.toString()).emit('notification', {
-                message: notification.message,
-                senderId: followingId,
-                followerId,
-                type: notification.type,
-                createdAt: notification.createdAt
-            });
+            // io.to(followingId.toString()).emit('notification', {
+            //     message: notification.message,
+            //     senderId: followingId,
+            //     followerId,
+            //     type: notification.type,
+            //     createdAt: notification.createdAt
+            // });
 
             return { success: true, message: 'Follow request accepted' };
 
@@ -132,21 +132,21 @@ class FollowService {
             if (!followRequest) throw new Error('Follow request not found or already handled');
 
             // Send notification for Rejected
-            const notification = await this.notificationService.createNotification({
-                recipientId: requesterId,
-                senderId: userId,
-                type: "follow_reject",
-                message: "Your follow request was rejected!",
-            } as INotification);
+            // const notification = await this.notificationService.createNotification({
+            //     recipientId: requesterId,
+            //     senderId: userId,
+            //     type: "follow_reject",
+            //     message: "Your follow request was rejected!",
+            // } as INotification);
 
             // region Socket IO-TO
-            io.to(userId.toString()).emit('notification', {
-                message: notification.message,
-                senderId: userId,
-                type: notification.type,
-                requesterId,
-                createdAt: notification.createdAt
-            });
+            // io.to(userId.toString()).emit('notification', {
+            //     message: notification.message,
+            //     senderId: userId,
+            //     type: notification.type,
+            //     requesterId,
+            //     createdAt: notification.createdAt
+            // });
 
             return { success: true, message: 'Follow request rejected' };
 
@@ -184,6 +184,59 @@ class FollowService {
             throw error;
         }
     };
+
+    /**
+     * GET FOLLOW REQUESTS
+     * @param userId
+     * @param type - 'sent' or 'received'
+     * @param page
+     * @param limit
+     */
+    // region Follow Request
+    public async followRequest(userId: string, type: 'sent' | 'received' = 'received', page: number = 1, limit: number = 10) {
+        try {
+            const skip = (page - 1) * limit;
+            const matchField = type === 'sent' ? 'followerId' : 'followingId';
+            const lookupField = type === 'sent' ? 'followingId' : 'followerId';
+            const asField = type === 'sent' ? 'following' : 'follower';
+
+            const followRequests = await this.followerFollowingModelRepository.aggregate([
+                {
+                    $match: {
+                        [matchField]: new mongoose.Types.ObjectId(userId),
+                        status: 'pending'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: lookupField,
+                        foreignField: '_id',
+                        as: asField
+                    }
+                },
+                { $unwind: `$${asField}` },
+                {
+                    $project: {
+                        _id: `$${asField}._id`,
+                        firstname: `$${asField}.firstname`,
+                        lastname: `$${asField}.lastname`,
+                        email: `$${asField}.email`,
+                        profilePhoto: `$${asField}.profilePhoto`,
+                        requestedAt: '$createdAt'
+                    }
+                },
+                { $skip: skip },
+                { $limit: limit }
+            ]);
+
+            return followRequests;
+
+        } catch (error) {
+            console.log(`Error occured while follow requests check: ${error}`);
+            throw error;
+        }
+    }
 
     /**
      * GET FOLLOWERS

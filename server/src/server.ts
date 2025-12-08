@@ -14,7 +14,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// DB Connection and server Listening..
+// DB Connection and server Listening.
 connectDB(DB_URI)
     .then(() => {
         console.log('------ Database is connected! -------');

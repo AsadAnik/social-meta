@@ -35,5 +35,5 @@ const notificationSlice = createSlice({
     },
 });
 
-export const {addNotification, markAsRead, deleteNotification} = notificationSlice.actions;
+export const { addNotification, markAsRead, deleteNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;

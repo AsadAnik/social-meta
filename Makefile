@@ -34,10 +34,10 @@ server-down:
 
 # Database Management
 db:
-	docker-compose up mongodb
-
-db-detach:
 	docker-compose up mongodb -d
 
-down-db:
+db-inspect:
+	docker-compose up mongodb
+
+db-down:
 	docker-compose down mongodb

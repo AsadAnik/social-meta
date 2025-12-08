@@ -1,46 +1,69 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-    Avatar,
-    Box,
-    Button,
     Dialog,
-    DialogContent,
     DialogTitle,
+    DialogContent,
+    Avatar,
     IconButton,
-    Stack,
+    Button,
     TextField,
+    Box,
     Typography,
+    Stack,
 } from "@mui/material";
 import { Close, PhotoLibrary } from "@mui/icons-material";
-import { useCreatePostMutation, useFetchPostsQuery } from "@/redux/slice/post.slice";
-import { useDispatch, useSelector } from "react-redux";
+import { useCreatePostMutation, useUpdatePostMutation } from "@/redux/slice/post.slice";
 import toaster from "react-hot-toast";
-import { AppDispatch } from "@/redux/store";
+import { IUser, IPost } from '@/shared/types';
+import { TextUtils } from '@/shared/utils';
 
-interface CreatePostDialogProps {
-    avatarSrc: string;
+interface PostFormModalProps {
     open: boolean;
     setOpen: (value: boolean) => void;
-    onPostCreated: () => void;
+    onPostUpdated?: () => void;
+    mode: 'create' | 'edit';
+    post?: IPost; // Required for 'edit' mode
+    currentUser?: IUser | null; // User for 'create' mode
 }
 
-// region CREATE POST DIALOG
-function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePostDialogProps) {
-    const dispatch = useDispatch<AppDispatch>();
-    const [body, setBody] = useState("");
+// region POST FORM MODAL
+const PostFormModal = ({ open, setOpen, onPostUpdated, mode, post, currentUser }: PostFormModalProps) => {
+    const [content, setContent] = useState("");
     const [image, setImage] = useState<File | null>(null);
-    const [createPost, { isLoading }] = useCreatePostMutation();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const { refetch } = useFetchPostsQuery({ page: 1, limit: 5 });
-    const data = useSelector((state: {
-        posts(arg0: string, posts: any): unknown; postsApi: any
-    }) => state);
 
-    console.log('data from post model', data.posts);
+    const [createPost, { isLoading: isCreating }] = useCreatePostMutation();
+    const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
 
-    // region Image Change
+    const isEditMode = mode === 'edit';
+    const isLoading = isCreating || isUpdating;
+
+    // region EFFECTS
+    // Pre-fill state when modal opens for editing
+    useEffect(() => {
+        if (open) {
+            if (isEditMode && post) {
+                setContent(post.content);
+                setImagePreview(post.image || null);
+            } else {
+                setContent("");
+                setImagePreview(null);
+            }
+            setImage(null);
+        }
+    }, [open, post, isEditMode]);
+
+    // Clean up the image preview URL to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (imagePreview && imagePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
+
+    // region Image Change Handle
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -49,25 +72,48 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
         }
     };
 
-    // region Submit Post
+    // region Submit Handle
     const handleSubmit = async () => {
-        if (!body.trim()) return;
+        if (!content.trim()) {
+            toaster.error("Content cannot be empty.");
+            return;
+        }
 
         const postData = new FormData();
-        postData.append("content", body);
-        if (image) postData.append("file", image);
+        postData.append('content', content);
+
+        if (image) {
+            postData.append('image', image);
+        }
 
         try {
-            await createPost(postData).unwrap();
-            onPostCreated();
-            toaster.success("Post created successfully!");
+            if (isEditMode && post) {
+                await updatePost({ postId: post._id, postData }).unwrap();
+                toaster.success("Post updated successfully!");
 
+            } else {
+                await createPost(postData).unwrap();
+                toaster.success("Post created successfully!");
+            }
+
+            onPostUpdated?.();
             setOpen(false);
-            await refetch();
+
         } catch (error) {
-            toaster.error("Failed to create post.");
+            console.error("Error:", error);
+            toaster.error(`Failed to ${mode} post. Try again.`);
         }
     };
+
+    // Determine which user's info to display based on the mode.
+    const userToDisplay = isEditMode ? post?.owner : currentUser;
+    const dialogTitle = isEditMode ? "Edit Post" : "Create Post";
+    const buttonText = isEditMode ? "Update" : "Post";
+
+    // Don't render the modal if the necessary user info isn't available yet.
+    if (!userToDisplay) {
+        return null;
+    }
 
     // region Main UI
     return (
@@ -78,7 +124,6 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
             maxWidth="sm"
             PaperProps={{ sx: { borderRadius: 3 } }}
         >
-            {/* ---- TITLE DIALOG ---- */}
             <DialogTitle
                 sx={{
                     borderBottom: "1px solid rgba(0,0,0,0.1)",
@@ -88,39 +133,49 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
                 }}
             >
                 <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center", fontWeight: "bold" }}>
-                    Create Post
+                    {dialogTitle}
                 </Typography>
-
                 <IconButton onClick={() => setOpen(false)} sx={{ color: "rgba(0,0,0,0.7)" }}>
                     <Close/>
                 </IconButton>
             </DialogTitle>
 
-            {/* ---- CONTENT DIALOG ---- */}
             <DialogContent sx={{ pt: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-                    <Avatar src={avatarSrc} sx={{ width: 50, height: 50 }}/>
+                {/* ==== MODAL HEADING ==== */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2, mt: 2 }}>
+                    <Avatar
+                        src={userToDisplay.profilePhoto || "https://via.placeholder.com/150"}
+                        sx={{ width: 50, height: 50 }}
+                    />
                     <Box>
                         <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                            Yaseen Arafat
+                            <span>{TextUtils.capitalizedTextFormat(userToDisplay.firstname)}</span>
+                            <span>{" "}</span>
+                            <span>{TextUtils.capitalizedTextFormat(userToDisplay.lastname)}</span>
+                        </Typography>
+
+                        <Typography variant="body2" sx={{ color: "gray" }}>
+                            {TextUtils.capitalizedTextFormat(userToDisplay.title)}
                         </Typography>
                     </Box>
                 </Box>
 
+                {/* ==== POST FIELD ==== */}
                 <TextField
                     fullWidth
                     multiline
                     rows={4}
-                    placeholder="What's on your mind?"
+                    placeholder={isEditMode ? "Edit your post..." : "What's on your mind?"}
                     variant="standard"
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
                     InputProps={{
                         disableUnderline: true,
                         sx: { fontSize: "1.25rem", p: 1, borderRadius: 1 },
                     }}
                 />
 
+                {/* ==== CLOSE MODAL ==== */}
                 {imagePreview && (
                     <Box
                         sx={{
@@ -155,7 +210,7 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
                         justifyContent: "space-between",
                     }}
                 >
-                    <Typography>Add to your post</Typography>
+                    <Typography>{isEditMode ? "Change image" : "Add to your post"}</Typography>
                     <Stack direction="row" spacing={1}>
                         <input
                             accept="image/*"
@@ -174,11 +229,9 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
 
                 <Button
                     fullWidth
-                    loading={isLoading}
-                    loadingPosition="start"
                     variant="contained"
                     onClick={handleSubmit}
-                    disabled={!body.trim() && !image}
+                    disabled={!content.trim() || isLoading}
                     sx={{
                         mt: 2,
                         textTransform: "none",
@@ -188,11 +241,11 @@ function CreatePostDialog({ avatarSrc, open, setOpen, onPostCreated }: CreatePos
                         "&:hover": { bgcolor: "#145db2" },
                     }}
                 >
-                    Post
+                    {buttonText}
                 </Button>
             </DialogContent>
         </Dialog>
     );
 }
 
-export default CreatePostDialog;
+export default PostFormModal;
