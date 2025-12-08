@@ -34,6 +34,13 @@ router.post('/reject-follow', followController.rejectFollowRequest);
 router.post('/unfollow', followController.unfollowUser);
 
 /**
+ * ---- Follow Request ----
+ * When you want to see your follow requests
+ */
+// region GET /follow-request
+router.get('/follow-requests', followController.followRequest);
+
+/**
  * ---- Get Followers ----
  * When you want to see your followers
  */

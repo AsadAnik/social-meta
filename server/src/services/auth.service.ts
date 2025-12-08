@@ -8,6 +8,8 @@ class AuthService {
     private readonly bcryptUtils: BcryptUtils;
     private readonly tokenUtils: TokenUtils;
     private readonly sessionService: SessionService;
+    private readonly accessTokenExpires: string = process.env.ACCESS_TOKEN_EXPIRES ?? '10m';
+    private readonly refreshTokenExpires: string = process.env.REFRESH_TOKEN_EXPIRES ?? '7d';
 
     constructor(userModelRepository: typeof User = User) {
         this.userModelRepository = userModelRepository;
@@ -39,12 +41,14 @@ class AuthService {
             const user = await this.userModelRepository.findOne({ email: userInfo.email });
             if (!user) return { success: false, message: 'Invalid Credentials!' };
 
+            console.log('REFRESH AND ACCESS TOKEN HERE - ', this.refreshTokenExpires, this.accessTokenExpires);
+
             const isPasswordMatch = await this.bcryptUtils.comparePassword(userInfo.password, user.password);
             if (!isPasswordMatch) return { success: false, message: 'Invalid Credentials!' };
 
             // Generate Token (Access & Refresh)
-            const accessToken = this.tokenUtils.generateToken({ id: user._id, email: user.email }, '10m');
-            const refreshToken = this.tokenUtils.generateToken({ id: user._id }, '7d');
+            const accessToken = this.tokenUtils.generateToken({ id: user._id, email: user.email }, this.accessTokenExpires);
+            const refreshToken = this.tokenUtils.generateToken({ id: user._id }, this.refreshTokenExpires);
 
             // Update..
             user.refreshToken = refreshToken;

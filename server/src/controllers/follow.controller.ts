@@ -46,6 +46,8 @@ class FollowController {
             const followingId = (req as any)?.user._id;
             const io = (req as any)?.io;
 
+            console.log('FOLLOWING AND FOLLWER - ', followerId, followingId);
+
             // Accept Follow Request from Service
             const acceptFollowRequest = await this.followService.acceptFollowRequest(followingId, followerId, io);
             if (!acceptFollowRequest) {
@@ -109,6 +111,34 @@ class FollowController {
             next({ status: 400, message: error });
         }
     }
+
+    /**
+     * ---- Follow Request ----
+     * @param req
+     * @param res
+     * @param next
+     */
+    public followRequest = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any)?.user._id || req.params.userId;
+            const { page, limit, type } = req.query;
+
+            // Convert page and limit to numbers
+            const pageNum = page ? parseInt(page as string) : 1;
+            const limitNum = limit ? parseInt(limit as string) : 10;
+            const requestType = (type === 'sent' || type === 'received') ? type : 'received';
+
+            const followRequest = await this.followService.followRequest(userId, requestType, pageNum, limitNum);
+            if (!followRequest) {
+                return next({ status: 400, message: 'Failed to get follow requests' });
+            }
+
+            res.status(200).json({ message: 'Follow Requests list fetched successfully', followRequest });
+
+        } catch (error) {
+            next({ status: 400, message: error });
+        }
+    };
 
     /**
      * ---- Get Followers ----
