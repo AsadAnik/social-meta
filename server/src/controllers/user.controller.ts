@@ -2,8 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models";
 import { BlobStorageUtils } from "../lib/shared";
 import { IUser } from '../lib/type';
+import { UserService } from '../services';
 
 class UserController {
+    private readonly userService: UserService;
+
+    constructor() {
+        this.userService = new UserService();
+    }
+
     /**
      * ---- Show All Users ----
      * @param {Request} req
@@ -237,6 +244,26 @@ class UserController {
             } else {
                 res.status(500).json({ success: false, message: "An unknown error occurred" });
             }
+        }
+    }
+
+    /**
+     * ---- Get Follows Suggested ----
+     * @param req
+     * @param res
+     * @param next
+     */
+    public getFollowsSuggested = async (_req: Request, res: Response, next: NextFunction) => {
+        try {
+            const followSuggestedUsers = await this.userService.getFollowSuggestedUsers();
+            if (!followSuggestedUsers) {
+                return next({ status: 400, message: 'No users found' });
+            }
+
+            res.status(200).json({ message: 'Follow suggested users fetched successfully', followSuggestedUsers });
+
+        } catch (error: any) {
+            next({ status: 400, message: error.message });
         }
     }
 }

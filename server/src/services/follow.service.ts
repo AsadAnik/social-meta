@@ -1,17 +1,17 @@
 import { FollowerFollowing } from '../models';
 import NotificationService from './notification.service';
 import UserService from './user.service';
-import { INotification } from '../models/Notification';
+// import { INotification } from '../models/Notification';
 import mongoose from 'mongoose';
 
 class FollowService {
     private readonly followerFollowingModelRepository: typeof FollowerFollowing;
-    private readonly notificationService: NotificationService;
+    // private readonly notificationService: NotificationService;
     private readonly userService: UserService;
 
     constructor(followerFollowingModelRepository: typeof FollowerFollowing = FollowerFollowing) {
         this.followerFollowingModelRepository = followerFollowingModelRepository;
-        this.notificationService = new NotificationService();
+        // this.notificationService = new NotificationService();
         this.userService = new UserService();
     }
 

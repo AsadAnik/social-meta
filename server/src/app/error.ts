@@ -20,10 +20,11 @@ const notFoundMiddleware = (_req: Request, _res: Response, next: NextFunction) =
  * @param {Error} error 
  * @param {express.Request} _req 
  * @param {express.Response} res 
+ * @param {express.NextFunction} next
  * @returns 
  */
 // region Error Handle
-const errorHandlerMiddleware = (error: any, _req: Request, res: Response | any) => {
+const errorHandlerMiddleware = (error: any, _req: Request, res: Response | any, _next: NextFunction) => {
     console.log('I am here who is responsible for error handling');
     const status = (error as any).status || 500;
     const message = error.message || "Something went wrong!";
